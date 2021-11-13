@@ -55,14 +55,8 @@ typedef enum {
     BUMPED_BOTH,
 
     //black tape sensors on the bottom
-    BT_FOUND_FRONT,
-    BT_LOST_FRONT,
-    BT_FOUND_REAR,
-    BT_LOST_REAR,
-    BT_FOUND_LEFT,
-    BT_LOST_LEFT,
-    BT_FOUND_RIGHT,
-    BT_LOST_RIGHT,
+    ON_BT,
+    OFF_BT,
 
     //Black tape sensors on the shooter
     BT_FOUND_SHOOTER_1,
@@ -79,7 +73,7 @@ typedef enum {
     BALLSHOT,
     LOADED,
     FOUND_BEACON,
-    FOUND_TRACK_WIRE
+    FOUND_TRACK_WIRE,
 
 } ES_EventTyp_t;
 
@@ -100,14 +94,8 @@ static const char *EventNames[] = {
     "BUMPED_BOTH",
 
     //black tape sensors on the bottom
-    "BT_FOUND_FRONT",
-    "BT_LOST_FRONT",
-    "BT_FOUND_REAR",
-    "BT_LOST_REAR",
-    "BT_FOUND_LEFT",
-    "BT_LOST_LEFT",
-    "BT_FOUND_RIGHT",
-    "BT_LOST_RIGHT",
+    "ON_BT",
+    "OFF_BT",
 
     //Black tape sensors on the shooter
     "BT_FOUND_SHOOTER_1",
@@ -124,7 +112,7 @@ static const char *EventNames[] = {
     "BALLSHOT",
     "LOADED",
     "FOUND_BEACON",
-    "FOUND_TRACK_WIRE"
+    "FOUND_TRACK_WIRE",
 };
 
 
@@ -132,11 +120,11 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This are the name of the Event checking function header file.
-#define EVENT_CHECK_HEADER "EventChecker.h"
+#define EVENT_CHECK_HEADER "EventCheckers.h"
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  TemplateCheckBattery
+#define EVENT_CHECK_LIST  TapeSensorEventChecker
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
@@ -144,9 +132,9 @@ static const char *EventNames[] = {
 // a timers, then you can use TIMER_UNUSED
 #define TIMER_UNUSED ((pPostFunc)0)
 #define TIMER0_RESP_FUNC TIMER_UNUSED
-#define TIMER1_RESP_FUNC Turn_Timer_Helper
-#define TIMER2_RESP_FUNC Forward_Timer_Helper
-#define TIMER3_RESP_FUNC Reverse_Timer_Helper
+#define TIMER1_RESP_FUNC TIMER_UNUSED
+#define TIMER2_RESP_FUNC TIMER_UNUSED
+#define TIMER3_RESP_FUNC TIMER_UNUSED
 #define TIMER4_RESP_FUNC TIMER_UNUSED
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
@@ -179,7 +167,21 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 8
+#define NUM_SERVICES 1
+
+///****************************************************************************/
+//// These are the definitions for Service 0, the lowest priority service
+//// every Events and Services application must have a Service 0. Further 
+//// services are added in numeric sequence (1,2,3,...) with increasing 
+//// priorities
+//// the header file with the public fuction prototypes
+//#define SERV_0_HEADER "TopLevel.h"
+//// the name of the Init function
+//#define SERV_0_INIT InitTopLevel
+//// the name of the run function
+//#define SERV_0_RUN RunTopLevel
+//// How big should this service's Queue be?
+//#define SERV_0_QUEUE_SIZE 9
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service
@@ -187,11 +189,11 @@ static const char *EventNames[] = {
 // services are added in numeric sequence (1,2,3,...) with increasing 
 // priorities
 // the header file with the public fuction prototypes
-#define SERV_0_HEADER "TopLevel.h"
+#define SERV_0_HEADER "ES_KeyboardInput.h"
 // the name of the Init function
-#define SERV_0_INIT InitTopLevel
+#define SERV_0_INIT InitKeyboardInput
 // the name of the run function
-#define SERV_0_RUN RunTopLevel
+#define SERV_0_RUN RunKeyboardInput
 // How big should this service's Queue be?
 #define SERV_0_QUEUE_SIZE 9
 
@@ -300,12 +302,14 @@ static const char *EventNames[] = {
 // These are the definitions for the Distribution lists. Each definition
 // should be a comma seperated list of post functions to indicate which
 // services are on that distribution list.
-#define NUM_DIST_LISTS 1 
+#define NUM_DIST_LISTS 0 
 
 //Horace added 11/12:
 // for now I will only put posttoplevel.
 // This wrapper function only returns True or False depending on the Queue status
 // We probably don't need it at all
+//Luca added 11/12:
+// Hoarce my guy. What is this?
 
 #if NUM_DIST_LISTS > 0 
 #define DIST_LIST0 PostTopLevel

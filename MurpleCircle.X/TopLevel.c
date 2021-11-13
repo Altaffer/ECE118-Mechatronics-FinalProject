@@ -30,8 +30,8 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "BOARD.h"
-#include "TemplateHSM.h"
-#include "TemplateSubHSM.h" //#include all sub state machines called
+//#include "TemplateHSM.h"
+//#include "TemplateSubHSM.h" //#include all sub state machines called
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
  ******************************************************************************/
@@ -93,7 +93,7 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitTemplateHSM(uint8_t Priority)
+uint8_t InitTopLevel(uint8_t Priority)
 {
     MyPriority = Priority;
     // put us into the Initial PseudoState
@@ -118,7 +118,7 @@ uint8_t InitTemplateHSM(uint8_t Priority)
  *        be posted to. Remember to rename to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t PostTemplateHSM(ES_Event ThisEvent)
+uint8_t PostTopLevel(ES_Event ThisEvent)
 {
     return ES_PostToService(MyPriority, ThisEvent);
 }
