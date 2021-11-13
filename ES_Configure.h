@@ -32,6 +32,10 @@
 // Name/define the events of interest
 // Universal events occupy the lowest entries, followed by user-defined events
 
+#define TurnTimer 1
+#define ForwardTimer 2
+#define ReverseTimer 3
+
 /****************************************************************************/
 typedef enum {
     ES_NO_EVENT, ES_ERROR, /* used to indicate an error from the service */
@@ -44,11 +48,39 @@ typedef enum {
     ES_TIMERACTIVE, /* signals that a timer has become active */
     ES_TIMERSTOPPED, /* signals that a timer has stopped*/
     /* User-defined events start here */
-    BATTERY_CONNECTED,
-    BATTERY_DISCONNECTED,
-    NUMBEROFEVENTS,
-    BUMPED,
-    UNBUMPED,
+
+    //bumper events
+    BUMPED_LEFT,
+    BUMPED_RIGHT,
+    BUMPED_BOTH,
+
+    //black tape sensors on the bottom
+    BT_FOUND_FRONT,
+    BT_LOST_FRONT,
+    BT_FOUND_REAR,
+    BT_LOST_REAR,
+    BT_FOUND_LEFT,
+    BT_LOST_LEFT,
+    BT_FOUND_RIGHT,
+    BT_LOST_RIGHT,
+
+    //Black tape sensors on the shooter
+    BT_FOUND_SHOOTER_1,
+    BT_LOST_SHOOTER_1,
+    BT_FOUND_SHOOTER_2,
+    BT_LOST_SHOOTER_2,
+
+    //Timer events
+    TURN_TIMER_EXP,
+    FORWARD_TIMER_EXP,
+    REVERSE_TIMER_EXP,
+    
+    //Tower events
+    BALLSHOT,
+    LOADED,
+    FOUND_BEACON,
+    FOUND_TRACK_WIRE
+
 } ES_EventTyp_t;
 
 static const char *EventNames[] = {
@@ -62,11 +94,37 @@ static const char *EventNames[] = {
 	"ES_TIMEOUT",
 	"ES_TIMERACTIVE",
 	"ES_TIMERSTOPPED",
-	"BATTERY_CONNECTED",
-	"BATTERY_DISCONNECTED",
-	"NUMBEROFEVENTS",
-    "BUMPED",
-    "UNBUMPED",
+	//bumper events
+    "BUMPED_LEFT",
+    "BUMPED_RIGHT",
+    "BUMPED_BOTH",
+
+    //black tape sensors on the bottom
+    "BT_FOUND_FRONT",
+    "BT_LOST_FRONT",
+    "BT_FOUND_REAR",
+    "BT_LOST_REAR",
+    "BT_FOUND_LEFT",
+    "BT_LOST_LEFT",
+    "BT_FOUND_RIGHT",
+    "BT_LOST_RIGHT",
+
+    //Black tape sensors on the shooter
+    "BT_FOUND_SHOOTER_1",
+    "BT_LOST_SHOOTER_1",
+    "BT_FOUND_SHOOTER_2",
+    "BT_LOST_SHOOTER_2",
+
+    //Timer events
+    "TURN_TIMER_EXP",
+    "FORWARD_TIMER_EXP",
+    "REVERSE_TIMER_EXP",
+    
+    //Tower events
+    "BALLSHOT",
+    "LOADED",
+    "FOUND_BEACON",
+    "FOUND_TRACK_WIRE"
 };
 
 
@@ -74,7 +132,7 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This are the name of the Event checking function header file.
-#define EVENT_CHECK_HEADER "TemplateEventChecker.h"
+#define EVENT_CHECK_HEADER "EventChecker.h"
 
 /****************************************************************************/
 // This is the list of event checking functions
@@ -86,9 +144,9 @@ static const char *EventNames[] = {
 // a timers, then you can use TIMER_UNUSED
 #define TIMER_UNUSED ((pPostFunc)0)
 #define TIMER0_RESP_FUNC TIMER_UNUSED
-#define TIMER1_RESP_FUNC TIMER_UNUSED
-#define TIMER2_RESP_FUNC TIMER_UNUSED
-#define TIMER3_RESP_FUNC TIMER_UNUSED
+#define TIMER1_RESP_FUNC Turn_Timer_Helper
+#define TIMER2_RESP_FUNC Forward_Timer_Helper
+#define TIMER3_RESP_FUNC Reverse_Timer_Helper
 #define TIMER4_RESP_FUNC TIMER_UNUSED
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
@@ -121,7 +179,7 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This macro determines that nuber of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 1
+#define NUM_SERVICES 8
 
 /****************************************************************************/
 // These are the definitions for Service 0, the lowest priority service
@@ -129,11 +187,11 @@ static const char *EventNames[] = {
 // services are added in numeric sequence (1,2,3,...) with increasing 
 // priorities
 // the header file with the public fuction prototypes
-#define SERV_0_HEADER "ES_KeyboardInput.h"
+#define SERV_0_HEADER "TopLevel.h"
 // the name of the Init function
-#define SERV_0_INIT InitKeyboardInput
+#define SERV_0_INIT InitTopLevel
 // the name of the run function
-#define SERV_0_RUN RunKeyboardInput
+#define SERV_0_RUN RunTopLevel
 // How big should this service's Queue be?
 #define SERV_0_QUEUE_SIZE 9
 
@@ -141,25 +199,26 @@ static const char *EventNames[] = {
 // These are the definitions for Service 1
 #if NUM_SERVICES > 1
 // the header file with the public fuction prototypes
-#define SERV_1_HEADER "TestService.h"
+#define SERV_1_HEADER "OrientBotSub.h"
 // the name of the Init function
-#define SERV_1_INIT TestServiceInit
+#define SERV_1_INIT InitOrientBot
 // the name of the run function
-#define SERV_1_RUN TestServiceRun
+#define SERV_1_RUN RunOrientBot
 // How big should this services Queue be?
-#define SERV_1_QUEUE_SIZE 3
+#define SERV_1_QUEUE_SIZE 9
 #endif
 
+/****************************************************************************/
 // These are the definitions for Service 2
 #if NUM_SERVICES > 2
 // the header file with the public fuction prototypes
-#define SERV_2_HEADER "TestService.h"
+#define SERV_2_HEADER "ScanForBeaconSub.h"
 // the name of the Init function
-#define SERV_2_INIT TestServiceInit
+#define SERV_2_INIT InitScanForBeacon
 // the name of the run function
-#define SERV_2_RUN TestServiceRun
+#define SERV_2_RUN RunScanForBeacon
 // How big should this services Queue be?
-#define SERV_2_QUEUE_SIZE 3
+#define SERV_2_QUEUE_SIZE 9
 #endif
 
 
@@ -168,65 +227,65 @@ static const char *EventNames[] = {
 // These are the definitions for Service 3
 #if NUM_SERVICES > 3
 // the header file with the public fuction prototypes
-#define SERV_3_HEADER "TestService.h"
+#define SERV_3_HEADER "FindNewCornerSub.h"
 // the name of the Init function
-#define SERV_3_INIT TestServiceInit
+#define SERV_3_INIT InitFindNewCorner
 // the name of the run function
-#define SERV_3_RUN TestServiceRun
+#define SERV_3_RUN RunFindNewCorner
 // How big should this services Queue be?
-#define SERV_3_QUEUE_SIZE 3
+#define SERV_3_QUEUE_SIZE 9
 #endif
 
 /****************************************************************************/
 // These are the definitions for Service 4
 #if NUM_SERVICES > 4
 // the header file with the public fuction prototypes
-#define SERV_4_HEADER "TestService.h"
+#define SERV_4_HEADER "NavigateFieldSub.h"
 // the name of the Init function
-#define SERV_4_INIT TestServiceInit
+#define SERV_4_INIT InitNavigateField
 // the name of the run function
-#define SERV_4_RUN TestServiceRun
+#define SERV_4_RUN RunNavigateField
 // How big should this services Queue be?
-#define SERV_4_QUEUE_SIZE 3
+#define SERV_4_QUEUE_SIZE 9
 #endif
 
 /****************************************************************************/
 // These are the definitions for Service 5
 #if NUM_SERVICES > 5
 // the header file with the public fuction prototypes
-#define SERV_5_HEADER "TestService.h"
+#define SERV_5_HEADER "NavigateTowerSub.h"
 // the name of the Init function
-#define SERV_5_INIT TestServiceInit
+#define SERV_5_INIT InitNavigateTower
 // the name of the run function
-#define SERV_5_RUN TestServiceRun
+#define SERV_5_RUN RunNavigateTower
 // How big should this services Queue be?
-#define SERV_5_QUEUE_SIZE 3
+#define SERV_5_QUEUE_SIZE 9
 #endif
 
 /****************************************************************************/
 // These are the definitions for Service 6
 #if NUM_SERVICES > 6
 // the header file with the public fuction prototypes
-#define SERV_6_HEADER "TestService.h"
+#define SERV_6_HEADER "MoveToBeaconSub.h"
 // the name of the Init function
-#define SERV_6_INIT TestServiceInit
+#define SERV_6_INIT InitMoveToBeacon
 // the name of the run function
-#define SERV_6_RUN TestServiceRun
+#define SERV_6_RUN RunMoveToBeacon
 // How big should this services Queue be?
-#define SERV_6_QUEUE_SIZE 3
+#define SERV_6_QUEUE_SIZE 9
 #endif
 
 /****************************************************************************/
 // These are the definitions for Service 7
 #if NUM_SERVICES > 7
 // the header file with the public fuction prototypes
-#define SERV_7_HEADER "TestService.h"
+#define SERV_7_HEADER "ParkSub.h"
 // the name of the Init function
-#define SERV_7_INIT TestServiceInit
+#define SERV_7_INIT InitPark
 // the name of the run function
-#define SERV_7_RUN TestServiceRun
+#define SERV_7_RUN RunPark
 // How big should this services Queue be?
-#define SERV_7_QUEUE_SIZE 3
+#define SERV_7_QUEUE_SIZE 9
 #endif
 
 /****************************************************************************/
@@ -241,9 +300,15 @@ static const char *EventNames[] = {
 // These are the definitions for the Distribution lists. Each definition
 // should be a comma seperated list of post functions to indicate which
 // services are on that distribution list.
-#define NUM_DIST_LISTS 0
+#define NUM_DIST_LISTS 1 
+
+//Horace added 11/12:
+// for now I will only put posttoplevel.
+// This wrapper function only returns True or False depending on the Queue status
+// We probably don't need it at all
+
 #if NUM_DIST_LISTS > 0 
-#define DIST_LIST0 PostTemplateFSM
+#define DIST_LIST0 PostTopLevel
 #endif
 #if NUM_DIST_LISTS > 1 
 #define DIST_LIST1 PostTemplateFSM
