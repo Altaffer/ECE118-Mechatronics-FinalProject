@@ -30,6 +30,7 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "BOARD.h"
+#include "OrientBotSub.h"
 //#include "TemplateHSM.h"
 //#include "TemplateSubHSM.h" //#include all sub state machines called
 /*******************************************************************************
@@ -154,7 +155,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
             // transition from the initial pseudo-state into the actual
             // initial state
             // Initialize all sub-state machines
-            InitTemplateSubHSM();
+//            InitTemplateSubHSM();
             // now put the machine into the actual initial state
             nextState = OrientBot;
             makeTransition = TRUE;
@@ -167,7 +168,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
     {
         // Spins to the left to find Black Tape. Once tape is found follow the tap in a CCW orientation to find a corner
         // Enter Orientation sub state machine
-        ThisEvent = RunOrientBotSubHSM(ThisEvent);
+        ThisEvent = RunOrientBot(ThisEvent);
         switch (ThisEvent.EventType)
         {
         case Bot_Oriented:
@@ -328,9 +329,9 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
         if (makeTransition == TRUE)
         { // making a state transition, send EXIT and ENTRY
             // recursively call the current state with an exit event
-            RunTemplateHSM(EXIT_EVENT); // <- rename to your own Run function
+            RunTopLevel(EXIT_EVENT); // <- rename to your own Run function
             CurrentState = nextState;
-            RunTemplateHSM(ENTRY_EVENT); // <- rename to your own Run function
+            RunTopLevel(ENTRY_EVENT); // <- rename to your own Run function
         }
 
         ES_Tail(); // trace call stack end

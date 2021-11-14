@@ -137,9 +137,9 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunFindnewCorner(EXIT_EVENT); // <- rename to your own Run function
+        RunOrientBot(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunFindnewCorner(ENTRY_EVENT); // <- rename to your own Run function
+        RunOrientBot(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end

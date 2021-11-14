@@ -8,8 +8,9 @@
       <itemPath>C:/ECE118/include/BOARD.h</itemPath>
       <itemPath>C:/ECE118/include/IO_Ports.h</itemPath>
       <itemPath>C:/ECE118/include/LED.h</itemPath>
-      <itemPath>C:/ECE118/include/roach.h</itemPath>
       <itemPath>C:/ECE118/include/serial.h</itemPath>
+      <itemPath>../MurpleCircle.X/robot.h</itemPath>
+      <itemPath>../../../../../ECE118/include/pwm.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -23,9 +24,9 @@
       <itemPath>C:/ECE118/src/BOARD.c</itemPath>
       <itemPath>C:/ECE118/src/IO_Ports.c</itemPath>
       <itemPath>C:/ECE118/src/LED.c</itemPath>
-      <itemPath>C:/ECE118/src/roach.c</itemPath>
-      <itemPath>C:/Users/eappleto/Desktop/ECE118-FinalProject/final-project-code/Testing.X/TestingMain.c</itemPath>
       <itemPath>C:/ECE118/src/serial.c</itemPath>
+      <itemPath>TestingMain.c</itemPath>
+      <itemPath>../MurpleCircle.X/robot.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -37,6 +38,8 @@
     <Elem>C:\Users\eappleto\Desktop\ECE118-FinalProject\final-project-code\MurpleCircle.X</Elem>
     <Elem>C:\Users\eappleto\Desktop\ECE118-FinalProject\final-project-code\Testing.X</Elem>
     <Elem>C:\ECE118</Elem>
+    <Elem>.</Elem>
+    <Elem>../MurpleCircle.X</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>
@@ -89,7 +92,8 @@
         <property key="enable-symbols" value="true"/>
         <property key="enable-unroll-loops" value="false"/>
         <property key="exclude-floating-point" value="false"/>
-        <property key="extra-include-directories" value=".;C:\ECE118\include"/>
+        <property key="extra-include-directories"
+                  value=".;C:\ECE118\include;..\MurpleCircle.X"/>
         <property key="generate-16-bit-code" value="false"/>
         <property key="generate-micro-compressed-code" value="false"/>
         <property key="isolate-each-function" value="false"/>
@@ -217,10 +221,6 @@
         <property key="stack-smashing" value=""/>
         <property key="wpo-lto" value="false"/>
       </C32Global>
-      <item path="C:/ECE118/include/roach.h" ex="true" overriding="false">
-      </item>
-      <item path="C:/ECE118/src/roach.c" ex="true" overriding="false">
-      </item>
     </conf>
   </confs>
 </configurationDescriptor>

@@ -16,6 +16,8 @@
                 <sourceRootElem>C:\Users\eappleto\Desktop\ECE118-FinalProject\final-project-code\MurpleCircle.X</sourceRootElem>
                 <sourceRootElem>C:\Users\eappleto\Desktop\ECE118-FinalProject\final-project-code\Testing.X</sourceRootElem>
                 <sourceRootElem>C:\ECE118</sourceRootElem>
+                <sourceRootElem>.</sourceRootElem>
+                <sourceRootElem>../MurpleCircle.X</sourceRootElem>
             </sourceRootList>
             <confList>
                 <confElem>

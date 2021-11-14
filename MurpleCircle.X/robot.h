@@ -24,10 +24,31 @@
 /*******************************************************************************
  * PUBLIC FUNCTION PROTOTYPES                                                  *
  ******************************************************************************/
+// speed and direction
+#define FWD_speed 90    // Straight
+#define STOP_speed 0    // stopping
+
+#define LTANK_L -60     // tank turns
+#define LTANK_R 60
+#define RTANK_L 60
+#define RTANK_R -60
+
+#define LPIVOT_L 0      // pivot turns
+#define LPIVOT_R 60
+#define RPIVOT_L 60
+#define RPIVOT_R 0
+
+#define LGRAD_L 20      // gradual turn
+#define LGRAD_R 60
+#define RGRAD_R 20
+#define RGRAD_L 60
+
+// bumper events
 #define BUMPER_TRIPPED 1
 #define BUMPER_NOT_TRIPPED 0
 
-#define ROACH_MAX_SPEED 100 
+// maximums
+#define ROBOT_MAX_SPEED 100 
 
 /**
  * @Function Robot_Init(void)

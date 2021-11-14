@@ -68,7 +68,7 @@ uint8_t InitFindNewCorner(void)
 {
     ES_Event returnEvent;
     CurrentState = InitPSubState;
-    returnEvent = RunFindnewCorner(INIT_EVENT);
+    returnEvent = RunFindNewCorner(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -116,9 +116,9 @@ ES_Event RunFindnewCorner(ES_Event ThisEvent)
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunFindnewCorner(EXIT_EVENT); // <- rename to your own Run function
+        RunFindNewCorner(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunFindnewCorner(ENTRY_EVENT); // <- rename to your own Run function
+        RunFindNewCorner(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end

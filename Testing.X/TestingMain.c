@@ -9,9 +9,10 @@
 #include "xc.h"
 #include "BOARD.h"
 #include "AD.h"
-#include "RC_Servo.h"
 #include "LED.h"
 #include "serial.h"
+#include "robot.h"
+#include "pwm.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "IO_Ports.h"
@@ -39,17 +40,24 @@
 /*
  * 
  */
+
+uint8_t goForward(void) {
+    //something here to make the bot go forward at full speed
+    Robot_LeftMtrSpeed(FWD_speed);
+    Robot_RightMtrSpeed(FWD_speed);
+    
+}
 int main(void) {
     BOARD_Init();
     SERIAL_Init();
+    Robot_Init();
+    PWM_Init();
     int currentTapeValue = 0;
     
     PORTX03_TRIS = INPUT;
     while(1){
-      currentTapeValue = TAPE_SENSOR_1;
-      printf("Tape Sensor Value: %d \n\n\r", currentTapeValue);
+        goForward();
     }
     
     
 }
-
