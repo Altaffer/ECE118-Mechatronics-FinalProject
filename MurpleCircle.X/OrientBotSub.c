@@ -11,7 +11,7 @@
 #include "BOARD.h"
 #include "TopLevel.h"
 #include "OrientBotSub.h"
-
+#include "robot.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,11 +20,12 @@
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 //States have not been renamed - HZ 11/12
+
 typedef enum {
     InitPSubState,
     NoSubService,
-    SpinLeft,
-    FindBT,
+    Spin,
+    Spiral,
     Adjust,
     FindCorner
 } SubHSMState_t;
@@ -32,8 +33,8 @@ typedef enum {
 static const char *StateNames[] = {
     "InitPSubState",
     "NoSubService",
-    "SpinLeft",
-    "FindBT",
+    "Spin",
+    "Spiral",
     "Adjust",
     "FindCorner"
 };
@@ -46,7 +47,9 @@ static const char *StateNames[] = {
 
 uint8_t goForward(void);
 
-uint8_t turn(void);
+uint8_t spin(void);
+
+uint8_t spiral(void);
 
 uint8_t stop(void);
 
@@ -72,8 +75,7 @@ static SubHSMState_t CurrentState = InitPSubState; // initial state
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitOrientBot(void)
-{
+uint8_t InitOrientBot(void) {
     ES_Event returnEvent;
     CurrentState = InitPSubState;
     returnEvent = RunOrientBot(INIT_EVENT);
@@ -98,31 +100,39 @@ uint8_t InitOrientBot(void)
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunOrientBot(ES_Event ThisEvent)
-{
+ES_Event RunOrientBot(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
-    SubHSMState_t nextState; 
+    SubHSMState_t nextState;
     static int counter = 1;
 
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-    case InitPSubState: // If current state is initial Psedudo State
-        if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-        {
-            nextState = NoSubService;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-        }
-        break;
+        case InitPSubState: // If current state is initial Psedudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
+                nextState = NoSubService;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
 
-    case NoSubService: /* After initialzing or executing, it sits here for the next 
+        case NoSubService: /* After initialzing or executing, it sits here for the next 
                           time it gets called. */
-        if ( 0 ) {// some trigger event to indicate 
-            ;
-        }
-    default: // all unhandled events fall into here
-        break;
+            if (0) {// some trigger event to indicate 
+                ;
+            }
+
+        case Spin: // 360 deg pivot turn to the left looking for BT
+            
+        case Spiral: // indefinite gradual turn spiraling to the left
+            
+        case Adjust: // Make the bot parallel with the BT once it is located
+            
+        case FindCorner: // follow BT until the front and left sensor detects BT
+            
+        default: // all unhandled events fall into here
+            break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
@@ -136,26 +146,37 @@ ES_Event RunOrientBot(ES_Event ThisEvent)
     return ThisEvent;
 }
 
-
-
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
 
-uint8_t goForward(void){
+uint8_t goForward(void) {
     //something here to make the bot go forward at full speed
+    Robot_LeftMtrSpeed(FWD_speed);
+    Robot_RightMtrSpeed(FWD_speed);
 
-    return 0;//this could be used to indicated true or false. Not necessary tho. 
+    return 0; //this could be used to indicated true or false. Not necessary tho. 
 }
 
-uint8_t turn(void){
+uint8_t spin(void) {
     //turn bot
+    Robot_LeftMtrSpeed(LPIVOT_L);
+    Robot_RightMtrSpeed(LPIVOT_R);
     return 0;
 }
 
-uint8_t stop(void){
+uint8_t spiral(void) {
+    //turn bot
+    Robot_LeftMtrSpeed(LGRAD_L);
+    Robot_RightMtrSpeed(LGRAD_R);
+    return 0;
+}
+
+uint8_t stop(void) { //one concern - if the gearhead is too powerful we may need to slow down first
     //stop the bot
-    //one concern - if the gearhead is too powerful we may need to slow down first
+    Robot_LeftMtrSpeed(STOP_speed);
+    Robot_RightMtrSpeed(STOP_speed);
+
 
     return 0;
 }
