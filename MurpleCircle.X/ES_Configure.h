@@ -74,7 +74,8 @@ typedef enum {
     LOADED,
     FOUND_BEACON,
     FOUND_TRACK_WIRE,
-
+    LOST_TRACK_WIRE //just in case
+           
 } ES_EventTyp_t;
 
 static const char *EventNames[] = {
@@ -113,6 +114,7 @@ static const char *EventNames[] = {
     "LOADED",
     "FOUND_BEACON",
     "FOUND_TRACK_WIRE",
+    "LOST_TRACK_WIRE", //just in case
 };
 
 

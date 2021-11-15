@@ -10,6 +10,7 @@
 #include "roach.h"
 #include "robot.h"
 #include "BOARD.h"
+#include "TopLevel.h"
 //#include "TemplateHSM.h"
 
 /*******************************************************************************
@@ -18,7 +19,17 @@
 #define BATTERY_DISCONNECT_THRESHOLD 175
 #define ON_BLACK_TAPE 1
 #define OFF_BLACK_TAPE 0
+#define TW_UPPER_BOUND 500
+#define TW_LOWER_BOUND 200
+#define BEACON_UPPER_BOUND 500
+#define BEACON_LOWER_BOUND 200
 
+//comment this out if you don't want to consider prev values for the track wire's
+//   hysteresis bounds
+#define TAKE_PREV
+
+//enable this if you want to see spamming prints at each event to debug
+//#define DEBUG_PRINTS
 /*******************************************************************************
  * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
  ******************************************************************************/
@@ -76,9 +87,17 @@ uint8_t TapeSensorEventChecker(void) {
     }else{
         currentEvent = ON_BT;
     }
+#ifdef DEBUG_PRINTS
+    if (currentEvent == OFF_BT) {
+        printf("ON_BT.\r\n");
+    } else {
+        printf("OFF_BT.\r\n");
+    }
+#endif
     if (currentEvent != lastEvent) {
         thisEvent.EventType = currentEvent;
         thisEvent.EventParam = tapeSensorInput;
+        PostTopLevel(thisEvent); // added 11/14
         lastEvent = currentEvent;
         returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
@@ -91,6 +110,124 @@ uint8_t TapeSensorEventChecker(void) {
     return (returnVal);
 }
 
+/**
+ * @Function TrackWireEventChecker(void)
+ * @param void
+ * @return TRUE or FALSE
+ * @brief 2 options: if you defined "TAKE_PREV", it will compare the previous 
+ *          Track wire values with the current ones. Returns True and post event
+ *          if there is change, False otherwise. This is default.
+ * 
+ *          If you didn't define "TAKE_PREV", it will only look at the current
+ *          values of the Track wire values and post sensor outputs continuously
+ *          until the value drops below the LOWER_BOUND. 
+ * @author Horace, 11/14 */
+
+uint32_t TrackWireEventChecker(void) {
+    static ES_EventTyp_t lastEvent = ES_NO_EVENT; 
+    // Setting a value because currentEvent would be initialized to some random 
+    // value. 
+    ES_EventTyp_t currentEvent = lastEvent;
+    ES_Event thisEvent;
+    uint8_t returnVal = FALSE;
+    uint32_t TrackWireInput = Robot_ReadTrackWire();
+    uint8_t recording = 0; //this is a flag to indicate if the track wire is detected
+        //if it does, then it starts to record the ADC output to find the distance
+        //between the track wire and the sensor
+        //initial state: es-no-event
+
+    // hysteresis bounds 
+    if (TrackWireInput > TW_UPPER_BOUND) {
+#ifdef DEBUG_PRINTS
+        printf("TrackWire found.\r\n");
+#endif
+        recording = FOUND_TRACK_WIRE;
+    } else if (TrackWireInput < TW_LOWER_BOUND) {
+#ifdef DEBUG_PRINTS
+        printf("TrackWire lost.\r\n"); 
+#endif
+        recording = 0; //ES_NO_EVENT
+    }
+    
+    
+    // This one does not consider the prev values 
+    // pick the one you want by changing the define value in the beginning
+    // This will post continuously. Only good for updating distance in real time
+#ifndef TAKE_PREV    
+    thisEvent.EventType = recording; //either FOUND or NO EVENT
+    // alternatively: (if LOST event is needed)
+    //thisEvent.EventType = recording? FOUND_TRACK_WIRE:LOST_TRACK_WIRE;//either FOUND or LOST
+    thisEvent.EventParam = TrackWireInput;
+    PostTopLevel(thisEvent);
+    return (TRUE);
+#endif    
+    
+    // This one takes consideration of the prev values 
+    currentEvent = recording;//either FOUND or NO EVENT
+    // alternatively: (if LOST event is needed)
+    //currentEvent = recording? FOUND_TRACK_WIRE:LOST_TRACK_WIRE;//either FOUND or LOST
+    if (currentEvent != lastEvent) {
+        thisEvent.EventType = currentEvent; 
+        thisEvent.EventParam = TrackWireInput;
+        PostTopLevel(thisEvent);
+        lastEvent = currentEvent;
+        returnVal = TRUE;
+    
+
+#ifndef EVENTCHECKER_TEST           // keep this as is for test harness
+        //        PostTemplateHSM(thisEvent);
+        //        PostGenericService(thisEvent);
+#else
+        SaveEvent(thisEvent);
+#endif   
+    }
+    return (returnVal);
+}
+
+/**
+ * @Function BeaconEventChecker(void)
+ * @param void
+ * @return TRUE or FALSE
+ * @brief Compares the previous beacon values with the current ones. Returns 
+ *          True and post event if there is change, False otherwise. 
+ * @author Horace, 11/14 */
+uint32_t BeaconEventChecker(void) {
+    static ES_EventTyp_t lastEvent = ES_NO_EVENT; 
+    ES_EventTyp_t currentEvent = lastEvent;
+    ES_Event thisEvent;
+    uint8_t returnVal = FALSE;
+    uint32_t BeaconInput = Robot_ReadBeaconSensor(); 
+    // 32 bits - assuming output from an ADC
+
+    // hysteresis bounds 
+    if (BeaconInput > BEACON_UPPER_BOUND) {
+#ifdef DEBUG_PRINTS
+        printf("Beacon found.\r\n");
+#endif
+        currentEvent = FOUND_BEACON;
+    } else if (BeaconInput < BEACON_LOWER_BOUND) {
+#ifdef DEBUG_PRINTS
+        printf("Beacon lost.\r\n"); 
+#endif
+        currentEvent = 0; //ES_NO_EVENT
+    }
+    if (currentEvent != lastEvent) {
+        thisEvent.EventType = currentEvent; 
+        thisEvent.EventParam = BeaconInput;
+        PostTopLevel(thisEvent);
+        lastEvent = currentEvent;
+        returnVal = TRUE;
+    
+
+#ifndef EVENTCHECKER_TEST           // keep this as is for test harness
+        //        PostTemplateHSM(thisEvent);
+        //        PostGenericService(thisEvent);
+#else
+        SaveEvent(thisEvent);
+#endif   
+    }
+    return (returnVal);
+}
 /* 
  * The Test Harness for the event checkers is conditionally compiled using
  * the EVENTCHECKER_TEST macro (defined either in the file or at the project level).
