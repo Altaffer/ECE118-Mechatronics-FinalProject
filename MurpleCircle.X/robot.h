@@ -163,4 +163,8 @@ char Robot_BarGraph(uint8_t Number);
 
 unsigned char Robot_ReadTapeSensors(void);
 
+uint32_t Robot_ReadTrackWire(void);
+
+uint32_t Robot_ReadBeaconSensor(void);
+
 #endif

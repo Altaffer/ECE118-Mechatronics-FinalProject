@@ -3,12 +3,13 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/ECE118/include/RC_Servo.h</file>
-            <file>file:/C:/Users/eappleto/Desktop/ECE118-FinalProject/MurpleCircle.X/EventCheckers.c</file>
-            <file>file:/C:/ECE118/include/ES_Events.h</file>
-            <file>file:/C:/Users/eappleto/Desktop/ECE118-FinalProject/MurpleCircle.X/EventCheckers.h</file>
-            <file>file:/C:/ECE118/src/ES_Framework.c</file>
-            <file>file:/C:/Users/eappleto/Desktop/ECE118-FinalProject/final-project-code/ES_Configure.h</file>
+            <file>file:/C:/Users/zzhan247/final-project-code/MurpleCircle.X/OrientBotSub.c</file>
+            <file>file:/C:/Users/zzhan247/final-project-code/MurpleCircle.X/ES_Configure.h</file>
+            <file>file:/C:/Users/zzhan247/final-project-code/MurpleCircle.X/FindNewCornerSub.c</file>
+            <file>file:/C:/Users/zzhan247/final-project-code/MurpleCircle.X/robot.c</file>
+            <file>file:/C:/Users/zzhan247/final-project-code/MurpleCircle.X/EventCheckers.c</file>
+            <file>file:/C:/Users/zzhan247/final-project-code/MurpleCircle.X/robot.h</file>
+            <file>file:/C:/Users/zzhan247/final-project-code/MurpleCircle.X/TopLevel.h</file>
         </group>
     </open-files>
 </project-private>

@@ -1,11 +1,12 @@
 /*
- * File:   roach.c
+ * File:   robot.c
  * Author: mdunne, elkaim
  *
  * Created on December 15, 2011, 12:59 PM
  * Modified to remove PLIB on June 29, 2021
  */
 
+#include <robot.h>
 #include <roach.h>
 #include <BOARD.h>
 #include <xc.h>
@@ -33,6 +34,9 @@
 #define TAPE_SENSOR_4 PORTX06_BIT
 #define TAPE_SENSOR_5 PORTX07_BIT
 #define TAPE_SENSOR_6 PORTX08_BIT
+
+#define BEACON_PIN AD_PORTV3
+#define TRACK_WIRE_PIN AD_PORTV4
 
 #define TAPE_SENSOR_1_TRIS PORTX03_TRIS
 #define TAPE_SENSOR_2_TRIS PORTX04_TRIS
@@ -370,6 +374,15 @@ unsigned char Robot_ReadTapeSensors(void) {
             +((!TAPE_SENSOR_4) << 3)+((!TAPE_SENSOR_5) << 4)+((!TAPE_SENSOR_6) << 5));
 }
 
+uint32_t Robot_ReadTrackWire(void) {
+    //according to our design, this should return a value from the ADC to indicate the distance
+    return AD_ReadADPin(TRACK_WIRE_PIN);
+}
+
+uint32_t Robot_ReadBeaconSensor(void) {
+    //Assuming that this should return a value from the ADC to indicate the distance
+    return AD_ReadADPin(BEACON_PIN);
+}
 //#define ROACH_TEST
 #ifdef ROACH_TEST
 #pragma config FPLLIDIV 	= DIV_2		//PLL Input Divider
