@@ -29,8 +29,8 @@
 
 
 #define DELAY_MULTIPLIER 1000
-#define DELAY(x)    for (wait = 0; wait <= (DELAY_MULTIPLIER * x); wait++) {asm("nop");}
-#define DELAY_LOOP_TIME 10 // ms
+#define DELAY(x)    for (int wait = 0; wait <= (DELAY_MULTIPLIER * x); wait++) {asm("nop");}
+#define DELAY_LOOP_TIME 1000 // ms
 
 
 //#define FREQ_TEST
@@ -44,10 +44,15 @@
 uint8_t goForward(void) {
     //something here to make the bot go forward at full speed
     Robot_LeftMtrSpeed(FWD_speed);
-    Robot_RightMtrSpeed(FWD_speed);
+    DELAY(DELAY_LOOP_TIME);
+    Robot_LeftMtrSpeed(0);
+    DELAY(DELAY_LOOP_TIME);
+//    Robot_RightMtrSpeed(FWD_speed);
     
 }
 int main(void) {
+    
+    
     BOARD_Init();
     SERIAL_Init();
     Robot_Init();

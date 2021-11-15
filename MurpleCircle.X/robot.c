@@ -6,7 +6,7 @@
  * Modified to remove PLIB on June 29, 2021
  */
 
-#include <roach.h>
+#include <robot.h>
 #include <BOARD.h>
 #include <xc.h>
 
@@ -22,10 +22,10 @@
 #define INPUT 1
 #define OUTPUT 0
 
-#define LEFT_DIR LATBbits.LATB3
-#define LEFT_DIR_INV LATBbits.LATB2
-#define RIGHT_DIR LATEbits.LATE5
-#define RIGHT_DIR_INV LATEbits.LATE6
+#define LEFT_DIR LATBbits.LATB3 // V04
+#define LEFT_DIR_INV LATBbits.LATB2 // V03
+#define RIGHT_DIR LATEbits.LATE5 // Y11
+#define RIGHT_DIR_INV LATEbits.LATE6 // Y09
 
 #define TAPE_SENSOR_1 PORTX03_BIT
 #define TAPE_SENSOR_2 PORTX04_BIT
@@ -60,7 +60,7 @@
 #define RIGHT_PWM PWM_PORTY12
 
 #define LIGHT_SENSOR ROACH_LIGHT_SENSOR
-#define ROACH_BAT_VOLTAGE BAT_VOLTAGE
+#define ROBOT_BAT_VOLTAGE BAT_VOLTAGE
 
 
 //light bar defines
@@ -189,7 +189,7 @@ void Robot_Init(void) {
  * @brief  This function is used to set the speed and direction of the left motor.
  * @author Max Dunne, 2012.01.06 */
 char Robot_LeftMtrSpeed(char newSpeed) {
-    if ((newSpeed < -ROACH_MAX_SPEED) || (newSpeed > ROACH_MAX_SPEED)) {
+    if ((newSpeed < -ROBOT_MAX_SPEED) || (newSpeed > ROBOT_MAX_SPEED)) {
         return (ERROR);
     }
     newSpeed = -newSpeed;
@@ -201,7 +201,7 @@ char Robot_LeftMtrSpeed(char newSpeed) {
         LEFT_DIR = 1;
     }
     LEFT_DIR_INV = ~(LEFT_DIR);
-    if (PWM_SetDutyCycle(LEFT_PWM, newSpeed * (MAX_PWM / ROACH_MAX_SPEED)) == ERROR) {
+    if (PWM_SetDutyCycle(LEFT_PWM, newSpeed * (MAX_PWM / ROBOT_MAX_SPEED)) == ERROR) {
         //printf("ERROR: setting channel 1 speed!\n");
         return (ERROR);
     }
@@ -216,7 +216,7 @@ char Robot_LeftMtrSpeed(char newSpeed) {
  * @brief  This function is used to set the speed and direction of the left motor.
  * @author Max Dunne, 2012.01.06 */
 char Robot_RightMtrSpeed(char newSpeed) {
-    if ((newSpeed < -ROACH_MAX_SPEED) || (newSpeed > ROACH_MAX_SPEED)) {
+    if ((newSpeed < -ROBOT_MAX_SPEED) || (newSpeed > ROBOT_MAX_SPEED)) {
         return (ERROR);
     }
     if (newSpeed < 0) {
@@ -226,7 +226,7 @@ char Robot_RightMtrSpeed(char newSpeed) {
         RIGHT_DIR = 1;
     }
     RIGHT_DIR_INV = ~(RIGHT_DIR);
-    if (PWM_SetDutyCycle(RIGHT_PWM, newSpeed * (MAX_PWM / ROACH_MAX_SPEED)) == ERROR) {
+    if (PWM_SetDutyCycle(RIGHT_PWM, newSpeed * (MAX_PWM / ROBOT_MAX_SPEED)) == ERROR) {
         //puts("\aERROR: setting channel 1 speed!\n");
         return (ERROR);
     }
@@ -250,7 +250,7 @@ unsigned int Robot_LightLevel(void) {
  * @brief  returns a 10:1 scaled value of the roach battery level
  * @author Max Dunne, 2013.07.12 */
 unsigned int Robot_BatteryVoltage(void) {
-    return AD_ReadADPin(ROACH_BAT_VOLTAGE);
+    return AD_ReadADPin(ROBOT_BAT_VOLTAGE);
 }
 
 /**
@@ -370,8 +370,8 @@ unsigned char Robot_ReadTapeSensors(void) {
             +((!TAPE_SENSOR_4) << 3)+((!TAPE_SENSOR_5) << 4)+((!TAPE_SENSOR_6) << 5));
 }
 
-//#define ROACH_TEST
-#ifdef ROACH_TEST
+//#define ROBOT_TEST
+#ifdef ROBOT_TEST
 #pragma config FPLLIDIV 	= DIV_2		//PLL Input Divider
 #pragma config FPLLMUL 		= MUL_20	//PLL Multiplier
 #pragma config FPLLODIV 	= DIV_1 	//System PLL Output Clock Divid

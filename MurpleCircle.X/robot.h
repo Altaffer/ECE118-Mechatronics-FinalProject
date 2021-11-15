@@ -25,7 +25,7 @@
  * PUBLIC FUNCTION PROTOTYPES                                                  *
  ******************************************************************************/
 // speed and direction
-#define FWD_speed 90    // Straight
+#define FWD_speed 100    // Straight
 #define STOP_speed 0    // stopping
 
 #define LTANK_L -60     // tank turns
@@ -48,7 +48,7 @@
 #define BUMPER_NOT_TRIPPED 0
 
 // maximums
-#define ROBOT_MAX_SPEED 100 
+#define ROBOT_MAX_SPEED 150 
 
 /**
  * @Function Robot_Init(void)
