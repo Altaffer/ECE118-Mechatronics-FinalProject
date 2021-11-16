@@ -10,7 +10,7 @@
 #include "ES_Framework.h"
 #include "BOARD.h"
 #include "TopLevel.h"
-#include "FindNewCornerSub.h"
+#include "ScanForBeaconSub.h"
 
 
 #include <stdio.h>
@@ -36,12 +36,6 @@ static const char *StateNames[] = {
  * PRIVATE FUNCTION PROTOTYPES                                                 *
  ******************************************************************************/
 
-//uint8_t goForward(void);
-//
-//uint8_t turn(void);
-//
-//uint8_t stop(void);
-
 /*******************************************************************************
  * PRIVATE MODULE VARIABLES                                                            *
  ******************************************************************************/
@@ -64,11 +58,11 @@ static SubHSMState_t CurrentState = InitPSubState; // initial state
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitFindNewCorner(void)
+uint8_t InitScanForBeacon(void)
 {
     ES_Event returnEvent;
     CurrentState = InitPSubState;
-    returnEvent = RunFindNewCorner(INIT_EVENT);
+    returnEvent = RunScanForBeacon(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -90,7 +84,7 @@ uint8_t InitFindNewCorner(void)
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunFindNewCorner(ES_Event ThisEvent)
+ES_Event RunScanForBeacon(ES_Event ThisEvent)
 {
     uint8_t makeTransition = FALSE; // use to flag transition
     SubHSMState_t nextState; 
@@ -116,9 +110,9 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent)
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunFindNewCorner(EXIT_EVENT); // <- rename to your own Run function
+        RunScanForBeacon(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunFindNewCorner(ENTRY_EVENT); // <- rename to your own Run function
+        RunScanForBeacon(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end
@@ -131,21 +125,3 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent)
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
 
-//uint8_t goForward(void){
-//    //something here to make the bot go forward at full speed
-//
-//    return 0;//this could be used to indicated true or false. Not necessary tho. 
-//}
-//
-//uint8_t turn(void){
-//    //turn bot
-//    return 0;
-//}
-//
-//uint8_t stop(void){
-//    //stop the bot
-//    //one concern - if the gearhead is too powerful we may need to slow down first
-//
-//    return 0;
-//}
-//

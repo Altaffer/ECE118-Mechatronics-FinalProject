@@ -1,5 +1,0 @@
-<<<<<<< HEAD:MurpleCircle.X/.generated_files/flags/default/56e27eada52e5ca39a16f4a2a694b9759064fd93
- $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include"   -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  C:\Users\eappleto\Desktop\ECE118-FinalProject\final-project-code\MurpleCircle.X\TopLevel.c
-=======
- $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include"   -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  C:\Users\zzhan247\final-project-code\MurpleCircle.X\robot.c
->>>>>>> 1885a1156ad1297af85f09e6e409663158cb7e95:MurpleCircle.X/.generated_files/flags/default/21ef51d23517b83a04432eaae5a190ee0da68319

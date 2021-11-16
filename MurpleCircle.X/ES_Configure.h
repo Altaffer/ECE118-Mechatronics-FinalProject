@@ -73,9 +73,16 @@ typedef enum {
     BALLSHOT,
     LOADED,
     FOUND_BEACON,
+    LOST_BEACON,
     FOUND_TRACK_WIRE,
-    LOST_TRACK_WIRE //just in case
-           
+    LOST_TRACK_WIRE, //just in case
+    TOWER_DONE,        
+    
+    //Bot Events
+    Bot_Oriented,
+    No_Signal,
+    Found_New_Corner,
+            
 } ES_EventTyp_t;
 
 static const char *EventNames[] = {
@@ -113,8 +120,15 @@ static const char *EventNames[] = {
     "BALLSHOT",
     "LOADED",
     "FOUND_BEACON",
+    "LOST_BEACON",
     "FOUND_TRACK_WIRE",
     "LOST_TRACK_WIRE", //just in case
+    "TOWER_DONE",  
+    
+    //Bot Events
+    "Bot_Oriented",
+    "No_Signal",
+    "Found_New_Corner",
 };
 
 

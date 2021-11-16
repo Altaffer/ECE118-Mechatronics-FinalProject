@@ -32,6 +32,10 @@
       <itemPath>FindNewCornerSub.h</itemPath>
       <itemPath>robot.h</itemPath>
       <itemPath>TopLevel.h</itemPath>
+      <itemPath>ScanForBeaconSub.h</itemPath>
+      <itemPath>ToBeaconSub.h</itemPath>
+      <itemPath>NavTowerSub.h</itemPath>
+      <itemPath>NavFieldSub.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -62,11 +66,11 @@
       <itemPath>OrientBotSub.c</itemPath>
       <itemPath>robot.c</itemPath>
       <itemPath>TopLevel.c</itemPath>
+      <itemPath>ScanForBeaconSub.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false">
-      <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>

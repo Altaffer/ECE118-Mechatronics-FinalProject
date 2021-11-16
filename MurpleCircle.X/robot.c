@@ -7,10 +7,7 @@
  */
 
 #include <robot.h>
-<<<<<<< HEAD
-=======
 #include <roach.h>
->>>>>>> 1885a1156ad1297af85f09e6e409663158cb7e95
 #include <BOARD.h>
 #include <xc.h>
 
@@ -377,10 +374,8 @@ unsigned char Robot_ReadTapeSensors(void) {
             +((!TAPE_SENSOR_4) << 3)+((!TAPE_SENSOR_5) << 4)+((!TAPE_SENSOR_6) << 5));
 }
 
-<<<<<<< HEAD
 //#define ROBOT_TEST
-#ifdef ROBOT_TEST
-=======
+//#ifdef ROBOT_TEST
 uint32_t Robot_ReadTrackWire(void) {
     //according to our design, this should return a value from the ADC to indicate the distance
     return AD_ReadADPin(TRACK_WIRE_PIN);
@@ -390,9 +385,8 @@ uint32_t Robot_ReadBeaconSensor(void) {
     //Assuming that this should return a value from the ADC to indicate the distance
     return AD_ReadADPin(BEACON_PIN);
 }
-//#define ROACH_TEST
-#ifdef ROACH_TEST
->>>>>>> 1885a1156ad1297af85f09e6e409663158cb7e95
+//#define ROBOT_TEST
+#ifdef ROBOT_TEST
 #pragma config FPLLIDIV 	= DIV_2		//PLL Input Divider
 #pragma config FPLLMUL 		= MUL_20	//PLL Multiplier
 #pragma config FPLLODIV 	= DIV_1 	//System PLL Output Clock Divid

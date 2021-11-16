@@ -30,7 +30,17 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "BOARD.h"
+
+#include "TopLevel.h"
+#include "stdio.h"
+#include "stdlib.h"
+
 #include "OrientBotSub.h"
+#include "ScanForBeaconSub.h"
+#include "FindNewCornerSub.h"
+#include "ToBeaconSub.h"
+#include "NavTowerSub.h"
+#include "NavFieldsub.h"
 //#include "TemplateHSM.h"
 //#include "TemplateSubHSM.h" //#include all sub state machines called
 /*******************************************************************************
@@ -143,6 +153,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
 {
     uint8_t makeTransition = FALSE; // use to flag transition
     TemplateHSMState_t nextState;   // <- change type to correct enum
+    static uint8_t Tower_Found = 0;
 
     ES_Tattle(); // trace call stack
 
@@ -187,10 +198,10 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
     {
         // Completes two 180 deg sweeps to find the closest beacon
         // Enter scan for beaco sub state machine
-        ThisEvent = RunScanForBeaconSubHSM(ThisEvent);
+        ThisEvent = RunScanForBeacon(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case No_Signal:
+        case No_Signal: // or ES_NO_EVENT - HZ 11/15
             // make transition to find a new corner
             if (Tower_Found == 0)
             {
@@ -207,7 +218,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
-        case Signal_Found:
+        case FOUND_BEACON:
             // make transition to move toward the beacon
             nextState = ToBeacon;
             makeTransition = TRUE;
@@ -222,10 +233,10 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
     {
         // As a case to get a new perspective, this state should change position to the nreturn to Scan for Beacon
         // Enter Find new corner sub state machine
-        ThisEvent = RunFindNewCornerSubHSM(ThisEvent);
+        ThisEvent = RunFindNewCorner(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case New_Corner_Found:
+        case Found_New_Corner:
             // make transition to scan for beacon state
             nextState = ScanForBeacon;
             makeTransition = TRUE;
@@ -238,13 +249,14 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
     }
 
     case ReAdjustBot: // Re-adjust the bot in case the bot veers off course
+        //this state to be changed - HZ 11/15
     {
         // Stops the bot mid way to the beacon to complete anotehr partial sweep to find it again
         // Enter re-adjust bot sub state machine
-        ThisEvent = RunReAdjustBotSubHSM(ThisEvent);
+        //ThisEvent = RunReAdjustBotSubHSM(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case SignalStronger:
+        case FOUND_BEACON:
             // make transition to scan for beacon state
             nextState = ToBeacon;
             makeTransition = TRUE;
@@ -260,19 +272,21 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
     {
         // Once the clsoes beacon is located, moves the bot immediately straight
         // Enter re-adjust bot sub state machine
-        ThisEvent = RunToBeaconSubHSM(ThisEvent);
+        //ThisEvent = RunToBeacon(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case SignalWeaker:
+        case LOST_BEACON:
             // make transition to re-adjust the bot
             nextState = ReAdjustBot;
             makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
             break;
-        case Bump_Event:
+        case BUMPED_LEFT:
+        case BUMPED_RIGHT:
+        case BUMPED_BOTH:
             // make tranisiton to navigate the tower
             nextState = NavTower;
-            makeTransition = True;
+            makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
             break;
         case ES_NO_EVENT:
@@ -286,10 +300,10 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
         // Wall follows the tower. Once the track wire is detected, the bot then alligns
         // itself with the wall and looks for tape
         // Enter Navigate tower sub state machine
-        ThisEvent = RunNavTowerSubHSM(ThisEvent);
+        //ThisEvent = RunNavTower(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case Tower_Done:
+        case TOWER_DONE:
             // make transition to scan for beacon state
             nextState = ScanForBeacon;
             makeTransition = TRUE;
@@ -305,16 +319,18 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
     {
         // If a new beacon isn't found after ball release, this state locates a new corner to scan again
         // EnterNavigate Field sub state machine
-        ThisEvent = RunNavFieldSubHSM(ThisEvent);
+        //ThisEvent = RunNavField(ThisEvent); 
         switch (ThisEvent.EventType)
         {
-        case New_Corner_Found:
+        case Found_New_Corner:
             // make transition to Scan for Beacon state
             nextState = ScanForBeacon;
             makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
             break;
-        case Bump_Event:
+        case BUMPED_LEFT:
+        case BUMPED_RIGHT:
+        case BUMPED_BOTH:
             // make tranisiton to Navigate Tower
             nextState = NavTower;
             makeTransition = TRUE;
@@ -337,7 +353,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
         ES_Tail(); // trace call stack end
         return ThisEvent;
     }
-
+}
     /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
