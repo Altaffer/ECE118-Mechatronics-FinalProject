@@ -23,6 +23,8 @@
 #define TW_LOWER_BOUND 200
 #define BEACON_UPPER_BOUND 500
 #define BEACON_LOWER_BOUND 200
+#define BEACON_DETECTED 0
+#define BEACON_NOT_DETECTED 1
 
 //comment this out if you don't want to consider prev values for the track wire's
 //   hysteresis bounds
@@ -33,7 +35,7 @@
 /*******************************************************************************
  * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
  ******************************************************************************/
-//#define EVENTCHECKER_TEST
+#define EVENTCHECKER_TEST
 #ifdef EVENTCHECKER_TEST
 #include <stdio.h>
 #include <ES_Events.h>
@@ -102,7 +104,7 @@ uint8_t TapeSensorEventChecker(void) {
         returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
         //        PostTemplateHSM(thisEvent);
-        //        PostGenericService(thisEvent);
+                PostGenericService(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif   
@@ -176,7 +178,7 @@ uint32_t TrackWireEventChecker(void) {
 
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
         //        PostTemplateHSM(thisEvent);
-        //        PostGenericService(thisEvent);
+                PostGenericService(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif   
@@ -200,12 +202,12 @@ uint32_t BeaconEventChecker(void) {
     // 32 bits - assuming output from an ADC
 
     // hysteresis bounds 
-    if (BeaconInput > BEACON_UPPER_BOUND) {
+    if (BeaconInput = BEACON_DETECTED) {
 #ifdef DEBUG_PRINTS
         printf("Beacon found.\r\n");
 #endif
         currentEvent = FOUND_BEACON;
-    } else if (BeaconInput < BEACON_LOWER_BOUND) {
+    } else if (BeaconInput = BEACON_NOT_DETECTED) {
 #ifdef DEBUG_PRINTS
         printf("Beacon lost.\r\n"); 
 #endif
@@ -221,7 +223,7 @@ uint32_t BeaconEventChecker(void) {
 
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
         //        PostTemplateHSM(thisEvent);
-        //        PostGenericService(thisEvent);
+                PostGenericService(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif   
@@ -257,7 +259,7 @@ void PrintEvent(void);
 
 void main(void) {
     BOARD_Init();
-    Roach_Init();
+    Robot_Init();
     /* user initialization code goes here */
 
     // Do not alter anything below this line

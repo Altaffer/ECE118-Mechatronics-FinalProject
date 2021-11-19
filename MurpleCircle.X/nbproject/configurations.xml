@@ -273,6 +273,8 @@
         <C32Global>
         </C32Global>
       </item>
+      <item path="C:/ECE118/templates/TemplateES_Main.c" ex="true" overriding="false">
+      </item>
     </conf>
   </confs>
 </configurationDescriptor>

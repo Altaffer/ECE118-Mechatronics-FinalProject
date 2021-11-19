@@ -1,5 +1,0 @@
-<<<<<<< HEAD:MurpleCircle.X/.generated_files/flags/default/17749bb193b55f3a121b352ae1c86f56f68bee3e
- $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include"   -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  C:\Users\eappleto\Desktop\ECE118-FinalProject\final-project-code\MurpleCircle.X\EventCheckers.c
-=======
- $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include"   -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  C:\Users\zzhan247\final-project-code\MurpleCircle.X\FindNewCornerSub.c
->>>>>>> 1885a1156ad1297af85f09e6e409663158cb7e95:MurpleCircle.X/.generated_files/flags/default/cf6b602b430f8a68bc985ceabb5d385b87bcafed
