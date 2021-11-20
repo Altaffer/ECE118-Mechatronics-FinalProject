@@ -63,6 +63,8 @@ uint8_t TemplateCheckBattery(void);
 
 uint8_t TapeSensorEventChecker(void);
 
+uint8_t BeaconEventChecker(void);
+
 
 
 #endif	/* TEMPLATEEVENTCHECKER_H */

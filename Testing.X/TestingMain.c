@@ -37,6 +37,7 @@
 // TEST DEFINES
 //#define MOTOR_TEST
 #define BUMPER_TEST
+//#define BUMPER_TEST
 //#define TAPE_SENSOR_TEST
 //#define BEACON_TEST
 //#define SERVO_TEST
@@ -69,6 +70,9 @@ int main(void) {
     int currentTapeValue = 0;
     uint8_t currentBumperValue = 0;
     int currentBeaconValue = 0;
+    
+    //HZ 11/19 - testing code for beacon detector - IO ports X10
+    IO_PortsSetPortInputs(PORTX, PIN10);
 
     PORTX03_TRIS = INPUT;
     PORTX10_TRIS = INPUT;
@@ -88,7 +92,8 @@ int main(void) {
 #endif
 #ifdef BEACON_TEST
         currentBeaconValue = BEACON_PIN;
-        printf("\nBeacon Detector Value = %d \n\r", currentBeaconValue);
+        //printf("\nBeacon Detector Value = %d \n\r", currentBeaconValue);
+        printf("\nBeacon %d \n\r", currentBeaconValue); //BEACON working -HZ 11/19
 #endif
 #ifdef SERVO_TEST
         RC_SetPulseTime(SERVO_PIN, 1550);

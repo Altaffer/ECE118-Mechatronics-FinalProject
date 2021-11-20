@@ -13,6 +13,9 @@
 #include "TopLevel.h"
 //#include "TemplateHSM.h"
 
+#include "IO_Ports.h"
+
+
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
@@ -125,7 +128,7 @@ uint8_t TapeSensorEventChecker(void) {
  *          until the value drops below the LOWER_BOUND. 
  * @author Horace, 11/14 */
 
-uint32_t TrackWireEventChecker(void) {
+uint8_t TrackWireEventChecker(void) {
     static ES_EventTyp_t lastEvent = ES_NO_EVENT; 
     // Setting a value because currentEvent would be initialized to some random 
     // value. 
@@ -193,21 +196,20 @@ uint32_t TrackWireEventChecker(void) {
  * @brief Compares the previous beacon values with the current ones. Returns 
  *          True and post event if there is change, False otherwise. 
  * @author Horace, 11/14 */
-uint32_t BeaconEventChecker(void) {
+uint8_t BeaconEventChecker(void) {
     static ES_EventTyp_t lastEvent = ES_NO_EVENT; 
     ES_EventTyp_t currentEvent = lastEvent;
     ES_Event thisEvent;
-    uint8_t returnVal = FALSE;
-    uint32_t BeaconInput = Robot_ReadBeaconSensor(); 
-    // 32 bits - assuming output from an ADC
+    uint8_t returnVal = (FALSE);
+    uint8_t BeaconInput = Robot_ReadBeaconSensor(); 
 
-    // hysteresis bounds 
-    if (BeaconInput = BEACON_DETECTED) {
+    // hysteresis bounds - we don't need it anymore HZ 11/19
+    if (BeaconInput == BEACON_DETECTED) {
 #ifdef DEBUG_PRINTS
-        printf("Beacon found.\r\n");
+        printf("Beacon detected.\r\n");
 #endif
         currentEvent = FOUND_BEACON;
-    } else if (BeaconInput = BEACON_NOT_DETECTED) {
+    } else if (BeaconInput == BEACON_NOT_DETECTED) {
 #ifdef DEBUG_PRINTS
         printf("Beacon lost.\r\n"); 
 #endif
@@ -261,7 +263,8 @@ void main(void) {
     BOARD_Init();
     Robot_Init();
     /* user initialization code goes here */
-
+    IO_PortsSetPortInputs(PORTX, PIN10);
+    //PWM_Init();
     // Do not alter anything below this line
     int i;
 

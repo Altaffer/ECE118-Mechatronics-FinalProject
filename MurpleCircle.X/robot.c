@@ -6,11 +6,12 @@
  * Modified to remove PLIB on June 29, 2021
  */
 
-#include <robot.h>
-#include <roach.h>
-#include <BOARD.h>
-#include <xc.h>
-
+#include "xc.h"
+#include "BOARD.h"
+#include "LED.h"
+#include "robot.h"
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <pwm.h>
 #include <serial.h>
@@ -381,9 +382,11 @@ uint32_t Robot_ReadTrackWire(void) {
     return AD_ReadADPin(TRACK_WIRE_PIN);
 }
 
-uint32_t Robot_ReadBeaconSensor(void) {
+uint8_t Robot_ReadBeaconSensor(void) {
     //Assuming that this should return a value from the ADC to indicate the distance
-    return AD_ReadADPin(BEACON_PIN);
+    //return AD_ReadADPin(BEACON_PIN);
+    //HZ 11/19 - now we use the IO ports
+    return BEACON_PIN;
 }
 //#define ROBOT_TEST
 #ifdef ROBOT_TEST
