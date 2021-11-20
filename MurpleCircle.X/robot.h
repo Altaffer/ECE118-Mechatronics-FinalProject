@@ -165,6 +165,6 @@ unsigned char Robot_ReadTapeSensors(void);
 
 uint32_t Robot_ReadTrackWire(void);
 
-uint32_t Robot_ReadBeaconSensor(void);
+uint8_t Robot_ReadBeaconSensor(void);
 
 #endif
