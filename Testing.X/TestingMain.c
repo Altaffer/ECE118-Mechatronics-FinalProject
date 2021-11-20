@@ -35,8 +35,8 @@
 #define DELAY_LOOP_TIME 1000 // ms
 
 // TEST DEFINES
-#define MOTOR_TEST
-//#define BUMPER_TEST
+//#define MOTOR_TEST
+#define BUMPER_TEST
 //#define TAPE_SENSOR_TEST
 //#define BEACON_TEST
 //#define SERVO_TEST
@@ -67,7 +67,7 @@ int main(void) {
     RC_Init();
     RC_AddPins(SERVO_PIN);
     int currentTapeValue = 0;
-    int currentBumperValue = 0;
+    uint8_t currentBumperValue = 0;
     int currentBeaconValue = 0;
 
     PORTX03_TRIS = INPUT;
@@ -83,7 +83,7 @@ int main(void) {
         goForward();
 #endif
 #ifdef BUMPER_TEST
-        currentBumperValue = Robot_ReadFrontLeftBumper();
+        currentBumperValue = Robot_ReadBumpers();
         printf("\nBumper Value = %d \n\r", currentBumperValue);
 #endif
 #ifdef BEACON_TEST
