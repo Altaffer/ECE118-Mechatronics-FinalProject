@@ -83,6 +83,8 @@ typedef enum {
     No_Signal,
     Found_New_Corner,
             
+    Found_Ping,
+            
 } ES_EventTyp_t;
 
 static const char *EventNames[] = {
@@ -129,6 +131,8 @@ static const char *EventNames[] = {
     "Bot_Oriented",
     "No_Signal",
     "Found_New_Corner",
+    
+    "Found_Ping",
 };
 
 
@@ -140,7 +144,7 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  BeaconEventChecker
+#define EVENT_CHECK_LIST  PingEventChecker
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the

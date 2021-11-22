@@ -27,6 +27,7 @@
 #define POT_PIN AD_PORTV8         // use V-08 for pot
 #define TAPE_SENSOR_1 PORTX03_BIT
 #define BEACON_PIN PORTX10_BIT
+#define PING_PIN PORTX9_BIT
 #define SERVO_PIN RC_PORTW08
 
 
@@ -36,11 +37,12 @@
 
 // TEST DEFINES
 //#define MOTOR_TEST
-#define BUMPER_TEST
+//#define BUMPER_TEST
 //#define BUMPER_TEST
 //#define TAPE_SENSOR_TEST
 //#define BEACON_TEST
 //#define SERVO_TEST
+#define PING_SENSOR_TEST
 
 //#define FREQ_TEST
 // </editor-fold>
@@ -65,6 +67,7 @@ int main(void) {
     SERIAL_Init();
     Robot_Init();
     PWM_Init();
+    TIMERS_Init();
     RC_Init();
     RC_AddPins(SERVO_PIN);
     int currentTapeValue = 0;
@@ -73,7 +76,6 @@ int main(void) {
     
     //HZ 11/19 - testing code for beacon detector - IO ports X10
     IO_PortsSetPortInputs(PORTX, PIN10);
-
     PORTX03_TRIS = INPUT;
     PORTX10_TRIS = INPUT;
     PORTV06_LAT = HIGH;  // enable for DC motor

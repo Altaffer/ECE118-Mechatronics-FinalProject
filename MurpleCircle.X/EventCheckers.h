@@ -65,6 +65,8 @@ uint8_t TapeSensorEventChecker(void);
 
 uint8_t BeaconEventChecker(void);
 
+uint8_t PingEventChecker(void);
+
 
 
 #endif	/* TEMPLATEEVENTCHECKER_H */

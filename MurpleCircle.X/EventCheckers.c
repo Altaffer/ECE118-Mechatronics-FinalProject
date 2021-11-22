@@ -11,6 +11,7 @@
 #include "robot.h"
 #include "BOARD.h"
 #include "TopLevel.h"
+#include "timers.h"
 //#include "TemplateHSM.h"
 
 #include "IO_Ports.h"
@@ -38,7 +39,7 @@
 /*******************************************************************************
  * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
  ******************************************************************************/
-//#define EVENTCHECKER_TEST
+#define EVENTCHECKER_TEST
 #ifdef EVENTCHECKER_TEST
 #include <stdio.h>
 #include <ES_Events.h>
@@ -232,6 +233,59 @@ uint8_t BeaconEventChecker(void) {
     }
     return (returnVal);
 }
+
+/**
+ * @Function BeaconEventChecker(void)
+ * @param void
+ * @return TRUE or FALSE
+ * @brief Compares the previous beacon values with the current ones. Returns 
+ *          True and post event if there is change, False otherwise. 
+ * @author Horace, 11/14 */
+uint8_t PingEventChecker(void) {
+    static ES_EventTyp_t lastEvent = ES_NO_EVENT; 
+    static uint8_t past_state = 0;
+    static uint8_t curr_state = 0;
+    static uint8_t flag = 0;//this is not necessary but secures the output
+    static uint32_t start_time = 0;
+    static uint32_t elapse_time = 0;
+    //static uint16_t counter = 0;
+    ES_EventTyp_t currentEvent = lastEvent;
+    ES_Event thisEvent;
+    uint8_t returnVal = (FALSE);
+    uint8_t PingInput = Robot_ReadPingSensor(); 
+
+    curr_state = PingInput;
+    if (curr_state > past_state) {
+        start_time = TIMERS_GetTime();
+        currentEvent = ES_NO_EVENT;
+        flag = 1;
+    } else if (curr_state < past_state && flag) {
+        elapse_time = TIMERS_GetTime() - start_time;
+        currentEvent = Found_Ping;
+        flag = 0;
+        
+    }
+    //if (flag) counter++;//this can be unstable but is very fast - backup plan
+    past_state = curr_state;
+    if (currentEvent == Found_Ping) {
+        thisEvent.EventType = currentEvent; 
+        thisEvent.EventParam = (uint16_t)elapse_time;
+        PostTopLevel(thisEvent);
+        currentEvent = ES_NO_EVENT;
+        lastEvent = currentEvent;
+        returnVal = TRUE;
+        //counter = 0;
+    
+
+#ifndef EVENTCHECKER_TEST           // keep this as is for test harness
+        //        PostTemplateHSM(thisEvent);
+                PostGenericService(thisEvent);
+#else
+        SaveEvent(thisEvent);
+#endif   
+    }
+    return (returnVal);
+}
 /* 
  * The Test Harness for the event checkers is conditionally compiled using
  * the EVENTCHECKER_TEST macro (defined either in the file or at the project level).
@@ -263,7 +317,8 @@ void main(void) {
     BOARD_Init();
     Robot_Init();
     /* user initialization code goes here */
-    IO_PortsSetPortInputs(PORTX, PIN10);
+    TIMERS_Init();
+    IO_PortsSetPortInputs(PORTW, PIN3);
     //PWM_Init();
     // Do not alter anything below this line
     int i;

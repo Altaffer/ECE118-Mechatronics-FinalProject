@@ -167,4 +167,6 @@ uint32_t Robot_ReadTrackWire(void);
 
 uint8_t Robot_ReadBeaconSensor(void);
 
+uint8_t Robot_ReadPingSensor(void); 
+
 #endif

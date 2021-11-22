@@ -12,6 +12,7 @@
 #include "robot.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "timers.h"
 
 #include <pwm.h>
 #include <serial.h>
@@ -35,6 +36,8 @@
 #define TAPE_SENSOR_4 PORTX06_BIT
 #define TAPE_SENSOR_5 PORTX07_BIT
 #define TAPE_SENSOR_6 PORTX08_BIT
+
+#define PING_PIN PORTW03_BIT
 
 #define BEACON_PIN PORTX10_BIT
 #define TRACK_WIRE_PIN AD_PORTV4
@@ -387,6 +390,10 @@ uint8_t Robot_ReadBeaconSensor(void) {
     //return AD_ReadADPin(BEACON_PIN);
     //HZ 11/19 - now we use the IO ports
     return BEACON_PIN;
+}
+
+uint8_t Robot_ReadPingSensor(void) {
+    return PING_PIN;
 }
 //#define ROBOT_TEST
 #ifdef ROBOT_TEST
