@@ -94,7 +94,6 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent)
 {
     uint8_t makeTransition = FALSE; // use to flag transition
     SubHSMState_t nextState; 
-    static int dance_counter = 1;
 
     ES_Tattle(); // trace call stack
 

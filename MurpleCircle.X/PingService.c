@@ -96,12 +96,10 @@ ES_Event RunPingService(ES_Event ThisEvent) {
         case ES_TIMEOUT:
             if (!ping_val) {
                 Robot_TrigPingSensor(TRIG_UP);
-                //printf("trigup\r\n");
                 ES_Timer_InitTimer(PingTriggerTimer, TIMER_HIGH_TICKS);
             } else {
                 Robot_TrigPingSensor(TRIG_DOWN);
                 ES_Timer_InitTimer(PingTriggerTimer, TIMER_0_TICKS);
-                //printf("trigdown\r\n");
             }
             break;
         default:

@@ -81,11 +81,11 @@ typedef enum {
     TOWER_DONE,        
     
     //Bot Events
-    Bot_Oriented,
-    No_Signal,
-    Found_New_Corner,
+    BOT_ORIENTED,
+    NO_SIGNAL,
+    FOUND_NEW_CORNER,
             
-    Found_Ping,
+    FOUND_PING,
             
 } ES_EventTyp_t;
 
@@ -130,11 +130,11 @@ static const char *EventNames[] = {
     "TOWER_DONE",  
     
     //Bot Events
-    "Bot_Oriented",
-    "No_Signal",
-    "Found_New_Corner",
+    "BOT_ORIENTED",
+    "NO_SIGNAL",
+    "FOUND_NEW_CORNER",
     
-    "Found_Ping",
+    "FOUND_PING",
 };
 
 

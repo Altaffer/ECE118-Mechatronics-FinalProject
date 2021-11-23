@@ -11,6 +11,7 @@
 #include "BOARD.h"
 #include "TopLevel.h"
 #include "ScanForBeaconSub.h"
+#include "robot.h"
 
 
 #include <stdio.h>
@@ -22,20 +23,30 @@
 //States have not been renamed - HZ 11/12
 typedef enum {
     InitPSubState,
+    Turn,
+    FindPing,
+    Reverse,
     NoSubService
 } SubHSMState_t;
 
 static const char *StateNames[] = {
     "InitPSubState",
+    "Turn",
+    "FindPing",
+    "Reverse",
     "NoSubService"
 };
 
+#define TURN_SPEED 50
+#define FRONT_TAPE 0x0008 // 1000 - Change this to the right one
 
 
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
  ******************************************************************************/
-
+uint8_t CCW_Turn(void);
+uint8_t CW_Turn(void);
+uint8_t stop_bot(void);
 /*******************************************************************************
  * PRIVATE MODULE VARIABLES                                                            *
  ******************************************************************************/
@@ -88,24 +99,51 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent)
 {
     uint8_t makeTransition = FALSE; // use to flag transition
     SubHSMState_t nextState; 
-    static int dance_counter = 1;
+    static uint8_t tower_counter = 0;//counts how many to go when reversing
+    static uint16_t min_elapse_time = 999;//max possible is 704, which does 
+                                            //not generate an event
+    
 
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-    case InitPSubState: // If current state is initial Psedudo State
-        if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-        {
-            nextState = NoSubService;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-        }
-        break;
-
-    case NoSubService: /* After initialzing or executing, it sits here for the next 
-                          time it gets called. */
-    default: // all unhandled events fall into here
-        break;
+        case InitPSubState: // If current state is initial Psedudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
+                nextState = Turn;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                CCW_Turn();
+            }
+            break;
+        case Turn:
+            if (ThisEvent.EventType == FOUND_BEACON) {
+                nextState = FindPing;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            } else if (ThisEvent.EventType == ON_BT && (ThisEvent.EventParam & FRONT_TAPE)) {
+                nextState = Reverse;
+                makeTransition = TRUE;
+                CW_Turn();
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
+        case FindPing:
+            if (ThisEvent.EventType == FOUND_PING) {
+                nextState = Turn;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                if (min_elapse_time > ThisEvent.EventParam){
+                    min_elapse_time = ThisEvent.EventParam;
+                } else {
+                    tower_counter++;
+                }
+            }
+            break;
+        case NoSubService: /* After initialzing or executing, it sits here for the next 
+                              time it gets called. */
+        default: // all unhandled events fall into here
+            break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
@@ -124,4 +162,22 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent)
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
+uint8_t CCW_Turn(void) {
+    Robot_LeftMtrSpeed(-1*TURN_SPEED);
+    Robot_RightMtrSpeed(TURN_SPEED);
+    return 0;
+}
+
+uint8_t CW_Turn(void) {
+    Robot_LeftMtrSpeed(TURN_SPEED);
+    Robot_RightMtrSpeed(-1*TURN_SPEED);
+    return 0;
+}
+
+uint8_t stop_bot(void) {
+    Robot_LeftMtrSpeed(0);
+    Robot_RightMtrSpeed(0);
+    return 0;
+}
+
 

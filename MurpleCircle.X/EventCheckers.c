@@ -15,7 +15,6 @@
 #include "timers.h"
 #include "stdio.h"
 #include "stdlib.h"
-//#include "TemplateHSM.h"
 
 #include "IO_Ports.h"
 
@@ -265,13 +264,18 @@ uint8_t PingEventChecker(void) {
         flag = 1;
     } else if (curr_state < past_state && flag) {
         elapse_time = (TIMERS_GetTime() - start_time);
-        currentEvent = Found_Ping;
+        currentEvent = FOUND_PING;
         flag = 0;
         
     }
     //if (flag) counter++;//this can be unstable but is very fast - backup plan
     past_state = curr_state;
-    if (currentEvent == Found_Ping && elapse_time < PING_MAX) {
+#ifndef TEST_HARNESSES
+    if (currentEvent == FOUND_PING && elapse_time < PING_MAX) {
+#else
+    if (currentEvent == FOUND_PING) {
+        printf("%d\r\n", elapse_time);
+#endif
         //printf("%d\r\n", elapse_time);
         thisEvent.EventType = currentEvent; 
         thisEvent.EventParam = elapse_time;
