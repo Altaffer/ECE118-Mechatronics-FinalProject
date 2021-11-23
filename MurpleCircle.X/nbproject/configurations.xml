@@ -36,6 +36,7 @@
       <itemPath>NavTowerSub.h</itemPath>
       <itemPath>NavFieldSub.h</itemPath>
       <itemPath>timers.h</itemPath>
+      <itemPath>PingService.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -67,6 +68,7 @@
       <itemPath>TopLevel.c</itemPath>
       <itemPath>ScanForBeaconSub.c</itemPath>
       <itemPath>timers.c</itemPath>
+      <itemPath>PingService.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -273,7 +275,9 @@
         <C32Global>
         </C32Global>
       </item>
-      <item path="C:/ECE118/templates/TemplateES_Main.c" ex="true" overriding="false">
+      <item path="C:/ECE118/templates/TemplateES_Main.c"
+            ex="false"
+            overriding="false">
         <C32>
         </C32>
         <C32-AR>

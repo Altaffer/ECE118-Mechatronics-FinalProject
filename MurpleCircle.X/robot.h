@@ -169,4 +169,8 @@ uint8_t Robot_ReadBeaconSensor(void);
 
 uint8_t Robot_ReadPingSensor(void); 
 
+uint8_t Robot_ReadPingTrigger(void); 
+
+uint8_t Robot_TrigPingSensor(uint8_t trig); 
+
 #endif
