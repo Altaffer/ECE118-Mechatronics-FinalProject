@@ -26,6 +26,7 @@
  ******************************************************************************/
 // speed and direction
 #define FWD_speed 80    // Straight
+#define BCKWD_speed -80 
 #define STOP_speed 0    // stopping
 
 #define LTANK_L -60     // tank turns

@@ -32,15 +32,15 @@
 
 #define DELAY_MULTIPLIER 1000
 #define DELAY(x)    for (int wait = 0; wait <= (DELAY_MULTIPLIER * x); wait++) {asm("nop");}
-#define DELAY_LOOP_TIME 1000 // ms
+#define DELAY_LOOP_TIME 2000 // ms
 
 // TEST DEFINES
 //#define MOTOR_TEST
-#define BUMPER_TEST
+//#define BUMPER_TEST
 //#define BUMPER_TEST
 //#define TAPE_SENSOR_TEST
 //#define BEACON_TEST
-//#define SERVO_TEST
+#define SERVO_TEST
 
 //#define FREQ_TEST
 // </editor-fold>
@@ -52,9 +52,9 @@ uint8_t goForward(void) {
     //something here to make the bot go forward at full speed
     Robot_LeftMtrSpeed(FWD_speed);
     Robot_RightMtrSpeed(FWD_speed);
-//    DELAY(DELAY_LOOP_TIME);
-//    Robot_LeftMtrSpeed(0);
-//    DELAY(DELAY_LOOP_TIME);
+    //    DELAY(DELAY_LOOP_TIME);
+    //    Robot_LeftMtrSpeed(0);
+    //    DELAY(DELAY_LOOP_TIME);
     //    Robot_RightMtrSpeed(FWD_speed);
 }
 
@@ -70,13 +70,13 @@ int main(void) {
     int currentTapeValue = 0;
     uint8_t currentBumperValue = 0;
     int currentBeaconValue = 0;
-    
+
     //HZ 11/19 - testing code for beacon detector - IO ports X10
     IO_PortsSetPortInputs(PORTX, PIN10);
 
     PORTX03_TRIS = INPUT;
     PORTX10_TRIS = INPUT;
-    PORTV06_LAT = HIGH;  // enable for DC motor
+    PORTV06_LAT = HIGH; // enable for DC motor
 
     while (1) {
 #ifdef TAPE_SENSOR_TEST
@@ -89,6 +89,24 @@ int main(void) {
 #ifdef BUMPER_TEST
         currentBumperValue = Robot_ReadBumpers();
         printf("\nBumper Value = %d \n\r", currentBumperValue);
+        if (currentBumperValue == 1) {
+            Robot_LeftMtrSpeed(FWD_speed);
+            DELAY(DELAY_LOOP_TIME);
+            Robot_LeftMtrSpeed(0);
+        }else if (currentBumperValue == 2){
+            Robot_RightMtrSpeed(FWD_speed);
+            DELAY(DELAY_LOOP_TIME);
+            Robot_RightMtrSpeed(0);
+        }else if (currentBumperValue == 3){
+            Robot_LeftMtrSpeed(FWD_speed);
+            Robot_RightMtrSpeed(FWD_speed);
+            DELAY(DELAY_LOOP_TIME);
+            Robot_LeftMtrSpeed(BCKWD_speed);
+            Robot_RightMtrSpeed(BCKWD_speed);
+            DELAY(DELAY_LOOP_TIME);
+            Robot_LeftMtrSpeed(0);
+            Robot_RightMtrSpeed(0);
+        }
 #endif
 #ifdef BEACON_TEST
         currentBeaconValue = BEACON_PIN;
@@ -97,6 +115,8 @@ int main(void) {
 #endif
 #ifdef SERVO_TEST
         RC_SetPulseTime(SERVO_PIN, 1550);
+        currentBumperValue = Robot_ReadRearLeftBumper();
+        printf("\nSwitch Value = %d \n\r", currentBumperValue);
 #endif
     }
 

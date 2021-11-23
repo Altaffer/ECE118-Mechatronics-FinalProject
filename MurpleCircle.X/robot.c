@@ -47,9 +47,10 @@
 #define TAPE_SENSOR_6_TRIS PORTX08_TRIS
 
 #define HALL_FRONT_LEFT _RB8 // V07
-#define HALL_FRONT_RIGHT _RD9 // V08
-#define HALL_REAR_RIGHT _RD8
-#define HALL_REAR_LEFT _RB10
+//#define HALL_FRONT_RIGHT _RD9 // V08 I don't think this pin works so I moved
+                                // to _RD8 (Z08)
+#define HALL_FRONT_RIGHT _RD8 // <- this is the new front right bump pin
+#define HALL_REAR_LEFT _RB10 // W04 used for ball shooter switch
 
 #define LEFT_DIR_TRIS _TRISB3
 #define LEFT_DIR_INV_TRIS _TRISB2
@@ -294,9 +295,9 @@ unsigned char Robot_ReadRearLeftBumper(void) {
  * @return BUMPER_TRIPPED or BUMPER_NOT_TRIPPED
  * @brief  Returns the state of the rear right bumper
  * @author Max Dunne, 2012.01.06 */
-unsigned char Robot_ReadRearRightBumper(void) {
-    return !HALL_REAR_RIGHT;
-}
+//unsigned char Robot_ReadRearRightBumper(void) {
+//    return !HALL_REAR_RIGHT;
+//}
 
 /**
  * @Function Robot_ReadBumpers(void)
@@ -307,7 +308,8 @@ unsigned char Robot_ReadRearRightBumper(void) {
 unsigned char Robot_ReadBumpers(void) {
     //unsigned char bump_state;
     //bump_state = (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
-    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
+    //    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
+    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1));
 }
 
 /**
