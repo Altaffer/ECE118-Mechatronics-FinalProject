@@ -32,9 +32,11 @@
 // Name/define the events of interest
 // Universal events occupy the lowest entries, followed by user-defined events
 
+
 #define TurnTimer 1
 #define ForwardTimer 2
 #define ReverseTimer 3
+#define PingTriggerTimer 4
 
 /****************************************************************************/
 typedef enum {
@@ -79,9 +81,11 @@ typedef enum {
     TOWER_DONE,        
     
     //Bot Events
-    Bot_Oriented,
-    No_Signal,
-    Found_New_Corner,
+    BOT_ORIENTED,
+    NO_SIGNAL,
+    FOUND_NEW_CORNER,
+            
+    FOUND_PING,
             
 } ES_EventTyp_t;
 
@@ -126,9 +130,11 @@ static const char *EventNames[] = {
     "TOWER_DONE",  
     
     //Bot Events
-    "Bot_Oriented",
-    "No_Signal",
-    "Found_New_Corner",
+    "BOT_ORIENTED",
+    "NO_SIGNAL",
+    "FOUND_NEW_CORNER",
+    
+    "FOUND_PING",
 };
 
 
@@ -140,7 +146,7 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  BeaconEventChecker
+#define EVENT_CHECK_LIST  PingEventChecker
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
@@ -151,7 +157,7 @@ static const char *EventNames[] = {
 #define TIMER1_RESP_FUNC TIMER_UNUSED
 #define TIMER2_RESP_FUNC TIMER_UNUSED
 #define TIMER3_RESP_FUNC TIMER_UNUSED
-#define TIMER4_RESP_FUNC TIMER_UNUSED
+#define TIMER4_RESP_FUNC PostPingService
 #define TIMER5_RESP_FUNC TIMER_UNUSED
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #define TIMER7_RESP_FUNC TIMER_UNUSED
@@ -181,16 +187,16 @@ static const char *EventNames[] = {
 #define MAX_NUM_SERVICES 8
 
 /****************************************************************************/
-// This macro determines that nuber of services that are *actually* used in
+// This macro determines that number of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 1
+#define NUM_SERVICES 3
 
 ///****************************************************************************/
 //// These are the definitions for Service 0, the lowest priority service
 //// every Events and Services application must have a Service 0. Further 
 //// services are added in numeric sequence (1,2,3,...) with increasing 
 //// priorities
-//// the header file with the public fuction prototypes
+//// the header file with the public function prototypes
 //#define SERV_0_HEADER "TopLevel.h"
 //// the name of the Init function
 //#define SERV_0_INIT InitTopLevel
@@ -217,11 +223,11 @@ static const char *EventNames[] = {
 // These are the definitions for Service 1
 #if NUM_SERVICES > 1
 // the header file with the public fuction prototypes
-#define SERV_1_HEADER "OrientBotSub.h"
+#define SERV_1_HEADER "TopLevel.h"
 // the name of the Init function
-#define SERV_1_INIT InitOrientBot
+#define SERV_1_INIT InitTopLevel
 // the name of the run function
-#define SERV_1_RUN RunOrientBot
+#define SERV_1_RUN RunTopLevel
 // How big should this services Queue be?
 #define SERV_1_QUEUE_SIZE 9
 #endif
@@ -230,11 +236,11 @@ static const char *EventNames[] = {
 // These are the definitions for Service 2
 #if NUM_SERVICES > 2
 // the header file with the public fuction prototypes
-#define SERV_2_HEADER "ScanForBeaconSub.h"
+#define SERV_2_HEADER "PingService.h"
 // the name of the Init function
-#define SERV_2_INIT InitScanForBeacon
+#define SERV_2_INIT InitPingService
 // the name of the run function
-#define SERV_2_RUN RunScanForBeacon
+#define SERV_2_RUN RunPingService
 // How big should this services Queue be?
 #define SERV_2_QUEUE_SIZE 9
 #endif

@@ -12,6 +12,8 @@
 #include "robot.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "timers.h"
+#include "ES_Configure.h"
 
 #include <pwm.h>
 #include <serial.h>
@@ -35,6 +37,9 @@
 #define TAPE_SENSOR_4 PORTX06_BIT
 #define TAPE_SENSOR_5 PORTX07_BIT
 #define TAPE_SENSOR_6 PORTX08_BIT
+
+#define PING_PIN PORTW03_BIT 
+#define PING_TRIG PORTW05_BIT
 
 #define BEACON_PIN PORTX10_BIT
 #define TRACK_WIRE_PIN AD_PORTV4
@@ -150,6 +155,9 @@ void Robot_Init(void) {
     PWM_Init();
     PWM_SetFrequency(1000);
     PWM_AddPins(LEFT_PWM | RIGHT_PWM);
+    
+    
+    IO_PortsSetPortOutputs(PORTW, PIN5);
 
     LEFT_DIR_TRIS = 0;
     LEFT_DIR_INV_TRIS = 0;
@@ -185,6 +193,8 @@ void Robot_Init(void) {
     AD_AddPins(LIGHT_SENSOR);
 
     //enable interrupts
+    
+    
 }
 
 /**
@@ -390,6 +400,20 @@ uint8_t Robot_ReadBeaconSensor(void) {
     //HZ 11/19 - now we use the IO ports
     return BEACON_PIN;
 }
+
+uint8_t Robot_ReadPingSensor(void) {
+    return PING_PIN;
+}
+
+uint8_t Robot_ReadPingTrigger(void) {
+    return PING_TRIG;
+}
+
+uint8_t Robot_TrigPingSensor(uint8_t trig) {
+    IO_PortsWritePort(PORTW, PIN5*trig);//PIN4
+    return 0;
+}
+
 //#define ROBOT_TEST
 #ifdef ROBOT_TEST
 #pragma config FPLLIDIV 	= DIV_2		//PLL Input Divider

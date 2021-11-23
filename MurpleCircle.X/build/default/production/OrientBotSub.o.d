@@ -5,8 +5,9 @@ build/default/production/OrientBotSub.o: OrientBotSub.c ES_Configure.h \
  C:/ECE118/include/ES_LookupTables.h C:/ECE118/include/ES_Port.h \
  C:/ECE118/include/ES_PostList.h C:/ECE118/include/ES_PriorTables.h \
  C:/ECE118/include/ES_Queue.h C:/ECE118/include/ES_ServiceHeaders.h \
- ES_Configure.h C:/ECE118/include/ES_TattleTale.h \
- C:/ECE118/include/BOARD.h TopLevel.h OrientBotSub.h robot.h
+ ES_Configure.h TopLevel.h ES_Configure.h PingService.h \
+ C:/ECE118/include/ES_TattleTale.h C:/ECE118/include/BOARD.h TopLevel.h \
+ OrientBotSub.h robot.h
 
 ES_Configure.h:
 
@@ -35,6 +36,12 @@ C:/ECE118/include/ES_Queue.h:
 C:/ECE118/include/ES_ServiceHeaders.h:
 
 ES_Configure.h:
+
+TopLevel.h:
+
+ES_Configure.h:
+
+PingService.h:
 
 C:/ECE118/include/ES_TattleTale.h:
 

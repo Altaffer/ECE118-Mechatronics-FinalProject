@@ -25,7 +25,6 @@
       <itemPath>C:/ECE118/include/pwm.h</itemPath>
       <itemPath>C:/ECE118/include/roach.h</itemPath>
       <itemPath>C:/ECE118/include/serial.h</itemPath>
-      <itemPath>C:/ECE118/include/timers.h</itemPath>
       <itemPath>ES_Configure.h</itemPath>
       <itemPath>OrientBotSub.h</itemPath>
       <itemPath>EventCheckers.h</itemPath>
@@ -36,6 +35,8 @@
       <itemPath>ToBeaconSub.h</itemPath>
       <itemPath>NavTowerSub.h</itemPath>
       <itemPath>NavFieldSub.h</itemPath>
+      <itemPath>timers.h</itemPath>
+      <itemPath>PingService.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -59,7 +60,6 @@
       <itemPath>C:/ECE118/src/RC_Servo.c</itemPath>
       <itemPath>C:/ECE118/src/pwm.c</itemPath>
       <itemPath>C:/ECE118/src/serial.c</itemPath>
-      <itemPath>C:/ECE118/src/timers.c</itemPath>
       <itemPath>C:/ECE118/templates/TemplateES_Main.c</itemPath>
       <itemPath>EventCheckers.c</itemPath>
       <itemPath>FindNewCornerSub.c</itemPath>
@@ -67,6 +67,8 @@
       <itemPath>robot.c</itemPath>
       <itemPath>TopLevel.c</itemPath>
       <itemPath>ScanForBeaconSub.c</itemPath>
+      <itemPath>timers.c</itemPath>
+      <itemPath>PingService.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -273,7 +275,9 @@
         <C32Global>
         </C32Global>
       </item>
-      <item path="C:/ECE118/templates/TemplateES_Main.c" ex="true" overriding="false">
+      <item path="C:/ECE118/templates/TemplateES_Main.c"
+            ex="false"
+            overriding="false">
         <C32>
         </C32>
         <C32-AR>

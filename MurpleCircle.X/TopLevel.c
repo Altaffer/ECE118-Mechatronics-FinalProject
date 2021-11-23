@@ -182,7 +182,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
         ThisEvent = RunOrientBot(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case Bot_Oriented:
+        case BOT_ORIENTED:
             // make transition to scan for beacon state
             nextState = ScanForBeacon;
             makeTransition = TRUE;
@@ -201,7 +201,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
         ThisEvent = RunScanForBeacon(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case No_Signal: // or ES_NO_EVENT - HZ 11/15
+        case NO_SIGNAL: // or ES_NO_EVENT - HZ 11/15
             // make transition to find a new corner
             if (Tower_Found == 0)
             {
@@ -236,7 +236,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
         ThisEvent = RunFindNewCorner(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case Found_New_Corner:
+        case FOUND_NEW_CORNER:
             // make transition to scan for beacon state
             nextState = ScanForBeacon;
             makeTransition = TRUE;
@@ -322,7 +322,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
         //ThisEvent = RunNavField(ThisEvent); 
         switch (ThisEvent.EventType)
         {
-        case Found_New_Corner:
+        case FOUND_NEW_CORNER:
             // make transition to Scan for Beacon state
             nextState = ScanForBeacon;
             makeTransition = TRUE;

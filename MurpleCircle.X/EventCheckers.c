@@ -5,13 +5,16 @@
 #include "ES_Configure.h"
 #include "EventCheckers.h"
 #include "ES_Events.h"
+#include "ES_Timers.h"
 #include "serial.h"
 #include "AD.h"
 #include "roach.h"
 #include "robot.h"
 #include "BOARD.h"
 #include "TopLevel.h"
-//#include "TemplateHSM.h"
+#include "timers.h"
+#include "stdio.h"
+#include "stdlib.h"
 
 #include "IO_Ports.h"
 
@@ -28,6 +31,7 @@
 #define BEACON_LOWER_BOUND 200
 #define BEACON_DETECTED 0
 #define BEACON_NOT_DETECTED 1
+#define PING_MAX 700
 
 //comment this out if you don't want to consider prev values for the track wire's
 //   hysteresis bounds
@@ -38,7 +42,7 @@
 /*******************************************************************************
  * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
  ******************************************************************************/
-#define EVENTCHECKER_TEST
+//#define EVENTCHECKER_TEST
 #ifdef EVENTCHECKER_TEST
 #include <stdio.h>
 #include <ES_Events.h>
@@ -107,7 +111,7 @@ uint8_t TapeSensorEventChecker(void) {
         returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
         //        PostTemplateHSM(thisEvent);
-                PostGenericService(thisEvent);
+        //        PostGenericService(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif   
@@ -181,7 +185,7 @@ uint8_t TrackWireEventChecker(void) {
 
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
         //        PostTemplateHSM(thisEvent);
-                PostGenericService(thisEvent);
+        //        PostGenericService(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif   
@@ -225,7 +229,66 @@ uint8_t BeaconEventChecker(void) {
 
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
         //        PostTemplateHSM(thisEvent);
-                PostGenericService(thisEvent);
+        //        PostGenericService(thisEvent);
+#else
+        SaveEvent(thisEvent);
+#endif   
+    }
+    return (returnVal);
+}
+
+/**
+ * @Function BeaconEventChecker(void)
+ * @param void
+ * @return TRUE or FALSE
+ * @brief Compares the previous beacon values with the current ones. Returns 
+ *          True and post event if there is change, False otherwise. 
+ * @author Horace, 11/14 */
+uint8_t PingEventChecker(void) {
+    static ES_EventTyp_t lastEvent = ES_NO_EVENT; 
+    static uint8_t past_state = 0;
+    static uint8_t curr_state = 0;
+    static uint8_t flag = 0;//this is not necessary but secures the output
+    static uint32_t start_time = 0;
+    static uint16_t elapse_time = 0;
+    //static uint16_t counter = 0;
+    ES_EventTyp_t currentEvent = lastEvent;
+    ES_Event thisEvent;
+    uint8_t returnVal = (FALSE);
+    uint8_t PingInput = Robot_ReadPingSensor(); 
+
+    curr_state = PingInput;
+    if (curr_state > past_state) {
+        start_time = TIMERS_GetTime();
+        currentEvent = ES_NO_EVENT;
+        flag = 1;
+    } else if (curr_state < past_state && flag) {
+        elapse_time = (TIMERS_GetTime() - start_time);
+        currentEvent = FOUND_PING;
+        flag = 0;
+        
+    }
+    //if (flag) counter++;//this can be unstable but is very fast - backup plan
+    past_state = curr_state;
+#ifndef TEST_HARNESSES
+    if (currentEvent == FOUND_PING && elapse_time < PING_MAX) {
+#else
+    if (currentEvent == FOUND_PING) {
+        printf("%d\r\n", elapse_time);
+#endif
+        //printf("%d\r\n", elapse_time);
+        thisEvent.EventType = currentEvent; 
+        thisEvent.EventParam = elapse_time;
+        PostTopLevel(thisEvent);
+        currentEvent = ES_NO_EVENT;
+        lastEvent = currentEvent;
+        returnVal = TRUE;
+        //counter = 0;
+    
+
+#ifndef EVENTCHECKER_TEST           // keep this as is for test harness
+        //        PostTemplateHSM(thisEvent);
+        //        PostGenericService(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif   
@@ -263,7 +326,9 @@ void main(void) {
     BOARD_Init();
     Robot_Init();
     /* user initialization code goes here */
-    IO_PortsSetPortInputs(PORTX, PIN10);
+    TIMERS_Init();
+    ES_Timer_Init();
+    IO_PortsSetPortInputs(PORTW, PIN3);
     //PWM_Init();
     // Do not alter anything below this line
     int i;
