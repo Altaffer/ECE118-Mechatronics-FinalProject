@@ -6,7 +6,7 @@ build/default/production/PingService.o: PingService.c \
  C:/ECE118/include/ES_LookupTables.h C:/ECE118/include/ES_Port.h \
  C:/ECE118/include/ES_PostList.h C:/ECE118/include/ES_PriorTables.h \
  C:/ECE118/include/ES_Queue.h C:/ECE118/include/ES_ServiceHeaders.h \
- ES_Configure.h TopLevel.h ES_Configure.h PingService.h \
+ ES_Configure.h TopLevel.h ES_Configure.h PingService.h BumperService.h \
  C:/ECE118/include/ES_TattleTale.h PingService.h \
  C:/ECE118/include/ES_Timers.h robot.h
 
@@ -47,6 +47,8 @@ TopLevel.h:
 ES_Configure.h:
 
 PingService.h:
+
+BumperService.h:
 
 C:/ECE118/include/ES_TattleTale.h:
 

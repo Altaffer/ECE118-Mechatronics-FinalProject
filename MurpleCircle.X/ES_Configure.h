@@ -37,6 +37,15 @@
 #define ForwardTimer 2
 #define ReverseTimer 3
 #define PingTriggerTimer 4
+#define BumperTimer 5
+
+#define BUMPER_TIMER 100
+
+
+
+
+//#define USE_TAPE_SERVICE //this option disables the working one in the event checkers
+#define TAPE_TIMER 6
 
 /****************************************************************************/
 typedef enum {
@@ -55,12 +64,16 @@ typedef enum {
     BUMPED_LEFT,
     BUMPED_RIGHT,
     BUMPED_BOTH,
+    BUMPER_SERVO,
 
     //black tape sensors on the bottom
     ON_BT,
     OFF_BT,
+    BOT_BT_CHANGED,
+
 
     //Black tape sensors on the shooter
+    SHOOTER_BT_CHANGED,
     BT_FOUND_SHOOTER_1,
     BT_LOST_SHOOTER_1,
     BT_FOUND_SHOOTER_2,
@@ -104,12 +117,16 @@ static const char *EventNames[] = {
     "BUMPED_LEFT",
     "BUMPED_RIGHT",
     "BUMPED_BOTH",
+    "BUMPER_SERVO",
 
     //black tape sensors on the bottom
     "ON_BT",
     "OFF_BT",
+    
+    "BOT_BT_CHANGED",
 
     //Black tape sensors on the shooter
+    "SHOOTER_BT_CHANGED",
     "BT_FOUND_SHOOTER_1",
     "BT_LOST_SHOOTER_1",
     "BT_FOUND_SHOOTER_2",
@@ -158,8 +175,12 @@ static const char *EventNames[] = {
 #define TIMER2_RESP_FUNC TIMER_UNUSED
 #define TIMER3_RESP_FUNC TIMER_UNUSED
 #define TIMER4_RESP_FUNC PostPingService
-#define TIMER5_RESP_FUNC TIMER_UNUSED
+#define TIMER5_RESP_FUNC PostBumperService
+#ifdef USE_TAPE_SERVICE
+#define TIMER6_RESP_FUNC PostTapeService
+#else
 #define TIMER6_RESP_FUNC TIMER_UNUSED
+#endif
 #define TIMER7_RESP_FUNC TIMER_UNUSED
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
@@ -189,7 +210,8 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This macro determines that number of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 3
+#define NUM_SERVICES 4 //when we decide to use the tape service, change it to 
+                        //at least 5
 
 ///****************************************************************************/
 //// These are the definitions for Service 0, the lowest priority service
@@ -251,11 +273,11 @@ static const char *EventNames[] = {
 // These are the definitions for Service 3
 #if NUM_SERVICES > 3
 // the header file with the public fuction prototypes
-#define SERV_3_HEADER "FindNewCornerSub.h"
+#define SERV_3_HEADER "BumperService.h"
 // the name of the Init function
-#define SERV_3_INIT InitFindNewCorner
+#define SERV_3_INIT InitBumperService
 // the name of the run function
-#define SERV_3_RUN RunFindNewCorner
+#define SERV_3_RUN RunBumperService
 // How big should this services Queue be?
 #define SERV_3_QUEUE_SIZE 9
 #endif
@@ -264,11 +286,11 @@ static const char *EventNames[] = {
 // These are the definitions for Service 4
 #if NUM_SERVICES > 4
 // the header file with the public fuction prototypes
-#define SERV_4_HEADER "NavigateFieldSub.h"
+#define SERV_4_HEADER "TapeService.h"
 // the name of the Init function
-#define SERV_4_INIT InitNavigateField
+#define SERV_4_INIT InitTapeService
 // the name of the run function
-#define SERV_4_RUN RunNavigateField
+#define SERV_4_RUN RunTapeService
 // How big should this services Queue be?
 #define SERV_4_QUEUE_SIZE 9
 #endif

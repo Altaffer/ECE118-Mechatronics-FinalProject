@@ -38,9 +38,9 @@
 #ifdef TEST_HARNESSES
 #include "PingService.h"
 
-#define RIGHT 10
+#define RIGHT 2
 #define LEFT 01
-#define BOTH 11
+#define BOTH 3
 #define NONE 0
 #define PRIORITY 5 //dummy
 
@@ -78,26 +78,31 @@ void main(void) {
     InitPingService(PRIORITY);
     uint8_t bumpers;
     while (1) {
+        printf("Test Harness iteration\r\n");
         DELAY(DELAY_LOOP_TIME);
         bumpers = Robot_ReadBumpers();
 
         switch (bumpers) {
                 /* run LED sequence once*/
             case BOTH:
+                printf("both pressed\r\n");
                 test_motors();
                 break;
 
             case RIGHT:
+                printf("right pressed\r\n");
                 test_servo();
                 break;
 
             case LEFT:
+                printf("left pressed\r\n");
                 test_something();
                 DELAY(DELAY_LOOP_TIME);
                 test_tapeSensors();
                 //press for a while
                 //this will:
                 // print something from the Ping Sensor
+                // and also print the tape status
                 break;
             default:
                 break;

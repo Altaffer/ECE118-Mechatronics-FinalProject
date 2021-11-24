@@ -32,6 +32,8 @@
 #define BEACON_DETECTED 0
 #define BEACON_NOT_DETECTED 1
 #define PING_MAX 700
+#define SHOOTER 48 //0b 11 0000
+#define BOTTOM 15 //0b 00 1111
 
 //comment this out if you don't want to consider prev values for the track wire's
 //   hysteresis bounds
@@ -82,19 +84,23 @@ static ES_Event storedEvent;
  *        returned
  */
 uint8_t TapeSensorEventChecker(void) {
-    static ES_EventTyp_t lastEvent = OFF_BT;
-
+#ifndef USE_TAPE_SERVICE
+    static ES_EventTyp_t lastEvent = ES_NO_EVENT;
+    static uint8_t past_val = 0 ;
     // Setting a value because currentEvent would be initialized to some random 
     // value. 
     ES_EventTyp_t currentEvent = lastEvent;
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
     int tapeSensorInput = Robot_ReadTapeSensors();
+    uint8_t change = tapeSensorInput ^ past_val;
 
-    if (tapeSensorInput == OFF_BLACK_TAPE) {
-        currentEvent = OFF_BT;
-    }else{
-        currentEvent = ON_BT;
+    if (!change) {
+        currentEvent = ES_NO_EVENT;
+    } else if (change & BOTTOM) {
+        currentEvent = BOT_BT_CHANGED;
+    } else {
+        currentEvent = SHOOTER_BT_CHANGED;
     }
 #ifdef DEBUG_PRINTS
     if (currentEvent == OFF_BT) {
@@ -117,6 +123,8 @@ uint8_t TapeSensorEventChecker(void) {
 #endif   
     }
     return (returnVal);
+#endif //using service?
+    return (0); 
 }
 
 /**
