@@ -68,7 +68,7 @@
       <itemPath>ScanForBeaconSub.c</itemPath>
       <itemPath>timers.c</itemPath>
       <itemPath>PingService.c</itemPath>
-      <itemPath>C:/Users/eappleto/Desktop/ECE118-FinalProject/final-project-code/MurpleCircle.X/TemplateES_Main.c</itemPath>
+      <itemPath>TemplateES_Main.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

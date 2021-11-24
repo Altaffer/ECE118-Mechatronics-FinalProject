@@ -168,7 +168,7 @@ uint8_t test_servo(void) {
 uint8_t test_something(void) {
 
     //This part reassembles ping service and ping event checker
-    Robot_TrigPingSensor(1); //W04
+    Robot_TrigPingSensor(1); //W05
     DELAY(1);
     Robot_TrigPingSensor(0); //a manual pulse
     uint32_t start_time = 0;
