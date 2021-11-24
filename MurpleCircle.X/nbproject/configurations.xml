@@ -25,14 +25,18 @@
       <itemPath>C:/ECE118/include/pwm.h</itemPath>
       <itemPath>C:/ECE118/include/roach.h</itemPath>
       <itemPath>C:/ECE118/include/serial.h</itemPath>
-      <itemPath>C:/ECE118/include/timers.h</itemPath>
       <itemPath>ES_Configure.h</itemPath>
       <itemPath>OrientBotSub.h</itemPath>
       <itemPath>EventCheckers.h</itemPath>
       <itemPath>FindNewCornerSub.h</itemPath>
       <itemPath>robot.h</itemPath>
       <itemPath>TopLevel.h</itemPath>
-      <itemPath>BumperService.h</itemPath>
+      <itemPath>ScanForBeaconSub.h</itemPath>
+      <itemPath>ToBeaconSub.h</itemPath>
+      <itemPath>NavTowerSub.h</itemPath>
+      <itemPath>NavFieldSub.h</itemPath>
+      <itemPath>timers.h</itemPath>
+      <itemPath>PingService.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -61,26 +65,16 @@
       <itemPath>OrientBotSub.c</itemPath>
       <itemPath>robot.c</itemPath>
       <itemPath>TopLevel.c</itemPath>
-      <itemPath>NavFieldSub.h</itemPath>
-      <itemPath>NavTowerSub.h</itemPath>
-      <itemPath>PingService.c</itemPath>
-      <itemPath>PingService.h</itemPath>
       <itemPath>ScanForBeaconSub.c</itemPath>
-      <itemPath>ScanForBeaconSub.h</itemPath>
-      <itemPath>TapeService.c</itemPath>
-      <itemPath>TapeService.h</itemPath>
-      <itemPath>TimerHelper.c</itemPath>
-      <itemPath>ToBeaconSub.h</itemPath>
       <itemPath>timers.c</itemPath>
-      <itemPath>timers.h</itemPath>
+      <itemPath>PingService.c</itemPath>
+      <itemPath>C:/Users/eappleto/Desktop/ECE118-FinalProject/final-project-code/MurpleCircle.X/TemplateES_Main.c</itemPath>
       <itemPath>BumperService.c</itemPath>
-      <itemPath>TemplateES_Main.c</itemPath>
-      <itemPath>Motions.c</itemPath>
+      <itemPath>BumperService.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
                    projectFiles="false">
-      <itemPath>Makefile</itemPath>
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
@@ -282,10 +276,6 @@
         </C32CPP>
         <C32Global>
         </C32Global>
-      </item>
-      <item path="Motions.c" ex="true" overriding="false">
-      </item>
-      <item path="TimerHelper.c" ex="true" overriding="false">
       </item>
     </conf>
   </confs>

@@ -57,17 +57,17 @@ OBJECTDIR=build/${CND_CONF}/${IMAGE_TYPE}
 DISTDIR=dist/${CND_CONF}/${IMAGE_TYPE}
 
 # Source Files Quoted if spaced
-SOURCEFILES_QUOTED_IF_SPACED=C:/ECE118/src/AD.c C:/ECE118/src/BOARD.c C:/ECE118/src/IO_Ports.c C:/ECE118/src/LED.c C:/ECE118/src/serial.c TestingMain.c ../MurpleCircle.X/robot.c
+SOURCEFILES_QUOTED_IF_SPACED=C:/ECE118/src/AD.c C:/ECE118/src/BOARD.c C:/ECE118/src/IO_Ports.c C:/ECE118/src/LED.c C:/ECE118/src/serial.c TestingMain.c ../MurpleCircle.X/robot.c C:/ECE118/src/pwm.c C:/ECE118/src/RC_Servo.c ../MurpleCircle.X/timers.c
 
 # Object Files Quoted if spaced
-OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1975241074/AD.o ${OBJECTDIR}/_ext/1975241074/BOARD.o ${OBJECTDIR}/_ext/1975241074/IO_Ports.o ${OBJECTDIR}/_ext/1975241074/LED.o ${OBJECTDIR}/_ext/1975241074/serial.o ${OBJECTDIR}/TestingMain.o ${OBJECTDIR}/_ext/1095528968/robot.o
-POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1975241074/AD.o.d ${OBJECTDIR}/_ext/1975241074/BOARD.o.d ${OBJECTDIR}/_ext/1975241074/IO_Ports.o.d ${OBJECTDIR}/_ext/1975241074/LED.o.d ${OBJECTDIR}/_ext/1975241074/serial.o.d ${OBJECTDIR}/TestingMain.o.d ${OBJECTDIR}/_ext/1095528968/robot.o.d
+OBJECTFILES_QUOTED_IF_SPACED=${OBJECTDIR}/_ext/1975241074/AD.o ${OBJECTDIR}/_ext/1975241074/BOARD.o ${OBJECTDIR}/_ext/1975241074/IO_Ports.o ${OBJECTDIR}/_ext/1975241074/LED.o ${OBJECTDIR}/_ext/1975241074/serial.o ${OBJECTDIR}/TestingMain.o ${OBJECTDIR}/_ext/1095528968/robot.o ${OBJECTDIR}/_ext/1975241074/pwm.o ${OBJECTDIR}/_ext/1975241074/RC_Servo.o ${OBJECTDIR}/_ext/1095528968/timers.o
+POSSIBLE_DEPFILES=${OBJECTDIR}/_ext/1975241074/AD.o.d ${OBJECTDIR}/_ext/1975241074/BOARD.o.d ${OBJECTDIR}/_ext/1975241074/IO_Ports.o.d ${OBJECTDIR}/_ext/1975241074/LED.o.d ${OBJECTDIR}/_ext/1975241074/serial.o.d ${OBJECTDIR}/TestingMain.o.d ${OBJECTDIR}/_ext/1095528968/robot.o.d ${OBJECTDIR}/_ext/1975241074/pwm.o.d ${OBJECTDIR}/_ext/1975241074/RC_Servo.o.d ${OBJECTDIR}/_ext/1095528968/timers.o.d
 
 # Object Files
-OBJECTFILES=${OBJECTDIR}/_ext/1975241074/AD.o ${OBJECTDIR}/_ext/1975241074/BOARD.o ${OBJECTDIR}/_ext/1975241074/IO_Ports.o ${OBJECTDIR}/_ext/1975241074/LED.o ${OBJECTDIR}/_ext/1975241074/serial.o ${OBJECTDIR}/TestingMain.o ${OBJECTDIR}/_ext/1095528968/robot.o
+OBJECTFILES=${OBJECTDIR}/_ext/1975241074/AD.o ${OBJECTDIR}/_ext/1975241074/BOARD.o ${OBJECTDIR}/_ext/1975241074/IO_Ports.o ${OBJECTDIR}/_ext/1975241074/LED.o ${OBJECTDIR}/_ext/1975241074/serial.o ${OBJECTDIR}/TestingMain.o ${OBJECTDIR}/_ext/1095528968/robot.o ${OBJECTDIR}/_ext/1975241074/pwm.o ${OBJECTDIR}/_ext/1975241074/RC_Servo.o ${OBJECTDIR}/_ext/1095528968/timers.o
 
 # Source Files
-SOURCEFILES=C:/ECE118/src/AD.c C:/ECE118/src/BOARD.c C:/ECE118/src/IO_Ports.c C:/ECE118/src/LED.c C:/ECE118/src/serial.c TestingMain.c ../MurpleCircle.X/robot.c
+SOURCEFILES=C:/ECE118/src/AD.c C:/ECE118/src/BOARD.c C:/ECE118/src/IO_Ports.c C:/ECE118/src/LED.c C:/ECE118/src/serial.c TestingMain.c ../MurpleCircle.X/robot.c C:/ECE118/src/pwm.c C:/ECE118/src/RC_Servo.c ../MurpleCircle.X/timers.c
 
 
 
@@ -137,17 +137,35 @@ ${OBJECTDIR}/_ext/1975241074/serial.o: C:/ECE118/src/serial.c  .generated_files/
 	@${RM} ${OBJECTDIR}/_ext/1975241074/serial.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG   -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1975241074/serial.o.d" -o ${OBJECTDIR}/_ext/1975241074/serial.o C:/ECE118/src/serial.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/TestingMain.o: TestingMain.c  .generated_files/flags/default/c8eefce9aa61e58c611a56b787d7bf705f3d343b .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
+${OBJECTDIR}/TestingMain.o: TestingMain.c  .generated_files/flags/default/e7c627a9a98d9e2be775481e8a5ddb56860a7e30 .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/TestingMain.o.d 
 	@${RM} ${OBJECTDIR}/TestingMain.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG   -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/TestingMain.o.d" -o ${OBJECTDIR}/TestingMain.o TestingMain.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/_ext/1095528968/robot.o: ../MurpleCircle.X/robot.c  .generated_files/flags/default/18465732d69d098438b93e6a838407c64ae971a2 .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
+${OBJECTDIR}/_ext/1095528968/robot.o: ../MurpleCircle.X/robot.c  .generated_files/flags/default/32fc313fa78886ff9393de4e76eb4b2bd94afaa5 .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
 	@${MKDIR} "${OBJECTDIR}/_ext/1095528968" 
 	@${RM} ${OBJECTDIR}/_ext/1095528968/robot.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1095528968/robot.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG   -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1095528968/robot.o.d" -o ${OBJECTDIR}/_ext/1095528968/robot.o ../MurpleCircle.X/robot.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/_ext/1975241074/pwm.o: C:/ECE118/src/pwm.c  .generated_files/flags/default/c827e8cdaf1ecfbc80a17ca7545ada32a99a89b .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
+	@${MKDIR} "${OBJECTDIR}/_ext/1975241074" 
+	@${RM} ${OBJECTDIR}/_ext/1975241074/pwm.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1975241074/pwm.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG   -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1975241074/pwm.o.d" -o ${OBJECTDIR}/_ext/1975241074/pwm.o C:/ECE118/src/pwm.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/_ext/1975241074/RC_Servo.o: C:/ECE118/src/RC_Servo.c  .generated_files/flags/default/f6136925759ff901f9b2b66c0619130f413f8934 .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
+	@${MKDIR} "${OBJECTDIR}/_ext/1975241074" 
+	@${RM} ${OBJECTDIR}/_ext/1975241074/RC_Servo.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1975241074/RC_Servo.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG   -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1975241074/RC_Servo.o.d" -o ${OBJECTDIR}/_ext/1975241074/RC_Servo.o C:/ECE118/src/RC_Servo.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/_ext/1095528968/timers.o: ../MurpleCircle.X/timers.c  .generated_files/flags/default/68a286a4b6bc6017ab1adcbf33c5b8e0e1381d9d .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
+	@${MKDIR} "${OBJECTDIR}/_ext/1095528968" 
+	@${RM} ${OBJECTDIR}/_ext/1095528968/timers.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1095528968/timers.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE) -g -D__DEBUG   -fframe-base-loclist  -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1095528968/timers.o.d" -o ${OBJECTDIR}/_ext/1095528968/timers.o ../MurpleCircle.X/timers.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 else
 ${OBJECTDIR}/_ext/1975241074/AD.o: C:/ECE118/src/AD.c  .generated_files/flags/default/c8c74805f14b0089fbddd29e1eca77246552d181 .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
@@ -180,17 +198,35 @@ ${OBJECTDIR}/_ext/1975241074/serial.o: C:/ECE118/src/serial.c  .generated_files/
 	@${RM} ${OBJECTDIR}/_ext/1975241074/serial.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1975241074/serial.o.d" -o ${OBJECTDIR}/_ext/1975241074/serial.o C:/ECE118/src/serial.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/TestingMain.o: TestingMain.c  .generated_files/flags/default/5da95a3d5f91d6b75b293fe97d16c097faa009be .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
+${OBJECTDIR}/TestingMain.o: TestingMain.c  .generated_files/flags/default/64c45d57965178ef6137f8f47a270dfa1f5620de .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
 	@${MKDIR} "${OBJECTDIR}" 
 	@${RM} ${OBJECTDIR}/TestingMain.o.d 
 	@${RM} ${OBJECTDIR}/TestingMain.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/TestingMain.o.d" -o ${OBJECTDIR}/TestingMain.o TestingMain.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
-${OBJECTDIR}/_ext/1095528968/robot.o: ../MurpleCircle.X/robot.c  .generated_files/flags/default/be58ee94242435da939cda6f8ea553c2af639c6b .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
+${OBJECTDIR}/_ext/1095528968/robot.o: ../MurpleCircle.X/robot.c  .generated_files/flags/default/5cebff67d7be7c9bf3092ff58e09b3f5b9ace51d .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
 	@${MKDIR} "${OBJECTDIR}/_ext/1095528968" 
 	@${RM} ${OBJECTDIR}/_ext/1095528968/robot.o.d 
 	@${RM} ${OBJECTDIR}/_ext/1095528968/robot.o 
 	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1095528968/robot.o.d" -o ${OBJECTDIR}/_ext/1095528968/robot.o ../MurpleCircle.X/robot.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/_ext/1975241074/pwm.o: C:/ECE118/src/pwm.c  .generated_files/flags/default/2291e8f1c601211606a4b96a81806ea0749c8d84 .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
+	@${MKDIR} "${OBJECTDIR}/_ext/1975241074" 
+	@${RM} ${OBJECTDIR}/_ext/1975241074/pwm.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1975241074/pwm.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1975241074/pwm.o.d" -o ${OBJECTDIR}/_ext/1975241074/pwm.o C:/ECE118/src/pwm.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/_ext/1975241074/RC_Servo.o: C:/ECE118/src/RC_Servo.c  .generated_files/flags/default/551adbe4d74e270dfb29310d621eab15509a31bb .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
+	@${MKDIR} "${OBJECTDIR}/_ext/1975241074" 
+	@${RM} ${OBJECTDIR}/_ext/1975241074/RC_Servo.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1975241074/RC_Servo.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1975241074/RC_Servo.o.d" -o ${OBJECTDIR}/_ext/1975241074/RC_Servo.o C:/ECE118/src/RC_Servo.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
+	
+${OBJECTDIR}/_ext/1095528968/timers.o: ../MurpleCircle.X/timers.c  .generated_files/flags/default/3f866a4fc6525709e6db8f6bb1eb26445c260e48 .generated_files/flags/default/25cf332145e109ecc94cb8c88ed46e464b66686
+	@${MKDIR} "${OBJECTDIR}/_ext/1095528968" 
+	@${RM} ${OBJECTDIR}/_ext/1095528968/timers.o.d 
+	@${RM} ${OBJECTDIR}/_ext/1095528968/timers.o 
+	${MP_CC}  $(MP_EXTRA_CC_PRE)  -g -x c -c -mprocessor=$(MP_PROCESSOR_OPTION)  -fno-common -I"." -I"C:/ECE118/include" -I"../MurpleCircle.X" -MP -MMD -MF "${OBJECTDIR}/_ext/1095528968/timers.o.d" -o ${OBJECTDIR}/_ext/1095528968/timers.o ../MurpleCircle.X/timers.c    -DXPRJ_default=$(CND_CONF)  -legacy-libc  $(COMPARISON_BUILD)  -mdfp="${DFP_DIR}"  
 	
 endif
 
