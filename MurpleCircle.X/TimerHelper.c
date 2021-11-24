@@ -5,13 +5,13 @@
 #include "ES_Framework.h"
 #include "BOARD.h"
 #include "TopLevel.h"
-//#include "TimerHelper.h" //depending on if you wanna keep helpers seperate
+#include "TimerHelper.h" 
 
 
 #include <stdio.h>
 #include <stdlib.h>
 
-uint8_t ExampleTimer_Helper(ES_Event ThisEvent){
+uint8_t TurnTimerHelper(ES_Event ThisEvent){
     ES_Event posting;
     
     switch (ThisEvent.EventType) {
@@ -26,8 +26,8 @@ uint8_t ExampleTimer_Helper(ES_Event ThisEvent){
     /* run internal event checkers */
     case ES_TIMEOUT:
         posting.EventParam = 1;
-        posting.EventType = ExampleTimerExp; //When the timer expires, it generates this event
-        PostToplevel(posting);//then send the event to the toplevel
+        posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
+        PostTopLevel(posting);//then send the event to the toplevel
         printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
         break;
     default:

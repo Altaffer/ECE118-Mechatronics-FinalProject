@@ -109,6 +109,14 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent)
 
     case NoSubService: /* After initialzing or executing, it sits here for the next 
                           time it gets called. */
+        if (ThisEvent.EventType == ES_ENTRY){
+            //state entry
+            ;
+        }
+        if (ThisEvent.EventType == ES_EXIT) {
+            //state exit
+            ;
+        }
     default: // all unhandled events fall into here
         break;
     } // end switch on Current State

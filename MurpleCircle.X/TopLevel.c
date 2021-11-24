@@ -35,14 +35,13 @@
 #include "stdio.h"
 #include "stdlib.h"
 
+
 #include "OrientBotSub.h"
 #include "ScanForBeaconSub.h"
 #include "FindNewCornerSub.h"
 #include "ToBeaconSub.h"
 #include "NavTowerSub.h"
-#include "NavFieldsub.h"
-//#include "TemplateHSM.h"
-//#include "TemplateSubHSM.h" //#include all sub state machines called
+#include "NavFieldsub.h"//#include all sub state machines called
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
  ******************************************************************************/

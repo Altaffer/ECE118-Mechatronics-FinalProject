@@ -37,6 +37,8 @@
       <itemPath>NavFieldSub.h</itemPath>
       <itemPath>timers.h</itemPath>
       <itemPath>PingService.h</itemPath>
+      <itemPath>TapeService.h</itemPath>
+      <itemPath>TimerHelper.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -71,6 +73,7 @@
       <itemPath>BumperService.c</itemPath>
       <itemPath>BumperService.h</itemPath>
       <itemPath>TemplateES_Main.c</itemPath>
+      <itemPath>TimerHelper.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

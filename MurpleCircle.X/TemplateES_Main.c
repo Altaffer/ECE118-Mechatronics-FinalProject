@@ -59,6 +59,8 @@ uint8_t test_servo(void);
 uint8_t test_something(void);
 uint8_t test_tapeSensors(void);
 
+//uint8_t TurnTimerHelper(ES_Event ThisEvent);
+
 void main(void) {
     ES_Return_t ErrorType;
 
@@ -198,7 +200,7 @@ uint8_t test_something(void) {
 uint8_t test_tapeSensors(void) {
     uint8_t currentTapeValue = 0;
 //    currentTapeValue = Robot_ReadTapeSensors();
-    currentTapeValue = TAPE_SENSOR_1;
+    currentTapeValue = Robot_ReadTapeSensors();
     printf("\nTape Sensors Param Value = %d \n\r", currentTapeValue);
     return 0;
 }
@@ -209,5 +211,31 @@ void PrintEvent(void) {
             EventNames[storedEvent.EventType], storedEvent.EventParam);
 }
 #endif
+
+////Timer Helpers
+//uint8_t TurnTimerHelper(ES_Event ThisEvent){
+//    ES_Event posting;
+//    
+//    switch (ThisEvent.EventType) {
+//    case ES_INIT: //do nothing (initializing)
+//        break;
+//    
+//    /* do nothng */
+//    case ES_TIMERACTIVE:
+//    case ES_TIMERSTOPPED:
+//        break; // We don't use these events
+//
+//    /* run internal event checkers */
+//    case ES_TIMEOUT:
+//        posting.EventParam = 1;
+//        posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
+//        PostTopLevel(posting);//then send the event to the toplevel
+//        printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
+//        break;
+//    default:
+//        break;
+//    }
+//    return 0;
+//}
 /*------------------------------- Footnotes -------------------------------*/
 /*------------------------------ End of file ------------------------------*/
