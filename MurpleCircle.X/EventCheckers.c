@@ -40,7 +40,7 @@
 #define TAKE_PREV
 
 //enable this if you want to see spamming prints at each event to debug
-//#define DEBUG_PRINTS
+#define DEBUG_PRINTS
 /*******************************************************************************
  * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
  ******************************************************************************/
@@ -103,10 +103,10 @@ uint8_t TapeSensorEventChecker(void) {
         currentEvent = SHOOTER_BT_CHANGED;
     }
 #ifdef DEBUG_PRINTS
-    if (currentEvent == OFF_BT) {
-        printf("ON_BT.\r\n");
-    } else {
-        printf("OFF_BT.\r\n");
+    if (currentEvent == BOT_BT_CHANGED) {
+        printf("Bottom Tape Sensor Change: %d.\r\n", tapeSensorInput);
+    } else if (currentEvent == SHOOTER_BT_CHANGED){
+        printf("Shooter Tape Sensor Change: %d.\r\n", tapeSensorInput);
     }
 #endif
     if (currentEvent != lastEvent) {

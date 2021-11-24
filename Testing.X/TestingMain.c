@@ -40,9 +40,9 @@
 //#define MOTOR_TEST
 //#define BUMPER_TEST
 //#define BUMPER_TEST
-//#define TAPE_SENSOR_TEST
+#define TAPE_SENSOR_TEST
 //#define BEACON_TEST
-#define SERVO_TEST
+//#define SERVO_TEST
 //#define SERVO_TEST
 //#define PING_SENSOR_TEST
 

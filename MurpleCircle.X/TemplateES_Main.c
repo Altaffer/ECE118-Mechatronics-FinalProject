@@ -22,7 +22,7 @@
 #define HIGH   1
 #define LOW    0
 #define POT_PIN AD_PORTV8         // use V-08 for pot
-#define TAPE_SENSOR_1 PORTX03_BIT
+//#define TAPE_SENSOR_1 PORTX03_BIT
 #define BEACON_PIN PORTX10_BIT
 #define SERVO_PIN RC_PORTW08
 
@@ -30,6 +30,8 @@
 #define DELAY_MULTIPLIER 1000
 #define DELAY(x)    for (int wait = 0; wait <= (DELAY_MULTIPLIER * x); wait++) {asm("nop");}
 #define DELAY_LOOP_TIME 1000 // ms
+
+
 
 //define this if using the test harnesses - ES_run will not be called
 
@@ -43,6 +45,12 @@
 #define BOTH 3
 #define NONE 0
 #define PRIORITY 5 //dummy
+
+
+
+#define SaveEvent(x) do {eventName=__func__; storedEvent=x;} while (0)
+static const char *eventName;
+static ES_Event storedEvent;
 
 #endif
 
@@ -96,8 +104,8 @@ void main(void) {
 
             case LEFT:
                 printf("left pressed\r\n");
-                test_something();
-                DELAY(DELAY_LOOP_TIME);
+//                test_something();
+//                DELAY(DELAY_LOOP_TIME);
                 test_tapeSensors();
                 //press for a while
                 //this will:
@@ -189,9 +197,17 @@ uint8_t test_something(void) {
 
 uint8_t test_tapeSensors(void) {
     uint8_t currentTapeValue = 0;
-    currentTapeValue = Robot_ReadTapeSensors();
+//    currentTapeValue = Robot_ReadTapeSensors();
+    currentTapeValue = TAPE_SENSOR_1;
     printf("\nTape Sensors Param Value = %d \n\r", currentTapeValue);
     return 0;
 }
+
+#ifdef TEST_HARNESSES
+void PrintEvent(void) {
+    printf("\r\nFunc: %s\tEvent: %s\tParam: 0x%X", eventName,
+            EventNames[storedEvent.EventType], storedEvent.EventParam);
+}
+#endif
 /*------------------------------- Footnotes -------------------------------*/
 /*------------------------------ End of file ------------------------------*/

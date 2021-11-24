@@ -383,8 +383,8 @@ char Robot_BarGraph(uint8_t Number) {
 unsigned char Robot_ReadTapeSensors(void) {
     //unsigned char bump_state;
     //bump_state = (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
-    return (!TAPE_SENSOR_1 + ((!TAPE_SENSOR_2) << 1)+((!TAPE_SENSOR_3) << 2)
-            +((!TAPE_SENSOR_4) << 3)+((!TAPE_SENSOR_5) << 4)+((!TAPE_SENSOR_6) << 5));
+    return (TAPE_SENSOR_1 + ((TAPE_SENSOR_2) << 1)+((TAPE_SENSOR_3) << 2)
+            +((TAPE_SENSOR_4) << 3)+((TAPE_SENSOR_5) << 4)+((TAPE_SENSOR_6) << 5));
 }
 
 //#define ROBOT_TEST
