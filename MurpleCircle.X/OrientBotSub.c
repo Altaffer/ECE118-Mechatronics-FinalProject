@@ -124,13 +124,70 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
             }
 
         case Spin: // 360 deg pivot turn to the left looking for BT
-            
+            if (ThisEvent.EventType == ES_ENTRY) {
+                // Setting a time for a 360 spin (needs to be calibrated) 
+                ES_Timer_InitTimer(SPIN_TIMER, 360_TICKS);
+                spin();
+                // if BT is detected go to Adjust (NEEDS TO BE FINISHED)
+            }
+
+            if (ThisEvent.EventType == ES_TIMEOUT) {
+                // Transition to Spiral if BT is not detected
+                if (ThisEvent.EventParam == SPIN_TIMER) {
+                    nextState = Spiral;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                }
+            }
+
+            if (ThisEvent.EventType == ES_EXIT) {
+                // Stop the Robot before transition
+                stop();
+            }
+            break;
+
         case Spiral: // indefinite gradual turn spiraling to the left
-            
-        case Adjust: // Make the bot parallel with the BT once it is located
-            
+            if (ThisEvent.EventType == ES_ENTRY) {
+                // Setting a time for an indefinite 360 spiral spin (needs to be calibrated) 
+                spiral();
+                // if BT is detected go to Adjust (NEEDS TO BE FINISHED)
+            }
+
+            if (ThisEvent.EventType == ES_EXIT) {
+                // Stop the Robot before transition
+                stop();
+            }
+            break;
+
+        case Adjust: // Make the bot parallel with the BT once it is located (NOT FINISHED))
+            if (ThisEvent.EventType == ES_ENTRY) {
+                // If the left BT sensor is detected
+                // Turn gradually to the left until mid sensors are detected
+                spiral();
+                // When mid sensors are detected transition to Find Corner
+                // If the right BT sensor is detected
+                // Turn gradually to right until mid sensors are detected
+                Robot_LeftMtrSpeed(RGRAD_L);
+                Robot_RightMtrSpeed(RGRAD_R);
+            }
+
+            if (ThisEvent.EventType == ES_EXIT) {
+                // Stop the Robot before transition
+                stop();
+            }
+
         case FindCorner: // follow BT until the front and left sensor detects BT
-            
+            if (ThisEvent.EventType == ES_ENTRY){
+                    // Go Straight
+                    goForward();
+                        // if left BT sensor is detected but not center, grad turn left
+                        // if right bT sensor is detected but not center, grad turn right
+                    // if left BT Sensor and mid sensors are detected Corner is found
+                }
+            if (ThisEvent.EventType == ES_EXIT) {
+                // Stop the Robot before transition
+                stop();
+
         default: // all unhandled events fall into here
             break;
     } // end switch on Current State
@@ -180,4 +237,3 @@ uint8_t stop(void) { //one concern - if the gearhead is too powerful we may need
 
     return 0;
 }
-
