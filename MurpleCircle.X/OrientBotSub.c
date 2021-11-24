@@ -188,7 +188,7 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_EXIT) {
                 // Stop the Robot before transition
                 stop();
-
+            }
         default: // all unhandled events fall into here
             break;
     } // end switch on Current State
@@ -203,7 +203,7 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
     ES_Tail(); // trace call stack end
     return ThisEvent;
 }
-}
+
 
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
