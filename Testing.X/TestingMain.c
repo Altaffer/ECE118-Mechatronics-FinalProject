@@ -41,12 +41,10 @@
 //#define BUMPER_TEST
 //#define TAPE_SENSOR_TEST
 //#define BEACON_TEST
-<<<<<<< HEAD
 #define SERVO_TEST
-=======
 //#define SERVO_TEST
-#define PING_SENSOR_TEST
->>>>>>> 0e9c4164fd2c34a79f32904b45a5a40b7668508f
+//#define PING_SENSOR_TEST
+
 
 //#define FREQ_TEST
 // </editor-fold>

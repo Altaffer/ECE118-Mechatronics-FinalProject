@@ -14,6 +14,7 @@
 #include "serial.h"
 #include "timers.h"
 #include "robot.h"
+#include "RC_Servo.h"
 
 // define
 #define INPUT  1
@@ -28,7 +29,7 @@
 
 #define DELAY_MULTIPLIER 1000
 #define DELAY(x)    for (int wait = 0; wait <= (DELAY_MULTIPLIER * x); wait++) {asm("nop");}
-#define DELAY_LOOP_TIME 100 // ms
+#define DELAY_LOOP_TIME 1000 // ms
 
 //define this if using the test harnesses - ES_run will not be called
 
@@ -48,16 +49,15 @@
 uint8_t test_motors(void);
 uint8_t test_servo(void);
 uint8_t test_something(void);
+uint8_t test_tapeSensors(void);
 
-
-void main(void)
-{
+void main(void) {
     ES_Return_t ErrorType;
 
     BOARD_Init();
-    
 
-    
+
+
 
     printf("Test Main Started\r\n");
 
@@ -70,6 +70,8 @@ void main(void)
     Robot_Init();
     ES_Timer_Init();
     TIMERS_Init();
+    RC_Init();
+
     //RC_AddPins(SERVO_PIN);
 #ifdef TEST_HARNESSES
     // Test harnesses
@@ -78,19 +80,21 @@ void main(void)
     while (1) {
         DELAY(DELAY_LOOP_TIME);
         bumpers = Robot_ReadBumpers();
-        
+
         switch (bumpers) {
-            /* run LED sequence once*/
+                /* run LED sequence once*/
             case BOTH:
                 test_motors();
                 break;
-              
+
             case RIGHT:
                 test_servo();
                 break;
-                
+
             case LEFT:
                 test_something();
+                DELAY(DELAY_LOOP_TIME);
+                test_tapeSensors();
                 //press for a while
                 //this will:
                 // print something from the Ping Sensor
@@ -98,7 +102,7 @@ void main(void)
             default:
                 break;
         }
-        
+
 
     }
 #endif
@@ -110,23 +114,22 @@ void main(void)
     }
     //if we got to here, there was an error
     switch (ErrorType) {
-    case FailedPointer:
-        printf("Failed on NULL pointer");
-        break;
-    case FailedInit:
-        printf("Failed Initialization");
-        break;
-    default:
-        printf("Other Failure: %d", ErrorType);
-        break;
+        case FailedPointer:
+            printf("Failed on NULL pointer");
+            break;
+        case FailedInit:
+            printf("Failed Initialization");
+            break;
+        default:
+            printf("Other Failure: %d", ErrorType);
+            break;
     }
     for (;;)
         ;
 
 };
 
-
-uint8_t test_motors(void){
+uint8_t test_motors(void) {
     Robot_LeftMtrSpeed(100);
     Robot_RightMtrSpeed(100);
     printf("both max speed\r\n");
@@ -155,24 +158,35 @@ uint8_t test_motors(void){
 }
 
 uint8_t test_servo(void) {
+    uint8_t currentSwitchValue = 0;
+    RC_SetPulseTime(SERVO_PIN, 1525);
+    currentSwitchValue = Robot_ReadRearLeftBumper();
+    printf("\nShooter Switch Value = %d \n\r", currentSwitchValue);
     ;
 }
 
 uint8_t test_something(void) {
-    
+
     //This part reassembles ping service and ping event checker
-    Robot_TrigPingSensor(1);//W04
+    Robot_TrigPingSensor(1); //W04
     DELAY(1);
-    Robot_TrigPingSensor(0);//a manual pulse
+    Robot_TrigPingSensor(0); //a manual pulse
     uint32_t start_time = 0;
     uint16_t elapse_time = 0;
-    while(!Robot_ReadPingSensor());//wait for it to go high
+    while (!Robot_ReadPingSensor()); //wait for it to go high
     start_time = TIMERS_GetTime();
-    while(Robot_ReadPingSensor());//wait for it to go low
+    while (Robot_ReadPingSensor()); //wait for it to go low
     elapse_time = (TIMERS_GetTime() - start_time)*100;
     printf("Ping Sensor: %d us\r\n", elapse_time);
     return 0;
-    
+
+}
+
+uint8_t test_tapeSensors(void) {
+    uint8_t currentTapeValue = 0;
+    currentTapeValue = Robot_ReadTapeSensors();
+    printf("\nTape Sensors Param Value = %d \n\r", currentTapeValue);
+    return 0;
 }
 /*------------------------------- Footnotes -------------------------------*/
 /*------------------------------ End of file ------------------------------*/
