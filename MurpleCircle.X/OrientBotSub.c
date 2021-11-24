@@ -12,6 +12,7 @@
 #include "TopLevel.h"
 #include "OrientBotSub.h"
 #include "robot.h"
+#include "timers.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -126,14 +127,14 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
         case Spin: // 360 deg pivot turn to the left looking for BT
             if (ThisEvent.EventType == ES_ENTRY) {
                 // Setting a time for a 360 spin (needs to be calibrated) 
-                ES_Timer_InitTimer(SPIN_TIMER, 360_TICKS);
+                ES_Timer_InitTimer(SpinTimer, TIMER_360);
                 spin();
                 // if BT is detected go to Adjust (NEEDS TO BE FINISHED)
             }
 
             if (ThisEvent.EventType == ES_TIMEOUT) {
                 // Transition to Spiral if BT is not detected
-                if (ThisEvent.EventParam == SPIN_TIMER) {
+                if (ThisEvent.EventParam == SpinTimer) {
                     nextState = Spiral;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
@@ -201,6 +202,7 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
 
     ES_Tail(); // trace call stack end
     return ThisEvent;
+}
 }
 
 /*******************************************************************************

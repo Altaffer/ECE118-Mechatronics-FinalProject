@@ -48,7 +48,7 @@ uint8_t InitBumperService(uint8_t Priority)
     // in here you write your initialization code
     // this includes all hardware and software initialization
     // that needs to occur.
-    ES_Timer_InitTimer(BumperTimer, BUMPER_TIMER);
+    ES_Timer_InitTimer(BumperTimer, BUMPER_TIME);
     // post the initial transition event
     ThisEvent.EventType = ES_INIT;
     if (ES_PostToService(MyPriority, ThisEvent) == TRUE) {

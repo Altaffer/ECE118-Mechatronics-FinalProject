@@ -25,24 +25,24 @@
  * PUBLIC FUNCTION PROTOTYPES                                                  *
  ******************************************************************************/
 // speed and direction
-#define FWD_speed 80    // Straight
-#define BCKWD_speed -80 
+#define FWD_speed 100    // Straight
+#define BCKWD_speed -100 
 #define STOP_speed 0    // stopping
 
-#define LTANK_L -60     // tank turns
-#define LTANK_R 60
-#define RTANK_L 60
-#define RTANK_R -60
+#define LTANK_L -80     // tank turns
+#define LTANK_R 80
+#define RTANK_L 80
+#define RTANK_R -80
 
 #define LPIVOT_L 0      // pivot turns
-#define LPIVOT_R 60
-#define RPIVOT_L 60
+#define LPIVOT_R 80
+#define RPIVOT_L 80
 #define RPIVOT_R 0
 
-#define LGRAD_L 20      // gradual turn
-#define LGRAD_R 60
-#define RGRAD_R 20
-#define RGRAD_L 60
+#define LGRAD_L 40      // gradual turn
+#define LGRAD_R 80
+#define RGRAD_R 40
+#define RGRAD_L 80
 
 // bumper events
 #define BUMPER_TRIPPED 1

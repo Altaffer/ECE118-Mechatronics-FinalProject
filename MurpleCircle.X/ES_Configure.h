@@ -38,14 +38,15 @@
 #define ReverseTimer 3
 #define PingTriggerTimer 4
 #define BumperTimer 5
+#define SpinTimer 6
 
-#define BUMPER_TIMER 100
-
+#define BUMPER_TIME 100
+#define TIMER_360 1000
 
 
 
 //#define USE_TAPE_SERVICE //this option disables the working one in the event checkers
-#define TAPE_TIMER 6
+#define TapeTimer 6
 
 /****************************************************************************/
 typedef enum {

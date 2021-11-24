@@ -17,6 +17,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "IO_Ports.h"
+#include "timers.h"
 
 
 // <editor-fold defaultstate="collapsed" desc="#DEFINES"> 

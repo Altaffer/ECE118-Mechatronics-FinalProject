@@ -49,7 +49,7 @@ uint8_t InitTapeService(uint8_t Priority)
     // in here you write your initialization code
     // this includes all hardware and software initialization
     // that needs to occur.
-    ES_Timer_InitTimer(TAPE_TIMER, TAPE_TICKS);
+    ES_Timer_InitTimer(TapeTimer, TAPE_TICKS);
     // post the initial transition event
     ThisEvent.EventType = ES_INIT;
     if (ES_PostToService(MyPriority, ThisEvent) == TRUE) {
