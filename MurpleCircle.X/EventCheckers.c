@@ -40,7 +40,7 @@
 #define TAKE_PREV
 
 //enable this if you want to see spamming prints at each event to debug
-#define DEBUG_PRINTS
+//#define DEBUG_PRINTS
 /*******************************************************************************
  * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
  ******************************************************************************/
@@ -99,7 +99,7 @@ uint8_t TapeSensorEventChecker(void) {
         currentEvent = ES_NO_EVENT;
     } else if (change & BOTTOM) {
         currentEvent = BOT_BT_CHANGED;
-    } else {
+    } else if (change & SHOOTER) {
         currentEvent = SHOOTER_BT_CHANGED;
     }
 #ifdef DEBUG_PRINTS
@@ -114,6 +114,7 @@ uint8_t TapeSensorEventChecker(void) {
         thisEvent.EventParam = tapeSensorInput;
         PostTopLevel(thisEvent); // added 11/14
         lastEvent = currentEvent;
+        past_val = tapeSensorInput;
         returnVal = TRUE;
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
         //        PostTemplateHSM(thisEvent);

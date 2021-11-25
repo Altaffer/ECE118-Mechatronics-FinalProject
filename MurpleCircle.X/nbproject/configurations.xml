@@ -39,6 +39,7 @@
       <itemPath>PingService.h</itemPath>
       <itemPath>TapeService.h</itemPath>
       <itemPath>TimerHelper.h</itemPath>
+      <itemPath>BumperService.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -71,7 +72,6 @@
       <itemPath>timers.c</itemPath>
       <itemPath>PingService.c</itemPath>
       <itemPath>BumperService.c</itemPath>
-      <itemPath>BumperService.h</itemPath>
       <itemPath>TemplateES_Main.c</itemPath>
       <itemPath>TimerHelper.c</itemPath>
     </logicalFolder>

@@ -42,7 +42,7 @@
 #define PING_TRIG PORTW05_BIT
 
 #define BEACON_PIN PORTX10_BIT
-#define TRACK_WIRE_PIN AD_PORTV4
+#define TRACK_WIRE_PIN AD_PORTV6
 
 #define TAPE_SENSOR_1_TRIS PORTX03_TRIS
 #define TAPE_SENSOR_2_TRIS PORTX04_TRIS
@@ -70,62 +70,54 @@
 #define LEFT_PWM PWM_PORTY10
 #define RIGHT_PWM PWM_PORTY12
 
-#define LIGHT_SENSOR ROACH_LIGHT_SENSOR
-#define ROBOT_BAT_VOLTAGE BAT_VOLTAGE
+//#define LIGHT_SENSOR ROACH_LIGHT_SENSOR
+//#define ROBOT_BAT_VOLTAGE BAT_VOLTAGE
 
 
-//light bar defines
-#define NUMLEDS 12
-
-#define LED_SetPinOutput(i) *LED_TRISCLR[i] = LED_bitsMap[i]
-#define LED_SetPinInput(i) *LED_TRISSET[i] = LED_bitsMap[i];
-#define LED_On(i) *LED_LATCLR[(unsigned int)i] = LED_bitsMap[(unsigned int)i];
-#define LED_Off(i) *LED_LATSET[(unsigned int)i] = LED_bitsMap[(unsigned int)i];
-#define LED_Get(i) (*LED_LAT[(unsigned int)i]&LED_bitsMap[(unsigned int)i])
 
 /*******************************************************************************
  * PRIVATE VARIABLES                                                           *
  ******************************************************************************/
 
-typedef union {
+//typedef union {
+//
+//    struct {
+//        unsigned bit0 : 1;
+//        unsigned bit1 : 1;
+//        unsigned bit2 : 1;
+//        unsigned bit3 : 1;
+//        unsigned bit4 : 1;
+//        unsigned bit5 : 1;
+//        unsigned bit6 : 1;
+//        unsigned bit7 : 1;
+//        unsigned bit8 : 1;
+//        unsigned bit9 : 1;
+//        unsigned bit10 : 1;
+//        unsigned bit11 : 1;
+//        unsigned : 4;
+//    };
+//    uint16_t c;
+//} LEDBank_t;
 
-    struct {
-        unsigned bit0 : 1;
-        unsigned bit1 : 1;
-        unsigned bit2 : 1;
-        unsigned bit3 : 1;
-        unsigned bit4 : 1;
-        unsigned bit5 : 1;
-        unsigned bit6 : 1;
-        unsigned bit7 : 1;
-        unsigned bit8 : 1;
-        unsigned bit9 : 1;
-        unsigned bit10 : 1;
-        unsigned bit11 : 1;
-        unsigned : 4;
-    };
-    uint16_t c;
-} LEDBank_t;
 
-
-static volatile unsigned int * const LED_TRISCLR[] = {&TRISECLR, &TRISDCLR, &TRISDCLR, &TRISDCLR,
-    &TRISDCLR, &TRISDCLR, &TRISDCLR, &TRISFCLR, &TRISFCLR, &TRISGCLR, &TRISFCLR, &TRISFCLR};
-
-static volatile unsigned int * const LED_TRISSET[] = {&TRISESET, &TRISDSET, &TRISDSET, &TRISDSET,
-    &TRISDSET, &TRISDSET, &TRISDSET, &TRISFSET, &TRISFSET, &TRISGSET, &TRISFSET, &TRISFSET};
-
-static volatile unsigned int * const LED_LATCLR[] = {&LATECLR, &LATDCLR, &LATDCLR, &LATDCLR,
-    &LATDCLR, &LATDCLR, &LATDCLR, &LATFCLR, &LATFCLR, &LATGCLR, &LATFCLR, &LATFCLR};
-
-static volatile unsigned int * const LED_LATSET[] = {&LATESET, &LATDSET, &LATDSET, &LATDSET,
-    &LATDSET, &LATDSET, &LATDSET, &LATFSET, &LATFSET, &LATGSET, &LATFSET, &LATFSET};
-
-static volatile unsigned int * const LED_LAT[] = {&LATE, &LATD, &LATD, &LATD,
-    &LATD, &LATD, &LATD, &LATF, &LATF, &LATG, &LATF, &LATF};
-
-static unsigned short int LED_bitsMap[] = {BIT_7, BIT_5, BIT_10, BIT_11, BIT_3, BIT_6, BIT_7, BIT_6, BIT_4, BIT_6, BIT_5, BIT_1};
-
-//static unsigned short int LED_ShiftAmount[] = {7, 5, 10, 11, 3, 6, 7, 6, 4, 6, 5, 1};
+//static volatile unsigned int * const LED_TRISCLR[] = {&TRISECLR, &TRISDCLR, &TRISDCLR, &TRISDCLR,
+//    &TRISDCLR, &TRISDCLR, &TRISDCLR, &TRISFCLR, &TRISFCLR, &TRISGCLR, &TRISFCLR, &TRISFCLR};
+//
+//static volatile unsigned int * const LED_TRISSET[] = {&TRISESET, &TRISDSET, &TRISDSET, &TRISDSET,
+//    &TRISDSET, &TRISDSET, &TRISDSET, &TRISFSET, &TRISFSET, &TRISGSET, &TRISFSET, &TRISFSET};
+//
+//static volatile unsigned int * const LED_LATCLR[] = {&LATECLR, &LATDCLR, &LATDCLR, &LATDCLR,
+//    &LATDCLR, &LATDCLR, &LATDCLR, &LATFCLR, &LATFCLR, &LATGCLR, &LATFCLR, &LATFCLR};
+//
+//static volatile unsigned int * const LED_LATSET[] = {&LATESET, &LATDSET, &LATDSET, &LATDSET,
+//    &LATDSET, &LATDSET, &LATDSET, &LATFSET, &LATFSET, &LATGSET, &LATFSET, &LATFSET};
+//
+//static volatile unsigned int * const LED_LAT[] = {&LATE, &LATD, &LATD, &LATD,
+//    &LATD, &LATD, &LATD, &LATF, &LATF, &LATG, &LATF, &LATF};
+//
+//static unsigned short int LED_bitsMap[] = {BIT_7, BIT_5, BIT_10, BIT_11, BIT_3, BIT_6, BIT_7, BIT_6, BIT_4, BIT_6, BIT_5, BIT_1};
+//
+////static unsigned short int LED_ShiftAmount[] = {7, 5, 10, 11, 3, 6, 7, 6, 4, 6, 5, 1};
 
 
 /*******************************************************************************
@@ -177,11 +169,11 @@ void Robot_Init(void) {
 
     //set up the light bank
 
-    uint8_t CurPin;
-    for (CurPin = 0; CurPin < NUMLEDS; CurPin++) {
-        LED_SetPinOutput(CurPin);
-        LED_Off(CurPin);
-    }
+//    uint8_t CurPin;
+//    for (CurPin = 0; CurPin < NUMLEDS; CurPin++) {
+//        LED_SetPinOutput(CurPin);
+//        LED_Off(CurPin);
+//    }
 
     //while (1);
 
@@ -190,7 +182,7 @@ void Robot_Init(void) {
     //    printf("Current pins: %d\n",AD_ActivePins());
     //    printf("Add Result: %d\n",AD_AddPins(LIGHT_SENSOR));
     //    while(1);
-    AD_AddPins(LIGHT_SENSOR);
+//    AD_AddPins(LIGHT_SENSOR);
 
     //enable interrupts
     
@@ -255,9 +247,9 @@ char Robot_RightMtrSpeed(char newSpeed) {
  * @return a 10-bit value corresponding to the amount of light received.
  * @brief  Returns the current light level. A higher value means less light is detected.
  * @author Max Dunne, 2012.01.06 */
-unsigned int Robot_LightLevel(void) {
-    return AD_ReadADPin(LIGHT_SENSOR);
-}
+//unsigned int Robot_LightLevel(void) {
+//    return AD_ReadADPin(LIGHT_SENSOR);
+//}
 
 /**
  * @Function Robot_BatteryVoltage(void)
@@ -265,9 +257,9 @@ unsigned int Robot_LightLevel(void) {
  * @return a 10-bit value corresponding to the current voltage of the roach
  * @brief  returns a 10:1 scaled value of the roach battery level
  * @author Max Dunne, 2013.07.12 */
-unsigned int Robot_BatteryVoltage(void) {
-    return AD_ReadADPin(ROBOT_BAT_VOLTAGE);
-}
+//unsigned int Robot_BatteryVoltage(void) {
+//    return AD_ReadADPin(ROBOT_BAT_VOLTAGE);
+//}
 
 /**
  * @Function Robot_ReadFrontLeftBumper(void)
@@ -328,34 +320,34 @@ unsigned char Robot_ReadBumpers(void) {
  * @return SUCCESS or ERROR
  * @brief  Forces the LEDs in (bank) to on (1) or off (0) to match the pattern.
  * @author Gabriel Hugh Elkaim, 2011.12.25 01:16 Max Dunne 2015.09.18 */
-char Robot_LEDSSet(uint16_t pattern) {
-    char i;
-    for (i = 0; i < NUMLEDS; i++) {
-        if (pattern & (1 << i)) {
-            LED_On(i);
-        } else {
-            LED_Off(i);
-        }
-    }
-    return SUCCESS;
-}
+//char Robot_LEDSSet(uint16_t pattern) {
+//    char i;
+//    for (i = 0; i < NUMLEDS; i++) {
+//        if (pattern & (1 << i)) {
+//            LED_On(i);
+//        } else {
+//            LED_Off(i);
+//        }
+//    }
+//    return SUCCESS;
+//}
 
 /**
  * @Function Robot_LEDSGet(void)
  * @return uint16_t: ERROR or state of BANK
  * @author Max Dunne, 203.10.21 01:16 2015.09.18 */
-uint16_t Robot_LEDSGet(void) {
-    uint16_t LEDStatus = 0;
-    int8_t i;
-    for (i = (NUMLEDS - 1); i >= 0; i--) {
-        LEDStatus |= !LED_Get(i);
-        LEDStatus <<= 1;
-        //        printf("%d\t",i);
-    }
-    LEDStatus >>= 1;
-    return LEDStatus;
-    return 0;
-}
+//uint16_t Robot_LEDSGet(void) {
+//    uint16_t LEDStatus = 0;
+//    int8_t i;
+//    for (i = (NUMLEDS - 1); i >= 0; i--) {
+//        LEDStatus |= !LED_Get(i);
+//        LEDStatus <<= 1;
+//        //        printf("%d\t",i);
+//    }
+//    LEDStatus >>= 1;
+//    return LEDStatus;
+//    return 0;
+//}
 
 /**
  * @Function Robot_BarGraph(uint8_t Number)
@@ -365,20 +357,20 @@ uint16_t Robot_LEDSGet(void) {
  * @author  Max Dunne 2015.09.18 */
 
 
-char Robot_BarGraph(uint8_t Number) {
-    if (Number > NUMLEDS) {
-        return ERROR;
-    }
-    uint16_t Pattern = 0;
-    uint8_t iterations;
-
-    for (iterations = 0; iterations < Number; iterations++) {
-        Pattern <<= 1;
-        Pattern |= 1;
-    }
-    Robot_LEDSSet(Pattern);
-    return SUCCESS;
-}
+//char Robot_BarGraph(uint8_t Number) {
+//    if (Number > NUMLEDS) {
+//        return ERROR;
+//    }
+//    uint16_t Pattern = 0;
+//    uint8_t iterations;
+//
+//    for (iterations = 0; iterations < Number; iterations++) {
+//        Pattern <<= 1;
+//        Pattern |= 1;
+//    }
+//    Robot_LEDSSet(Pattern);
+//    return SUCCESS;
+//}
 
 unsigned char Robot_ReadTapeSensors(void) {
     //unsigned char bump_state;
