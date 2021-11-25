@@ -42,6 +42,7 @@
 
 #define BUMPER_TIME 100
 #define TIMER_360 1000
+#define TIMER_90 250
 
 
 

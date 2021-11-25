@@ -129,7 +129,13 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
                 // Setting a time for a 360 spin (needs to be calibrated) 
                 ES_Timer_InitTimer(SpinTimer, TIMER_360);
                 spin();
-                // if BT is detected go to Adjust (NEEDS TO BE FINISHED)
+            }
+
+            // if BT is detected go to Adjust
+            if (Robot_ReadTapeSensors() & (0b0001 | 0b0100)) {
+                nextState = Adjust;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
             }
 
             if (ThisEvent.EventType == ES_TIMEOUT) {
@@ -163,13 +169,23 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
         case Adjust: // Make the bot parallel with the BT once it is located (NOT FINISHED))
             if (ThisEvent.EventType == ES_ENTRY) {
                 // If the left BT sensor is detected
-                // Turn gradually to the left until mid sensors are detected
-                spiral();
-                // When mid sensors are detected transition to Find Corner
+                if (Robot_ReadTapeSensors() & 0b0001) {
+                    // Turn gradually to the left until mid sensors are detected
+                    spiral();
+                }
                 // If the right BT sensor is detected
-                // Turn gradually to right until mid sensors are detected
-                Robot_LeftMtrSpeed(RGRAD_L);
-                Robot_RightMtrSpeed(RGRAD_R);
+                if (Robot_ReadTapeSensors() & 0b0100) {
+                    // Turn gradually to right until mid sensors are detected
+                    Robot_LeftMtrSpeed(RGRAD_L);
+                    Robot_RightMtrSpeed(RGRAD_R);
+                }
+            }
+
+            if (Robot_ReadTapeSensors() & (0b0010 | 0b1000)) {
+                // When mid sensors are detected transition to Find Corner
+                nextState = FindCorner;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
             }
 
             if (ThisEvent.EventType == ES_EXIT) {
@@ -178,16 +194,39 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
             }
 
         case FindCorner: // follow BT until the front and left sensor detects BT
-            if (ThisEvent.EventType == ES_ENTRY){
-                    // Go Straight
-                    goForward();
-                        // if left BT sensor is detected but not center, grad turn left
-                        // if right bT sensor is detected but not center, grad turn right
-                    // if left BT Sensor and mid sensors are detected Corner is found
-                }
+            if (ThisEvent.EventType == ES_ENTRY) {
+                // Go Straight
+                goForward();                
+            }
+
+            // if left BT sensor is detected but not center, grad turn left
+            if (Robot_ReadTapeSensors() & 0b0001) {
+                // Turn gradually to the left until mid sensors are detected
+                spiral();
+            }
+
+
+            // if right bT sensor is detected but not center, grad turn right
+            if (Robot_ReadTapeSensors() & 0b0100) {
+                // Turn gradually to the left until mid sensors are detected
+                Robot_LeftMtrSpeed(RGRAD_L);
+                Robot_RightMtrSpeed(RGRAD_R);
+            }
+            
+            // if left BT Sensor and mid sensors are detected exit of OrientBobSub
+            if (Robot_ReadTapeSensors() & 0b0100) {
+                // Transition
+                nextState = Spin;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+
             if (ThisEvent.EventType == ES_EXIT) {
                 // Stop the Robot before transition
                 stop();
+                ThisEvent.EventType = BOT_ORIENTED;
+                ThisEvent.EventParam = 1;
+                PostTopLevel(ThisEvent);
             }
         default: // all unhandled events fall into here
             break;
@@ -203,7 +242,6 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
     ES_Tail(); // trace call stack end
     return ThisEvent;
 }
-
 
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
