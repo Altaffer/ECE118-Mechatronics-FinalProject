@@ -10,6 +10,7 @@
 #include "ES_Framework.h"
 #include "BOARD.h"
 #include "TopLevel.h"
+#include "robot.h"
 #include "FindNewCornerSub.h"
 
 
@@ -20,14 +21,21 @@
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 //States have not been renamed - HZ 11/12
+
 typedef enum {
     InitPSubState,
-    NoSubService
+    NoSubService,
+    Find1,
+    Turn,
+    Find2
 } SubHSMState_t;
 
 static const char *StateNames[] = {
     "InitPSubState",
-    "NoSubService"
+    "NoSubService",
+    "Find1",
+    "Turn",
+    "Find2"
 };
 
 
@@ -64,8 +72,7 @@ static SubHSMState_t CurrentState = InitPSubState; // initial state
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitFindNewCorner(void)
-{
+uint8_t InitFindNewCorner(void) {
     ES_Event returnEvent;
     CurrentState = InitPSubState;
     returnEvent = RunFindNewCorner(INIT_EVENT);
@@ -90,35 +97,96 @@ uint8_t InitFindNewCorner(void)
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunFindNewCorner(ES_Event ThisEvent)
-{
+ES_Event RunFindNewCorner(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
-    SubHSMState_t nextState; 
+    SubHSMState_t nextState;
 
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
-    case InitPSubState: // If current state is initial Psedudo State
-        if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-        {
-            nextState = NoSubService;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-        }
-        break;
+        case InitPSubState: // If current state is initial Psedudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
+                nextState = NoSubService;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
 
-    case NoSubService: /* After initialzing or executing, it sits here for the next 
+        case NoSubService: /* After initialzing or executing, it sits here for the next 
                           time it gets called. */
-        if (ThisEvent.EventType == ES_ENTRY){
-            //state entry
-            ;
-        }
-        if (ThisEvent.EventType == ES_EXIT) {
-            //state exit
-            ;
-        }
-    default: // all unhandled events fall into here
-        break;
+            if (ThisEvent.EventType == ES_ENTRY) {
+                //state entry
+                ;
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                //state exit
+                ;
+            }
+            break;
+
+        case Find1: // Finds the first corner in the rotation
+            if (ThisEvent.EventType == ES_ENTRY) {
+                // Go Forward
+                goForward();
+            }
+            // If left and middle BT sensors detected 
+            if (Robot_ReadTapeSensors() == (0b0001 + 0b0010 + 0b1000)) {
+                nextState = Turn;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                // Stop the Robot
+                stop();
+            }
+            break;
+
+        case Turn: // Turn 90 deg 
+            if (ThisEvent.EventType == ES_ENTRY) {
+                // Spins 90 until timer ends
+                ES_Timer_InitTimer(SpinTimer, TIMER_90);
+                spin();
+            }
+
+            if (ThisEvent.EventType == ES_TIMEOUT) {
+                // timer end transition to find2
+                if (ThisEvent.EventParam == SpinTimer) {
+                    nextState = Find2;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                }
+            }
+
+            if (ThisEvent.EventType == ES_EXIT) {
+                // stops the robot before exit
+                stop();
+            }
+
+            break;
+
+        case Find2: // Finds the second corner in the rotation
+            if (ThisEvent.EventType == ES_ENTRY) {
+                // Go Forward
+                goForward();
+
+            }
+            if (Robot_ReadTapeSensors() == (0b0001 + 0b0010 + 0b1000)) {
+                nextState = Turn;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                // Stop the Robot
+                stop();
+                ThisEvent.EventType = FOUND_NEW_CORNER;
+                ThisEvent.EventParam = 1;
+                PostTopLevel(FOUND_NEW_CORNER);
+            }
+            break;
+
+        default: // all unhandled events fall into here
+            break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
@@ -132,27 +200,37 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent)
     return ThisEvent;
 }
 
-
-
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
 
-//uint8_t goForward(void){
+//uint8_t goForward(void) {
 //    //something here to make the bot go forward at full speed
+//    Robot_LeftMtrSpeed(FWD_speed);
+//    Robot_RightMtrSpeed(FWD_speed);
 //
-//    return 0;//this could be used to indicated true or false. Not necessary tho. 
+//    return 0; //this could be used to indicated true or false. Not necessary tho. 
 //}
 //
-//uint8_t turn(void){
+//uint8_t spin(void) {
 //    //turn bot
+//    Robot_LeftMtrSpeed(LPIVOT_L);
+//    Robot_RightMtrSpeed(LPIVOT_R);
 //    return 0;
 //}
 //
-//uint8_t stop(void){
+//uint8_t spiral(void) {
+//    //turn bot
+//    Robot_LeftMtrSpeed(LGRAD_L);
+//    Robot_RightMtrSpeed(LGRAD_R);
+//    return 0;
+//}
+//
+//uint8_t stop(void) { //one concern - if the gearhead is too powerful we may need to slow down first
 //    //stop the bot
-//    //one concern - if the gearhead is too powerful we may need to slow down first
+//    Robot_LeftMtrSpeed(STOP_speed);
+//    Robot_RightMtrSpeed(STOP_speed);
+//
 //
 //    return 0;
 //}
-//

@@ -8,7 +8,7 @@ build/default/production/FindNewCornerSub.o: FindNewCornerSub.c \
  C:/ECE118/include/ES_ServiceHeaders.h ES_Configure.h TopLevel.h \
  ES_Configure.h PingService.h BumperService.h \
  C:/ECE118/include/ES_TattleTale.h C:/ECE118/include/BOARD.h TopLevel.h \
- FindNewCornerSub.h
+ robot.h FindNewCornerSub.h
 
 ES_Configure.h:
 
@@ -51,5 +51,7 @@ C:/ECE118/include/ES_TattleTale.h:
 C:/ECE118/include/BOARD.h:
 
 TopLevel.h:
+
+robot.h:
 
 FindNewCornerSub.h:
