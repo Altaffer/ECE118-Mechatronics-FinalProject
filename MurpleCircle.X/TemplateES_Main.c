@@ -199,7 +199,6 @@ uint8_t test_something(void) {
 uint8_t test_tapeSensors(void) {
     int currentTapeValue = 0;
     currentTapeValue = Robot_ReadTapeSensors();
-    //    currentTapeValue = TAPE_SENSOR_1;
     printf("\nTape Sensors Param Value = %d \n\r", currentTapeValue);
     return 0;
 }
