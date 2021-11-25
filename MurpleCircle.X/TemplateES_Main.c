@@ -8,7 +8,6 @@
 #include <stdlib.h>
 #include "IO_Ports.h"
 #include "AD.h"
-#include "LED.h"
 #include "pwm.h"
 #include "RC_Servo.h"
 #include "serial.h"
@@ -22,9 +21,9 @@
 #define HIGH   1
 #define LOW    0
 #define POT_PIN AD_PORTV8         // use V-08 for pot
-//#define TAPE_SENSOR_1 PORTX03_BIT
 #define BEACON_PIN PORTX10_BIT
 #define SERVO_PIN RC_PORTW08
+//#define TAPE_SENSOR_1 PORTX05_BIT
 
 
 #define DELAY_MULTIPLIER 1000
@@ -66,6 +65,7 @@ void main(void) {
 
     BOARD_Init();
 
+    //    PORTX05_TRIS = INPUT;
 
 
 
@@ -74,7 +74,6 @@ void main(void) {
 
     // Your hardware initialization function calls go here
     AD_Init();
-    LED_Init();
     PWM_Init();
     SERIAL_Init();
     Robot_Init();
@@ -106,8 +105,8 @@ void main(void) {
 
             case LEFT:
                 printf("left pressed\r\n");
-//                test_something();
-//                DELAY(DELAY_LOOP_TIME);
+                //                test_something();
+                //                DELAY(DELAY_LOOP_TIME);
                 test_tapeSensors();
                 //press for a while
                 //this will:
@@ -198,14 +197,15 @@ uint8_t test_something(void) {
 }
 
 uint8_t test_tapeSensors(void) {
-    uint8_t currentTapeValue = 0;
-//    currentTapeValue = Robot_ReadTapeSensors();
+    int currentTapeValue = 0;
     currentTapeValue = Robot_ReadTapeSensors();
+    //    currentTapeValue = TAPE_SENSOR_1;
     printf("\nTape Sensors Param Value = %d \n\r", currentTapeValue);
     return 0;
 }
 
 #ifdef TEST_HARNESSES
+
 void PrintEvent(void) {
     printf("\r\nFunc: %s\tEvent: %s\tParam: 0x%X", eventName,
             EventNames[storedEvent.EventType], storedEvent.EventParam);

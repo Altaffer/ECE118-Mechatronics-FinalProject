@@ -40,7 +40,7 @@
 #define TAKE_PREV
 
 //enable this if you want to see spamming prints at each event to debug
-#define DEBUG_PRINTS
+//#define DEBUG_PRINTS
 /*******************************************************************************
  * EVENTCHECKER_TEST SPECIFIC CODE                                                             *
  ******************************************************************************/
