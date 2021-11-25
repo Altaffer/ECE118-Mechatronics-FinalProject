@@ -101,12 +101,14 @@ void main(void) {
             case RIGHT:
                 printf("right pressed\r\n");
                 test_servo();
+                printf("TrackWireOutput, %d\r\n", (int)Robot_ReadTrackWire());
+                printf("BeaconOutput, %d\r\n", (int)Robot_ReadBeaconSensor());
                 break;
 
             case LEFT:
                 printf("left pressed\r\n");
-                //                test_something();
-                //                DELAY(DELAY_LOOP_TIME);
+                test_something();
+                DELAY(DELAY_LOOP_TIME);
                 test_tapeSensors();
                 //press for a while
                 //this will:

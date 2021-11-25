@@ -20,6 +20,7 @@
       <itemPath>C:/ECE118/include/ES_TattleTale.h</itemPath>
       <itemPath>C:/ECE118/include/ES_Timers.h</itemPath>
       <itemPath>C:/ECE118/include/IO_Ports.h</itemPath>
+      <itemPath>C:/ECE118/include/LED.h</itemPath>
       <itemPath>C:/ECE118/include/RC_Servo.h</itemPath>
       <itemPath>C:/ECE118/include/pwm.h</itemPath>
       <itemPath>C:/ECE118/include/roach.h</itemPath>
@@ -38,6 +39,7 @@
       <itemPath>PingService.h</itemPath>
       <itemPath>TapeService.h</itemPath>
       <itemPath>TimerHelper.h</itemPath>
+      <itemPath>BumperService.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -57,6 +59,7 @@
       <itemPath>C:/ECE118/src/ES_TattleTale.c</itemPath>
       <itemPath>C:/ECE118/src/ES_Timers.c</itemPath>
       <itemPath>C:/ECE118/src/IO_Ports.c</itemPath>
+      <itemPath>C:/ECE118/src/LED.c</itemPath>
       <itemPath>C:/ECE118/src/RC_Servo.c</itemPath>
       <itemPath>C:/ECE118/src/pwm.c</itemPath>
       <itemPath>C:/ECE118/src/serial.c</itemPath>
@@ -69,7 +72,6 @@
       <itemPath>timers.c</itemPath>
       <itemPath>PingService.c</itemPath>
       <itemPath>BumperService.c</itemPath>
-      <itemPath>BumperService.h</itemPath>
       <itemPath>TemplateES_Main.c</itemPath>
       <itemPath>TimerHelper.c</itemPath>
     </logicalFolder>
