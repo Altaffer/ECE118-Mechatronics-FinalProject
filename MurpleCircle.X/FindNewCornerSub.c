@@ -181,7 +181,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 stop();
                 ThisEvent.EventType = FOUND_NEW_CORNER;
                 ThisEvent.EventParam = 1;
-                PostTopLevel(FOUND_NEW_CORNER);
+                PostTopLevel(ThisEvent);
             }
             break;
 

@@ -162,6 +162,14 @@ uint16_t Robot_LEDSGet(void);
  * @author  Max Dunne 2015.09.18 */
 char Robot_BarGraph(uint8_t Number);
 
+uint8_t goForward(void);
+
+uint8_t spin(void);
+
+uint8_t spiral(void);
+
+uint8_t stop(void);
+
 unsigned char Robot_ReadTapeSensors(void);
 
 uint32_t Robot_ReadTrackWire(void);
