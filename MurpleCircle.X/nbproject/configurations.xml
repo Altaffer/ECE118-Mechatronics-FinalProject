@@ -79,6 +79,8 @@
       <itemPath>NavTower_FindHole.c</itemPath>
       <itemPath>ParkSub.c</itemPath>
       <itemPath>TapeService.c</itemPath>
+      <itemPath>WallHug.c</itemPath>
+      <itemPath>WallHug.h</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"

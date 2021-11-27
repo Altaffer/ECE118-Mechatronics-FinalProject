@@ -47,6 +47,8 @@
 #define FINDHOLE_REV_TIME 20 //the bot was bumped onto the tower, now we need 
                             //to reverse a bit to create space for turning
 #define FINDHOLE_FORWARD_TIME 1000
+#define WALL_HUG_FORWARD_TIME 1000
+#define WALL_HUG_REVERSE_TIME 500
 
 
 //#define USE_TAPE_SERVICE //this option disables the working one in the event checkers
