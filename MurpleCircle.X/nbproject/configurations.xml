@@ -40,8 +40,8 @@
       <itemPath>TapeService.h</itemPath>
       <itemPath>TimerHelper.h</itemPath>
       <itemPath>BumperService.h</itemPath>
-      <itemPath>AlignSubHSM.h</itemPath>
       <itemPath>TestTopLevel.h</itemPath>
+      <itemPath>AlignSubHSM.h</itemPath>
       <itemPath>WallHugSubHSM.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
@@ -77,9 +77,8 @@
       <itemPath>BumperService.c</itemPath>
       <itemPath>TemplateES_Main.c</itemPath>
       <itemPath>TimerHelper.c</itemPath>
-      <itemPath>TapeService.c</itemPath>
-      <itemPath>AlignSubHSM.c</itemPath>
       <itemPath>TestTopLevel.c</itemPath>
+      <itemPath>AlignSubHSM.c</itemPath>
       <itemPath>WallHugSubHSM.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
@@ -286,8 +285,6 @@
         </C32CPP>
         <C32Global>
         </C32Global>
-      </item>
-      <item path="TimerHelper.h" ex="true" overriding="false">
       </item>
       <item path="TopLevel.c" ex="true" overriding="false">
       </item>
