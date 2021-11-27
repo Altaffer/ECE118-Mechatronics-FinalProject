@@ -280,9 +280,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
             makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
             break;
-        case BUMPED_LEFT:
-        case BUMPED_RIGHT:
-        case BUMPED_BOTH:
+            case BUMP_EVENT:
             // make tranisiton to navigate the tower
             nextState = NavTower;
             makeTransition = TRUE;
@@ -327,9 +325,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
             makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
             break;
-        case BUMPED_LEFT:
-        case BUMPED_RIGHT:
-        case BUMPED_BOTH:
+        case BUMP_EVENT:
             // make tranisiton to Navigate Tower
             nextState = NavTower;
             makeTransition = TRUE;

@@ -39,8 +39,7 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitBumperService(uint8_t Priority)
-{
+uint8_t InitBumperService(uint8_t Priority) {
     ES_Event ThisEvent;
 
     MyPriority = Priority;
@@ -67,11 +66,10 @@ uint8_t InitBumperService(uint8_t Priority)
  *        be posted to. Remember to rename to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t PostBumperService(ES_Event ThisEvent)
-{
+uint8_t PostBumperService(ES_Event ThisEvent) {
     //printf("\r\n%d,%d\r\n",ThisEvent.EventParam, ThisEvent.EventType);
     return ES_PostToService(MyPriority, ThisEvent);
-    
+
 }
 
 /**
@@ -100,26 +98,17 @@ ES_Event RunBumperService(ES_Event ThisEvent) {
             if (curr_val & SERVO) { //1zz
                 ReturnEvent.EventType = BUMPER_SERVO;
                 ReturnEvent.EventParam = curr_val;
-                PostTopLevel(ReturnEvent);//can be any wrapper function
-            }
-            if ((curr_val & BOTH) == BOTH) { // z11
-                ReturnEvent.EventType = BUMPED_BOTH;
+                PostTopLevel(ReturnEvent); //can be any wrapper function
+            } else {
+                ReturnEvent.EventType = BUMP_EVENT;
                 ReturnEvent.EventParam = curr_val;
-                PostTopLevel(ReturnEvent);//can be any wrapper function
-            } else if (curr_val & LEFT) { // z01
-                ReturnEvent.EventType = BUMPED_LEFT;
-                ReturnEvent.EventParam = curr_val;
-                PostTopLevel(ReturnEvent);//can be any wrapper function
-            } else if (curr_val & RIGHT) { // z10
-                ReturnEvent.EventType = BUMPED_RIGHT;
-                ReturnEvent.EventParam = curr_val;
-                PostTopLevel(ReturnEvent);//can be any wrapper function
+                PostTopLevel(ReturnEvent); //can be any wrapper function 
             }
             break;
         default:
             break;
     }
     past_val = curr_val;
-    
+
     return ReturnEvent;
 }

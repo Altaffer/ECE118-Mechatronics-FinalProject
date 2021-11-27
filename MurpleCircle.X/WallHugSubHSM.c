@@ -10,7 +10,7 @@
 #include "ES_Framework.h"
 #include "BOARD.h"
 #include "TopLevel.h"
-#include "WallHug.h"
+#include "WallHugSubHSM.h"
 #include "robot.h"
 
 
@@ -134,9 +134,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME);
             }
         switch (ThisEvent.EventType) {
-            case BUMPED_LEFT:
-            case BUMPED_RIGHT:
-            case BUMPED_BOTH:
+            case BUMP_EVENT:
                 nextState = Reversing;
                 robot_reverse();//pivot turn
                 ES_Timer_InitTimer(MotionTimer, WALL_HUG_REVERSE_TIME);
@@ -157,9 +155,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
         
     case Driving2: // in the first state, replace this with appropriate state
         switch (ThisEvent.EventType) {
-            case BUMPED_LEFT:
-            case BUMPED_RIGHT:
-            case BUMPED_BOTH:
+            case BUMP_EVENT:
                 nextState = Reversing;
                 robot_reverse();
                 ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME);

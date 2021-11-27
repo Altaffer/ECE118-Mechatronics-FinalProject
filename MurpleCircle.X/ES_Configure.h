@@ -68,9 +68,7 @@ typedef enum {
     /* User-defined events start here */
 
     //bumper events
-    BUMPED_LEFT,
-    BUMPED_RIGHT,
-    BUMPED_BOTH,
+    BUMP_EVENT,
     BUMPER_SERVO,
 
     //black tape sensors on the bottom
@@ -123,9 +121,7 @@ static const char *EventNames[] = {
 	"ES_TIMERACTIVE",
 	"ES_TIMERSTOPPED",
 	//bumper events
-    "BUMPED_LEFT",
-    "BUMPED_RIGHT",
-    "BUMPED_BOTH",
+    "BUMP_EVENT",
     "BUMPER_SERVO",
 
     //black tape sensors on the bottom

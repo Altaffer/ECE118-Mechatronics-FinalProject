@@ -12,8 +12,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-#include "AlignSub.h"
-#include "WallHugSub.h"
+#include "AlignSubHSM.h"
+#include "WallHugSubHSM.h"
 //#include all sub state machines called
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
@@ -145,7 +145,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
                 nextState = WallHug;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-            }
+            
             break;            
         case ES_NO_EVENT:
         default:
@@ -155,10 +155,10 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
 
     case WallHug: 
     {
-        ThisEvent = RunFindNewCorner(ThisEvent);
+        ThisEvent = RunWallHug(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case HUG_COMPLETE:
+        case BOT_BT_CHANGED:
             nextState = Align;
             makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
