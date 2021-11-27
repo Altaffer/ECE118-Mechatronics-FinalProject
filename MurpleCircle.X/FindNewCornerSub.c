@@ -199,34 +199,3 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
-
-//uint8_t goForward(void) {
-//    //something here to make the bot go forward at full speed
-//    Robot_LeftMtrSpeed(FWD_speed);
-//    Robot_RightMtrSpeed(FWD_speed);
-//
-//    return 0; //this could be used to indicated true or false. Not necessary tho. 
-//}
-//
-//uint8_t spin(void) {
-//    //turn bot
-//    Robot_LeftMtrSpeed(LPIVOT_L);
-//    Robot_RightMtrSpeed(LPIVOT_R);
-//    return 0;
-//}
-//
-//uint8_t spiral(void) {
-//    //turn bot
-//    Robot_LeftMtrSpeed(LGRAD_L);
-//    Robot_RightMtrSpeed(LGRAD_R);
-//    return 0;
-//}
-//
-//uint8_t stop(void) { //one concern - if the gearhead is too powerful we may need to slow down first
-//    //stop the bot
-//    Robot_LeftMtrSpeed(STOP_speed);
-//    Robot_RightMtrSpeed(STOP_speed);
-//
-//
-//    return 0;
-//}

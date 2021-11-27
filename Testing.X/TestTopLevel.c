@@ -1,27 +1,4 @@
-/*
- * File: TemplateSubHSM.c
- * Author: J. Edward Carryer
- * Modified: Gabriel Elkaim and Soja-Marie Morgens
- *
- * Template file to set up a Heirarchical State Machine to work with the Events and
- * Services Framework (ES_Framework) on the Uno32 for the CMPE-118/L class. Note that
- * this file will need to be modified to fit your exact needs, and most of the names
- * will have to be changed to match your code.
- *
- * There is another template file for the SubHSM's that is slightly differet, and
- * should be used for all of the subordinate state machines (flat or heirarchical)
- *
- * This is provided as an example and a good place to start.
- *
- * History
- * When           Who     What/Why
- * -------------- ---     --------
- * 09/13/13 15:17 ghe      added tattletail functionality and recursive calls
- * 01/15/12 11:12 jec      revisions for Gen2 framework
- * 11/07/11 11:26 jec      made the queue static
- * 10/30/11 17:59 jec      fixed references to CurrentEvent in RunTemplateSM()
- * 10/23/11 18:20 jec      began conversion from SMTemplate.c (02/20/07 rev)
- */
+//THIS FILE HAS STUFF TO STATE MACHINE DO
 
 /*******************************************************************************
  * MODULE #INCLUDE                                                             *
@@ -35,8 +12,6 @@
 #include "stdio.h"
 #include "stdlib.h"
 
-
-#include "GoForwardSub.h"
 #include "AlignSub.h"
 #include "WallHugSub.h"
 //#include all sub state machines called
@@ -155,7 +130,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
             // Initialize all sub-state machines
 //            InitTemplateSubHSM();
             // now put the machine into the actual initial state
-            nextState = GoForward;
+            nextState = Align;
             makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
             ;
@@ -164,49 +139,27 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
 
     case Align: //
     {
-        // Completes two 180 deg sweeps to find the closest beacon
-        // Enter scan for beaco sub state machine
-        ThisEvent = RunScanForBeacon(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case NO_SIGNAL: // or ES_NO_EVENT - HZ 11/15
-            // make transition to find a new corner
-            if (Tower_Found == 0)
-            {
-                // case before tower is found to initially find a tower from a corner
-                nextState = FindNewCorner;
+        case BUMP_EVENT:
+                nextState = WallHug;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
-            else if (Tower_Found > 0)
-            {
-                // case before tower is found to initially find a tower from a corner
-                nextState = NavField;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
-        case FOUND_BEACON:
-            // make transition to move toward the beacon
-            nextState = ToBeacon;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
+            break;            
         case ES_NO_EVENT:
         default:
             break;
         }
     }
 
-    case WallHug: // Locate the next corner going in a counter clock wise (CCW) orientation
+    case WallHug: 
     {
-        // As a case to get a new perspective, this state should change position to the nreturn to Scan for Beacon
-        // Enter Find new corner sub state machine
         ThisEvent = RunFindNewCorner(ThisEvent);
         switch (ThisEvent.EventType)
         {
-        case FOUND_NEW_CORNER:
-            // make transition to scan for beacon state
-            nextState = ScanForBeacon;
+        case HUG_COMPLETE:
+            nextState = Align;
             makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
             break;

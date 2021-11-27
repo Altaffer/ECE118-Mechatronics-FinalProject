@@ -372,13 +372,13 @@ unsigned char Robot_ReadBumpers(void) {
 //    return SUCCESS;
 //}
 
-uint8_t goForward(void) {
-    //something here to make the bot go forward at full speed
-    Robot_LeftMtrSpeed(FWD_speed);
-    Robot_RightMtrSpeed(FWD_speed);
-
-    return 0; //this could be used to indicated true or false. Not necessary tho. 
-}
+//uint8_t goForward(void) {
+//    //something here to make the bot go forward at full speed
+//    Robot_LeftMtrSpeed(FWD_speed);
+//    Robot_RightMtrSpeed(FWD_speed);
+//
+//    return 0; //this could be used to indicated true or false. Not necessary tho. 
+//}
 
 uint8_t spin(void) {
     //turn bot
