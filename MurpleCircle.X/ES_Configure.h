@@ -15,7 +15,7 @@
 #ifndef CONFIGURE_H
 #define CONFIGURE_H
 
-
+//#include "TopLevel.h"
 
 //defines for keyboard input
 //#define USE_KEYBOARD_INPUT
@@ -39,11 +39,14 @@
 #define PingTriggerTimer 4
 #define BumperTimer 5
 #define SpinTimer 6
+#define MotionTimer 15
 
 #define BUMPER_TIME 100
 #define TIMER_360 1000
 #define TIMER_90 250
-
+#define FINDHOLE_REV_TIME 20 //the bot was bumped onto the tower, now we need 
+                            //to reverse a bit to create space for turning
+#define FINDHOLE_FORWARD_TIME 1000
 
 
 //#define USE_TAPE_SERVICE //this option disables the working one in the event checkers
@@ -76,7 +79,7 @@ typedef enum {
 
     //Black tape sensors on the shooter
     SHOOTER_BT_CHANGED,
-    BT_FOUND_SHOOTER_1,
+    BT_FOUND_SHOOTER_1,//we don't need these four
     BT_LOST_SHOOTER_1,
     BT_FOUND_SHOOTER_2,
     BT_LOST_SHOOTER_2,
@@ -85,6 +88,7 @@ typedef enum {
     TURN_TIMER_EXP,
     FORWARD_TIMER_EXP,
     REVERSE_TIMER_EXP,
+    MOTION_TIMER_EXP,
     
     //Tower events
     BALLSHOT,
@@ -101,6 +105,7 @@ typedef enum {
     FOUND_NEW_CORNER,
             
     FOUND_PING,
+            
             
 } ES_EventTyp_t;
 
@@ -138,6 +143,7 @@ static const char *EventNames[] = {
     "TURN_TIMER_EXP",
     "FORWARD_TIMER_EXP",
     "REVERSE_TIMER_EXP",
+    "MOTION_TIMER_EXP",
     
     //Tower events
     "BALLSHOT",
@@ -191,7 +197,7 @@ static const char *EventNames[] = {
 #define TIMER12_RESP_FUNC TIMER_UNUSED
 #define TIMER13_RESP_FUNC TIMER_UNUSED
 #define TIMER14_RESP_FUNC TIMER_UNUSED
-#define TIMER15_RESP_FUNC TIMER_UNUSED
+#define TIMER15_RESP_FUNC MotionTimerHelper
 
 
 /****************************************************************************/
