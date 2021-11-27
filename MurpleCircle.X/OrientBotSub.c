@@ -202,11 +202,10 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
             }
 
             // if left BT sensor is detected but not center, grad turn left
-            if (Robot_ReadTapeSensors() & 0b0001) {
+            if (Robot_ReadTapeSensors() & (0b0010)) {
                 // Turn gradually to the left until mid sensors are detected
                 spiral();
             }
-
 
             // if right bT sensor is detected but not center, grad turn right
             if (Robot_ReadTapeSensors() & 0b0100) {
@@ -216,7 +215,7 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
             }
             
             // if left BT Sensor and mid sensors are detected exit of OrientBobSub
-            if (Robot_ReadTapeSensors() & 0b0100) {
+            if (Robot_ReadTapeSensors() == (0b0001 + 0b0010 + 0b1000)) {
                 // Transition
                 nextState = Spin;
                 makeTransition = TRUE;
