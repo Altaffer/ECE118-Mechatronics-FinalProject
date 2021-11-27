@@ -166,7 +166,7 @@ uint8_t goForward(void);
 
 uint8_t spin(void);
 
-uint8_t spiral(void);
+uint8_t turnBot(char leftSpeed, char rightSpeed);
 
 uint8_t stop(void);
 

@@ -53,7 +53,7 @@
 
 #define HALL_FRONT_LEFT _RB8 // V07
 //#define HALL_FRONT_RIGHT _RD9 // V08 I don't think this pin works so I moved
-                                // to _RD8 (Z08)
+// to _RD8 (Z08)
 #define HALL_FRONT_RIGHT _RD8 // <- this is the new front right bump pin (Z08))
 #define HALL_REAR_LEFT _RB10 // W04 used for ball shooter switch
 
@@ -147,8 +147,8 @@ void Robot_Init(void) {
     PWM_Init();
     PWM_SetFrequency(1000);
     PWM_AddPins(LEFT_PWM | RIGHT_PWM);
-    
-    
+
+
     IO_PortsSetPortOutputs(PORTW, PIN5);
 
     LEFT_DIR_TRIS = 0;
@@ -169,11 +169,11 @@ void Robot_Init(void) {
 
     //set up the light bank
 
-//    uint8_t CurPin;
-//    for (CurPin = 0; CurPin < NUMLEDS; CurPin++) {
-//        LED_SetPinOutput(CurPin);
-//        LED_Off(CurPin);
-//    }
+    //    uint8_t CurPin;
+    //    for (CurPin = 0; CurPin < NUMLEDS; CurPin++) {
+    //        LED_SetPinOutput(CurPin);
+    //        LED_Off(CurPin);
+    //    }
 
     //while (1);
 
@@ -182,11 +182,11 @@ void Robot_Init(void) {
     //    printf("Current pins: %d\n",AD_ActivePins());
     //    printf("Add Result: %d\n",AD_AddPins(LIGHT_SENSOR));
     //    while(1);
-//    AD_AddPins(LIGHT_SENSOR);
+    //    AD_AddPins(LIGHT_SENSOR);
 
     //enable interrupts
-    
-    
+
+
 }
 
 /**
@@ -380,17 +380,11 @@ uint8_t goForward(void) {
     return 0; //this could be used to indicated true or false. Not necessary tho. 
 }
 
-uint8_t spin(void) {
-    //turn bot
-    Robot_LeftMtrSpeed(LPIVOT_L);
-    Robot_RightMtrSpeed(LPIVOT_R);
-    return 0;
-}
 
-uint8_t spiral(void) {
+uint8_t turnBot(char leftSpeed, char rightSpeed) {
     //turn bot
-    Robot_LeftMtrSpeed(LGRAD_L);
-    Robot_RightMtrSpeed(LGRAD_R);
+    Robot_LeftMtrSpeed(leftSpeed);
+    Robot_RightMtrSpeed(rightSpeed);
     return 0;
 }
 
@@ -412,6 +406,7 @@ unsigned char Robot_ReadTapeSensors(void) {
 
 //#define ROBOT_TEST
 //#ifdef ROBOT_TEST
+
 uint32_t Robot_ReadTrackWire(void) {
     //according to our design, this should return a value from the ADC to indicate the distance
     return AD_ReadADPin(TRACK_WIRE_PIN);
@@ -433,7 +428,7 @@ uint8_t Robot_ReadPingTrigger(void) {
 }
 
 uint8_t Robot_TrigPingSensor(uint8_t trig) {
-    IO_PortsWritePort(PORTW, PIN5*trig);//PIN4
+    IO_PortsWritePort(PORTW, PIN5 * trig); //PIN4
     return 0;
 }
 

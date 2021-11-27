@@ -50,8 +50,6 @@ uint8_t goForward(void);
 
 uint8_t spin(void);
 
-uint8_t spiral(void);
-
 uint8_t stop(void);
 
 /*******************************************************************************
@@ -130,7 +128,7 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 // Setting a time for a 360 spin (needs to be calibrated) 
                 ES_Timer_InitTimer(SpinTimer, TIMER_360);
-                spin();
+                turnBot(LPIVOT_L, LPIVOT_R);
             }
 
             // if BT is detected go to Adjust
@@ -158,7 +156,7 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
         case Spiral: // indefinite gradual turn spiraling to the left
             if (ThisEvent.EventType == ES_ENTRY) {
                 // Setting a time for an indefinite 360 spiral spin (needs to be calibrated) 
-                spiral();
+                turnBot(LGRAD_L, LGRAD_R);
                 // if BT is detected go to Adjust (NEEDS TO BE FINISHED)
             }
 
@@ -173,7 +171,7 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
                 // If the left BT sensor is detected
                 if (Robot_ReadTapeSensors() & 0b0001) {
                     // Turn gradually to the left until mid sensors are detected
-                    spiral();
+                    turnBot(LGRAD_L, LGRAD_R); // left gradual turn
                 }
                 // If the right BT sensor is detected
                 if (Robot_ReadTapeSensors() & 0b0100) {
@@ -204,7 +202,7 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
             // if left BT sensor is detected but not center, grad turn left
             if (Robot_ReadTapeSensors() & (0b0010)) {
                 // Turn gradually to the left until mid sensors are detected
-                spiral();
+                turnBot(LGRAD_L, LGRAD_R); 
             }
 
             // if right bT sensor is detected but not center, grad turn right

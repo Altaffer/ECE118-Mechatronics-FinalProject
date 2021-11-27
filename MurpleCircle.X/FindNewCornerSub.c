@@ -142,7 +142,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 // Spins 90 until timer ends
                 ES_Timer_InitTimer(SpinTimer, TIMER_90);
-                spin();
+                turnBot(LPIVOT_L, LPIVOT_R);
             }
 
             if (ThisEvent.EventType == ES_TIMEOUT) {
