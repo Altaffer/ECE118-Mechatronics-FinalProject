@@ -38,8 +38,9 @@
       <itemPath>timers.h</itemPath>
       <itemPath>PingService.h</itemPath>
       <itemPath>TapeService.h</itemPath>
-      <itemPath>TimerHelper.h</itemPath>
       <itemPath>BumperService.h</itemPath>
+      <itemPath>NavTower_FindHole.h</itemPath>
+      <itemPath>ParkSub.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -73,7 +74,11 @@
       <itemPath>PingService.c</itemPath>
       <itemPath>BumperService.c</itemPath>
       <itemPath>TemplateES_Main.c</itemPath>
-      <itemPath>TimerHelper.c</itemPath>
+      <itemPath>NavTowerSub.c</itemPath>
+      <itemPath>Motions.c</itemPath>
+      <itemPath>NavTower_FindHole.c</itemPath>
+      <itemPath>ParkSub.c</itemPath>
+      <itemPath>TapeService.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -279,6 +284,8 @@
         </C32CPP>
         <C32Global>
         </C32Global>
+      </item>
+      <item path="Motions.c" ex="true" overriding="false">
       </item>
     </conf>
   </confs>

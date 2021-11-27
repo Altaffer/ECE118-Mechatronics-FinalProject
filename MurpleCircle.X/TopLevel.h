@@ -85,5 +85,9 @@ uint8_t PostTopLevel(ES_Event ThisEvent);
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
 ES_Event RunTopLevel(ES_Event ThisEvent);
 
+uint8_t TurnTimerHelper(ES_Event ThisEvent);
+
+uint8_t MotionTimerHelper(ES_Event ThisEvent);
+
 #endif /* Top_Level_H */
 
