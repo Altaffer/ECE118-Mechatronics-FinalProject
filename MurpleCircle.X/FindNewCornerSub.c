@@ -76,6 +76,7 @@ uint8_t InitFindNewCorner(void) {
     ES_Event returnEvent;
     CurrentState = InitPSubState;
     returnEvent = RunFindNewCorner(INIT_EVENT);
+    StartFindNewCorner = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -112,19 +113,14 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
-
         case NoSubService: /* After initialzing or executing, it sits here for the next 
-                          time it gets called. */
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                ;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
+                              time it gets called. */
+            if (StartFindNewCorner) {//when starting
+                nextState = Find1;
+                makeTransition = TRUE;
+                StartFindNewCorner = 0;
             }
             break;
-
         case Find1: // Finds the first corner in the rotation
             if (ThisEvent.EventType == ES_ENTRY) {
                 // Go Forward

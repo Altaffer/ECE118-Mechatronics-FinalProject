@@ -80,6 +80,7 @@ uint8_t InitOrientBot(void) {
     ES_Event returnEvent;
     CurrentState = InitPSubState;
     returnEvent = RunOrientBot(INIT_EVENT);
+    StartOrientBot = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -117,13 +118,14 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
-
         case NoSubService: /* After initialzing or executing, it sits here for the next 
-                          time it gets called. */
-            if (0) {// some trigger event to indicate 
-                ;
+                              time it gets called. */
+            if (StartOrientBot) {//when there is actually an event
+                nextState = Spin;
+                makeTransition = TRUE;
+                StartOrientBot = 0;
             }
-
+            break;
         case Spin: // 360 deg pivot turn to the left looking for BT
             if (ThisEvent.EventType == ES_ENTRY) {
                 // Setting a time for a 360 spin (needs to be calibrated) 

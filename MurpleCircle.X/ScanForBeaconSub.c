@@ -74,6 +74,7 @@ uint8_t InitScanForBeacon(void)
     ES_Event returnEvent;
     CurrentState = InitPSubState;
     returnEvent = RunScanForBeacon(INIT_EVENT);
+    StartScan = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -110,10 +111,20 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent)
         case InitPSubState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
             {
-                nextState = Turn;
+                nextState = NoSubService;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 CCW_Turn();
+            }
+            break;
+        case NoSubService: /* After initialzing or executing, it sits here for the next 
+                              time it gets called. */
+            if (StartScan)// only respond to an actual event
+            {
+                nextState = Turn;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                StartScan = 0;
             }
             break;
         case Turn:
@@ -121,7 +132,7 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent)
                 nextState = FindPing;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-            } else if (ThisEvent.EventType == ON_BT && (ThisEvent.EventParam & FRONT_TAPE)) {
+            } else if (ThisEvent.EventType == BOT_BT_CHANGED && (ThisEvent.EventParam & FRONT_TAPE)) {
                 nextState = Reverse;
                 makeTransition = TRUE;
                 CW_Turn();
@@ -135,13 +146,28 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent)
                 ThisEvent.EventType = ES_NO_EVENT;
                 if (min_elapse_time > ThisEvent.EventParam){
                     min_elapse_time = ThisEvent.EventParam;
+                    tower_counter = 0;
                 } else {
                     tower_counter++;
                 }
             }
             break;
-        case NoSubService: /* After initialzing or executing, it sits here for the next 
-                              time it gets called. */
+        case Reverse:
+            if (ThisEvent.EventType == FOUND_BEACON) {
+                if (tower_counter-- == 0) {
+                    stop_bot();
+                    nextState = InitPSubState;
+                    makeTransition = FALSE;//This makes sure that it sits at the InitState
+                    //ThisEvent.EventType = ES_NO_EVENT; //passing the event to super state
+                } else {
+                    ThisEvent.EventType = ES_NO_EVENT;
+                }
+                nextState = FindPing;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
+        
         default: // all unhandled events fall into here
             break;
     } // end switch on Current State

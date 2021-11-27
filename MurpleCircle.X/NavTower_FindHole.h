@@ -17,8 +17,8 @@
  * Updated on 16/Sep/2013
  */
 
-#ifndef ORIENT_BOT_SUB_H  // <- This should be changed to your own guard on both
-#define ORIENT_BOT_SUB_H  //    of these lines
+#ifndef NAV_TOWER_FIND_HOLE_H  // <- This should be changed to your own guard on both
+#define NAV_TOWER_FIND_HOLE_H  //    of these lines
 
 
 /*******************************************************************************
@@ -35,7 +35,7 @@
 /*******************************************************************************
  * PUBLIC TYPEDEFS                                                             *
  ******************************************************************************/
-static uint8_t StartOrientBot;
+static uint8_t StartFindHole;
 
 /*******************************************************************************
  * PUBLIC FUNCTION PROTOTYPES                                                  *
@@ -51,7 +51,7 @@ static uint8_t StartOrientBot;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitOrientBot(void);
+uint8_t InitFindHole(void);
 
 /**
  * @Function RunTemplateSubHSM(ES_Event ThisEvent)
@@ -68,7 +68,7 @@ uint8_t InitOrientBot(void);
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunOrientBot(ES_Event ThisEvent);
+ES_Event RunFindHole(ES_Event ThisEvent);
 
-#endif /* ORIENT_BOT_SUB_H */
+#endif /* FIND_NEW_CORNER_H */
 

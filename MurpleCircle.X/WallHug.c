@@ -10,14 +10,14 @@
 #include "ES_Framework.h"
 #include "BOARD.h"
 #include "TopLevel.h"
-#include "NavTowerSub.h"
+#include "WallHug.h"
 #include "robot.h"
-#include "ParkSub.h"
-#include "NavTower_FindHole.h"
 
 
 #include <stdio.h>
 #include <stdlib.h>
+
+
 
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
@@ -26,31 +26,36 @@
 
 typedef enum {
     InitPSubState,
-    WallHug,
-    Park,
-    FindHole,
-    ReleaseBall,
-    Leave,
-    NoSubService
+    //FirstState, which was the template state
+    Driving,
+    Hiding,
+    Reversing,
+    Driving2
 } SubHSMState_t;
 
 static const char *StateNames[] = {
-    "InitPSubState",
-    "WallHug",
-    "Park",
-    "FindHole",
-    "ReleaseBall",
-    "Leave",
-    "NoSubService"
+	"InitPSubState",
+	"Driving",
+    "Hiding",
+    "Reversing",
+    "Driving2"
 };
 
-#define TURN_SPEED 50
-#define FRONT_TAPE 0x0008 // 1000 - Change this to the right one
+
+
+
 
 
 /*******************************************************************************
  * PRIVATE FUNCTION PROTOTYPES                                                 *
  ******************************************************************************/
+uint8_t robot_reverse(void);
+
+uint8_t robot_forward(void);
+
+uint8_t robot_stop(void);
+
+uint8_t robot_forward_2(void);
 
 /*******************************************************************************
  * PRIVATE MODULE VARIABLES                                                            *
@@ -74,13 +79,11 @@ static SubHSMState_t CurrentState = InitPSubState; // initial state
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitNavTower(void) {
+uint8_t InitWallHug(void) {
     ES_Event returnEvent;
-    InitPark();
-    InitFindHole();
     CurrentState = InitPSubState;
-    returnEvent = RunNavTower(INIT_EVENT);
-    StartNavTower = 0;
+    returnEvent = RunWallHug(INIT_EVENT);
+    StartWallHug = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -102,128 +105,109 @@ uint8_t InitNavTower(void) {
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunNavTower(ES_Event ThisEvent) {
+ES_Event RunWallHug(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
     SubHSMState_t nextState;
 
 
     ES_Tattle(); // trace call stack
 
-    switch (CurrentState) {
-        case InitPSubState: // If current state is initial Psedudo State
-            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-            {
-                nextState = NoSubService;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            break;
-        case NoSubService: /* After initialzing or executing, it sits here for the next 
-                              time it gets called. */
-            if (StartNavTower) {//when there is actually an event
-                nextState = WallHug;
-                makeTransition = TRUE;
-                StartNavTower = 0;
-            }
-            break;
-        case WallHug:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                ;
-            }
-            // maybe a sub here
-            if (ThisEvent.EventType == FOUND_TRACK_WIRE) {
-                nextState = Park;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
-            }
-            break;
-        case Park:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                ;
-            }
-            RunPark(ThisEvent);
-            if (IsParallel) {
-                IsParallel = 0;
-                nextState = FindHole;
-                makeTransition = TRUE;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
-            }
-            break;
-        case FindHole:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                ;
-            }
-            RunFindHole(ThisEvent);
-            if (ThisEvent.EventType == SHOOTER_BT_CHANGED) {
-                //from the ssm, this is for sure both tape on
-                nextState = ReleaseBall;
-                Robot_LeftMtrSpeed(0);
-                Robot_RightMtrSpeed(0);
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
-            }
-            break;
-        case ReleaseBall:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                //start the servo, but what value?
-                ;
-            }
-            
-            if (ThisEvent.EventType = BUMPER_SERVO) {
-                //turn off servo, but what value?
-                nextState = Leave;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            //
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
-            }
-            break;
-        case Leave:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                Robot_LeftMtrSpeed(100);
-                Robot_RightMtrSpeed(100);
-            }
-            nextState = NoSubService;
-            makeTransition = TRUE;
-            //do we really need this state?
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
-            }
-            break;
 
-        default: // all unhandled events fall into here
-            break;
+    switch (CurrentState) {
+    case InitPSubState: // If current state is initial Psedudo State
+        if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+        {
+            // this is where you would put any actions associated with the
+            // transition from the initial pseudo-state into the actual
+            // initial state
+
+            // now put the machine into the actual initial state
+            nextState = Driving;
+            makeTransition = TRUE;
+            ThisEvent.EventType = ES_NO_EVENT;
+        }
+        break;
+
+    case Driving: // in the first state, replace this with appropriate state
+        if (ThisEvent.EventType == ES_ENTRY) {
+                robot_forward();
+                ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME);
+            }
+        switch (ThisEvent.EventType) {
+            case BUMPED_LEFT:
+            case BUMPED_RIGHT:
+            case BUMPED_BOTH:
+                nextState = Reversing;
+                robot_reverse();//pivot turn
+                ES_Timer_InitTimer(MotionTimer, WALL_HUG_REVERSE_TIME);
+                ThisEvent.EventType = ES_NO_EVENT;
+                makeTransition = TRUE;
+                break;
+            case MOTION_TIMER_EXP:
+                nextState = Driving2;
+                robot_forward_2();//at a larger angle
+                ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME*4);
+                ThisEvent.EventType = ES_NO_EVENT;
+                makeTransition = TRUE;
+                break;
+            default:
+                break;
+        }
+        break;
+        
+    case Driving2: // in the first state, replace this with appropriate state
+        switch (ThisEvent.EventType) {
+            case BUMPED_LEFT:
+            case BUMPED_RIGHT:
+            case BUMPED_BOTH:
+                nextState = Reversing;
+                robot_reverse();
+                ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME);
+                ThisEvent.EventType = ES_NO_EVENT;
+                makeTransition = TRUE;
+                break;
+            case MOTION_TIMER_EXP:
+                nextState = Driving;
+                robot_forward();//straight
+                ThisEvent.EventType = ES_NO_EVENT;
+                makeTransition = TRUE;
+                break;
+            default:
+                break;
+        }
+        break;
+        
+        
+
+        
+    case Reversing:
+        switch (ThisEvent.EventType) {
+            case MOTION_TIMER_EXP:
+                nextState = Driving;
+                ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME);
+                robot_forward();//straight
+                printf("%d\r\n",WALL_HUG_FORWARD_TIME);
+                ThisEvent.EventType = ES_NO_EVENT;
+                makeTransition = TRUE;
+                break;
+            default:
+                break;
+        }
+        break;
+
+    default: // all unhandled states fall into here
+        break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunNavTower(EXIT_EVENT); // <- rename to your own Run function
+        RunWallHug(EXIT_EVENT);
         CurrentState = nextState;
-        RunNavTower(ENTRY_EVENT); // <- rename to your own Run function
+        RunWallHug(ENTRY_EVENT);
     }
-
     ES_Tail(); // trace call stack end
     return ThisEvent;
+
 }
 
 
@@ -232,4 +216,31 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
 
+
+uint8_t robot_reverse(void){
+    printf("FL hit, reverse a bit\r\n");
+    Robot_LeftMtrSpeed(-100);
+    Robot_RightMtrSpeed(-5);
+    return 0;
+}
+
+uint8_t robot_forward(void){
+    printf("Robot going forward\r\n");
+    Robot_LeftMtrSpeed(80);
+    Robot_RightMtrSpeed(80);
+    return 0;
+}
+
+uint8_t robot_stop(void){
+    printf("Robot stopped\r\n");
+    Robot_LeftMtrSpeed(0);
+    Robot_RightMtrSpeed(0);
+    return 0;
+}
+
+uint8_t robot_forward_2(void){
+    printf("forward2/r/n");
+    Robot_LeftMtrSpeed(100);
+    Robot_RightMtrSpeed(30);
+}
 

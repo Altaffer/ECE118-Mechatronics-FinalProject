@@ -75,7 +75,7 @@ uint8_t InitPark(void) {
     ES_Event returnEvent;
     InitPark();
     CurrentState = InitPSubState;
-    returnEvent = RunNavTower(INIT_EVENT);
+    returnEvent = RunPark(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -108,10 +108,21 @@ ES_Event RunPark(ES_Event ThisEvent) {
         case InitPSubState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
             {
-                nextState = TurnToTower;
+                nextState = NoSubService;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 IsParallel = 0;
+            }
+            break;
+
+        case NoSubService: /* After initialzing or executing, it sits here for the next 
+                              time it gets called. */
+            if (StartPark)// only respond to an actual event
+            {
+                nextState = TurnToTower;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+                StartPark = 0;
             }
             break;
         case TurnToTower:
@@ -182,25 +193,24 @@ ES_Event RunPark(ES_Event ThisEvent) {
                 IsParallel = 1;
                 ;
             }
-            nextState = InitPSubState;
+            nextState = NoSubService;
             makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
+            //ThisEvent.EventType = ES_NO_EVENT;
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
                 ;
             }
             break;
-        case NoSubService: /* After initialzing or executing, it sits here for the next 
-                              time it gets called. */
+        
         default: // all unhandled events fall into here
             break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunNavTower(EXIT_EVENT); // <- rename to your own Run function
+        RunPark(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunNavTower(ENTRY_EVENT); // <- rename to your own Run function
+        RunPark(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end

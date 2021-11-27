@@ -11,9 +11,9 @@
 #include "BOARD.h"
 #include "TopLevel.h"
 #include "NavTowerSub.h"
+#include "NavTower_FindHole.h"
 #include "robot.h"
 #include "ParkSub.h"
-#include "NavTower_FindHole.h"
 
 
 #include <stdio.h>
@@ -26,11 +26,10 @@
 
 typedef enum {
     InitPSubState,
-    WallHug,
-    Park,
-    FindHole,
-    ReleaseBall,
-    Leave,
+    Reverse,
+    Turn,
+    Forward,
+    Backwards,
     NoSubService
 } SubHSMState_t;
 
@@ -44,8 +43,11 @@ static const char *StateNames[] = {
     "NoSubService"
 };
 
-#define TURN_SPEED 50
-#define FRONT_TAPE 0x0008 // 1000 - Change this to the right one
+#define FIRST_TAPE 1 // 01
+#define SECOND_TAPE 2 // 10
+#define BOTH_TAPE 3 // 11
+
+
 
 
 /*******************************************************************************
@@ -74,13 +76,12 @@ static SubHSMState_t CurrentState = InitPSubState; // initial state
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitNavTower(void) {
+uint8_t InitFindHole(void) {
     ES_Event returnEvent;
     InitPark();
-    InitFindHole();
     CurrentState = InitPSubState;
     returnEvent = RunNavTower(INIT_EVENT);
-    StartNavTower = 0;
+    StartFindHole = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -102,7 +103,7 @@ uint8_t InitNavTower(void) {
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunNavTower(ES_Event ThisEvent) {
+ES_Event RunFindHole(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
     SubHSMState_t nextState;
 
@@ -120,97 +121,124 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
             break;
         case NoSubService: /* After initialzing or executing, it sits here for the next 
                               time it gets called. */
-            if (StartNavTower) {//when there is actually an event
-                nextState = WallHug;
+            if (StartFindHole) {//when there is actually an event
+                nextState = Reverse;
                 makeTransition = TRUE;
-                StartNavTower = 0;
+                StartFindHole = 0;
             }
             break;
-        case WallHug:
+        case Reverse:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                ;
+                //reverse a bit
+                Robot_LeftMtrSpeed(-10);
+                Robot_RightMtrSpeed(-10);
+                ES_Timer_InitTimer(MotionTimer, FINDHOLE_REV_TIME);
             }
-            // maybe a sub here
-            if (ThisEvent.EventType == FOUND_TRACK_WIRE) {
-                nextState = Park;
+            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
+                nextState = Turn;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
-                ;
-            }
-            break;
-        case Park:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                ;
-            }
-            RunPark(ThisEvent);
-            if (IsParallel) {
-                IsParallel = 0;
-                nextState = FindHole;
-                makeTransition = TRUE;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
-            }
-            break;
-        case FindHole:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                ;
-            }
-            RunFindHole(ThisEvent);
-            if (ThisEvent.EventType == SHOOTER_BT_CHANGED) {
-                //from the ssm, this is for sure both tape on
-                nextState = ReleaseBall;
                 Robot_LeftMtrSpeed(0);
                 Robot_RightMtrSpeed(0);
+            }
+            break;
+        case Turn:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                //state entry
+                Robot_LeftMtrSpeed(-50);
+                Robot_RightMtrSpeed(50);
+                ES_Timer_InitTimer(MotionTimer, TIMER_90);
+            }
+            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
+                nextState = Forward;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
-                ;
+                Robot_LeftMtrSpeed(0);
+                Robot_RightMtrSpeed(0);
             }
             break;
-        case ReleaseBall:
+        case Forward:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                //start the servo, but what value?
-                ;
+                Robot_LeftMtrSpeed(60);
+                Robot_RightMtrSpeed(60);
+                ES_Timer_InitTimer(MotionTimer, FINDHOLE_FORWARD_TIME);
             }
-            
-            if (ThisEvent.EventType = BUMPER_SERVO) {
-                //turn off servo, but what value?
-                nextState = Leave;
+            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
+                nextState = Backwards;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
+            } else if (ThisEvent.EventType == SHOOTER_BT_CHANGED) {
+                switch (ThisEvent.EventParam){
+                    case FIRST_TAPE: //only found one - needs forward more
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+                    case SECOND_TAPE: //only found the other one - went too far - need backwards
+                        nextState = Backwards;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+                    case BOTH_TAPE:
+                        nextState = NoSubService;
+                        makeTransition = TRUE;//This makes sure that it sits at the InitState
+                        Robot_LeftMtrSpeed(0);
+                        Robot_RightMtrSpeed(0);
+                        break;
+                    default:
+                        break;
+                }
             }
-            //
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
-                ;
+                Robot_LeftMtrSpeed(0);
+                Robot_RightMtrSpeed(0);
             }
             break;
-        case Leave:
+        case Backwards:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                Robot_LeftMtrSpeed(100);
-                Robot_RightMtrSpeed(100);
+                Robot_LeftMtrSpeed(-60);
+                Robot_RightMtrSpeed(-60);
+                ES_Timer_InitTimer(MotionTimer, FINDHOLE_FORWARD_TIME);
             }
-            nextState = NoSubService;
-            makeTransition = TRUE;
-            //do we really need this state?
+            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
+                nextState = Forward;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            } else if (ThisEvent.EventType == SHOOTER_BT_CHANGED) {
+                switch (ThisEvent.EventParam){
+                    case SECOND_TAPE: //only found one - needs forward more
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+                    case FIRST_TAPE: //only found the other one - went too far - need backwards
+                        nextState = Forward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+                    case BOTH_TAPE:
+                        nextState = NoSubService;
+                        makeTransition = TRUE;//This makes sure that it sits at the InitState
+                        Robot_LeftMtrSpeed(0);
+                        Robot_RightMtrSpeed(0);
+                        break;
+                    default:
+                        break;
+                }
+            }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
-                ;
+                Robot_LeftMtrSpeed(0);
+                Robot_RightMtrSpeed(0);
             }
             break;
-
+        
         default: // all unhandled events fall into here
             break;
     } // end switch on Current State
