@@ -34,7 +34,7 @@
 
 //define this if using the test harnesses - ES_run will not be called
 
-#define TEST_HARNESSES
+//#define TEST_HARNESSES
 
 #ifdef TEST_HARNESSES
 #include "PingService.h"

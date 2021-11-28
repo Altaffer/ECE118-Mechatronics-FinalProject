@@ -30,7 +30,8 @@ typedef enum {
     Driving,
     Hiding,
     Reversing,
-    Driving2
+    Driving2,
+            NoSubService,
 } SubHSMState_t;
 
 static const char *StateNames[] = {
@@ -38,7 +39,8 @@ static const char *StateNames[] = {
 	"Driving",
     "Hiding",
     "Reversing",
-    "Driving2"
+    "Driving2",
+    "NoSubService",
 };
 
 
@@ -122,12 +124,19 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
             // initial state
 
             // now put the machine into the actual initial state
-            nextState = Driving;
+            nextState = NoSubService;
             makeTransition = TRUE;
             ThisEvent.EventType = ES_NO_EVENT;
         }
         break;
-
+    case NoSubService: /* After initialzing or executing, it sits here for the next 
+                              time it gets called. */
+            if (StartWallHug) {//when there is actually an event
+                nextState = Driving;
+                makeTransition = TRUE;
+                StartWallHug = 0;
+            }
+            break;
     case Driving: // in the first state, replace this with appropriate state
         if (ThisEvent.EventType == ES_ENTRY) {
                 robot_forward();
@@ -146,6 +155,10 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 robot_forward_2();//at a larger angle
                 ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME*4);
                 ThisEvent.EventType = ES_NO_EVENT;
+                makeTransition = TRUE;
+                break;
+            case BOT_BT_CHANGED:
+                nextState = NoSubService;
                 makeTransition = TRUE;
                 break;
             default:
@@ -168,6 +181,10 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 ThisEvent.EventType = ES_NO_EVENT;
                 makeTransition = TRUE;
                 break;
+            case BOT_BT_CHANGED:
+                nextState = NoSubService;
+                makeTransition = TRUE;
+                break;
             default:
                 break;
         }
@@ -184,6 +201,10 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 robot_forward();//straight
                 printf("%d\r\n",WALL_HUG_FORWARD_TIME);
                 ThisEvent.EventType = ES_NO_EVENT;
+                makeTransition = TRUE;
+                break;
+            case BOT_BT_CHANGED:
+                nextState = NoSubService;
                 makeTransition = TRUE;
                 break;
             default:

@@ -71,6 +71,8 @@ uint8_t InitTopLevel(uint8_t Priority)
     MyPriority = Priority;
     // put us into the Initial PseudoState
     CurrentState = InitPState;
+    InitWallHug();
+    InitAlignSubHSM();
     // post the initial transition event
     if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE)
     {
@@ -139,6 +141,11 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
 
     case Align: //
     {
+        if (ThisEvent.EventType == ES_ENTRY) {
+            //StartAlign = 1;
+            ;
+        }
+        ThisEvent = RunAlignSubHSM(ThisEvent);
         switch (ThisEvent.EventType)
         {
         case BUMP_EVENT:
@@ -152,9 +159,12 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
             break;
         }
     }
-
+    break;
     case WallHug: 
     {
+        if (ThisEvent.EventType == ES_ENTRY) {
+            StartWallHug = 1;
+        }
         ThisEvent = RunWallHug(ThisEvent);
         switch (ThisEvent.EventType)
         {
@@ -168,8 +178,12 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
             break;
         }
     }
-
-        if (makeTransition == TRUE)
+        break;
+    default:
+        break;
+        
+    }
+    if (makeTransition == TRUE)
         { // making a state transition, send EXIT and ENTRY
             // recursively call the current state with an exit event
             RunTopLevel(EXIT_EVENT); // <- rename to your own Run function
@@ -179,7 +193,6 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
 
         ES_Tail(); // trace call stack end
         return ThisEvent;
-    }
 }
     /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *

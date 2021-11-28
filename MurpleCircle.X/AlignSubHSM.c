@@ -184,7 +184,7 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                     turnBot(LGRAD_L, LGRAD_R);
                     break;
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam == F_CENTER_TAPE & B_CENTER_TAPE) {
+                    if (ThisEvent.EventParam == F_CENTER_TAPE | B_CENTER_TAPE) {
                         nextState = MoveForward;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -212,7 +212,7 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                             makeTransition = TRUE;
                             ThisEvent.EventType = ES_NO_EVENT;
                             break;
-                        case (F_CENTER_TAPE & F_LEFT_TAPE & B_CENTER_TAPE):
+                        case (F_CENTER_TAPE | F_LEFT_TAPE | B_CENTER_TAPE):
                             //                            nextState = CornerTurn;
                             //                            makeTransition = TRUE;
                             //                            ThisEvent.EventType = ES_NO_EVENT;
@@ -235,7 +235,7 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                     turnBot(LGRAD_L, LGRAD_R);
                     break;
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam == F_CENTER_TAPE & B_CENTER_TAPE) {
+                    if (ThisEvent.EventParam == F_CENTER_TAPE | B_CENTER_TAPE) {
                         nextState = MoveForward;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -252,7 +252,7 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                     turnBot(RGRAD_L, RGRAD_R);
                     break;
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam == F_CENTER_TAPE & B_CENTER_TAPE) {
+                    if (ThisEvent.EventParam == F_CENTER_TAPE | B_CENTER_TAPE) {
                         nextState = MoveForward;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
