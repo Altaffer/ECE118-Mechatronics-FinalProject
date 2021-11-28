@@ -25,14 +25,17 @@
  * PUBLIC FUNCTION PROTOTYPES                                                  *
  ******************************************************************************/
 // speed and direction
-#define FWD_speed 100    // Straight
-#define BCKWD_speed -100 
+#define FWD_speed 75    // Straight
+#define BCKWD_speed -75 
 #define STOP_speed 0    // stopping
+#define RIGHT_WHEEL_OFFSET 18
 
 #define LTANK_L -80     // tank turns
 #define LTANK_R 80
 #define RTANK_L 80
 #define RTANK_R -80
+#define LTANK_L_SLOW -70     // tank turns
+#define LTANK_R_SLOW 70
 
 #define LPIVOT_L 0      // pivot turns
 #define LPIVOT_R 80

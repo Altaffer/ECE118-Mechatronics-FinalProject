@@ -158,11 +158,10 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
         case TankTurn:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    turnBot(LTANK_L, LTANK_R);
+                    turnBot(LTANK_L_SLOW, LTANK_R_SLOW);
                     break;
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam & (F_CENTER_TAPE
-                            | B_CENTER_TAPE)) {
+                    if ((ThisEvent.EventParam & F_CENTER_TAPE)) {
                         nextState = MoveForward;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -200,23 +199,23 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
             //                    break;
             //            }
             //            break;
-//        case SlightLeft: // in the first state, replace this with appropriate state
-//            switch (ThisEvent.EventType) {
-//                case ES_ENTRY:
-//                    turnBot(LGRAD_L, LGRAD_R);
-//                    break;
-//                case BOT_BT_CHANGED:
-//                    if (ThisEvent.EventParam == F_CENTER_TAPE | B_CENTER_TAPE) {
-//                        nextState = MoveForward;
-//                        makeTransition = TRUE;
-//                        ThisEvent.EventType = ES_NO_EVENT;
-//                    }
-//                    break;
-//                case ES_EXIT:
-//                    stop();
-//                    break;
-//            }
-//            break;
+            //        case SlightLeft: // in the first state, replace this with appropriate state
+            //            switch (ThisEvent.EventType) {
+            //                case ES_ENTRY:
+            //                    turnBot(LGRAD_L, LGRAD_R);
+            //                    break;
+            //                case BOT_BT_CHANGED:
+            //                    if (ThisEvent.EventParam == F_CENTER_TAPE | B_CENTER_TAPE) {
+            //                        nextState = MoveForward;
+            //                        makeTransition = TRUE;
+            //                        ThisEvent.EventType = ES_NO_EVENT;
+            //                    }
+            //                    break;
+            //                case ES_EXIT:
+            //                    stop();
+            //                    break;
+            //            }
+            //            break;
         case MoveForward: // in the first state, replace this with correct names
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:

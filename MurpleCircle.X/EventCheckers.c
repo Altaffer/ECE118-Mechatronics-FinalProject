@@ -119,7 +119,7 @@ uint8_t TapeSensorEventChecker(void) {
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
         //        PostTemplateHSM(thisEvent);
         //        PostGenericService(thisEvent);
-//        PostTopLevel(thisEvent);
+        PostTopLevel(thisEvent);
 #else
         SaveEvent(thisEvent);
 #endif   

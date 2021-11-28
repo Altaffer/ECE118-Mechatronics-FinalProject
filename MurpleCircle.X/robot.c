@@ -142,6 +142,13 @@ void Robot_Init(void) {
     TAPE_SENSOR_4_TRIS = INPUT;
     TAPE_SENSOR_5_TRIS = INPUT;
     TAPE_SENSOR_6_TRIS = INPUT;
+    
+    TAPE_SENSOR_1 = 0;
+    TAPE_SENSOR_2 = 0;
+    TAPE_SENSOR_3 = 0;
+    TAPE_SENSOR_4 = 0;
+    TAPE_SENSOR_5 = 0;
+    TAPE_SENSOR_6 = 0;
 
     //set the control pins for the motors
     PWM_Init();
@@ -375,7 +382,7 @@ unsigned char Robot_ReadBumpers(void) {
 uint8_t goForward(void) {
     //something here to make the bot go forward at full speed
     Robot_LeftMtrSpeed(FWD_speed);
-    Robot_RightMtrSpeed(FWD_speed);
+    Robot_RightMtrSpeed(FWD_speed-RIGHT_WHEEL_OFFSET);
 
     return 0; //this could be used to indicated true or false. Not necessary tho. 
 }
@@ -384,7 +391,7 @@ uint8_t goForward(void) {
 uint8_t turnBot(char leftSpeed, char rightSpeed) {
     //turn bot
     Robot_LeftMtrSpeed(leftSpeed);
-    Robot_RightMtrSpeed(rightSpeed);
+    Robot_RightMtrSpeed(rightSpeed-RIGHT_WHEEL_OFFSET);
     return 0;
 }
 
@@ -400,8 +407,10 @@ uint8_t stop(void) { //one concern - if the gearhead is too powerful we may need
 unsigned char Robot_ReadTapeSensors(void) {
     //unsigned char bump_state;
     //bump_state = (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
+//    return (TAPE_SENSOR_1 + ((TAPE_SENSOR_2) << 1)+((TAPE_SENSOR_3) << 2)
+//            +((TAPE_SENSOR_4) << 3)+((TAPE_SENSOR_5) << 4)+((TAPE_SENSOR_6) << 5));
     return (TAPE_SENSOR_1 + ((TAPE_SENSOR_2) << 1)+((TAPE_SENSOR_3) << 2)
-            +((TAPE_SENSOR_4) << 3)+((TAPE_SENSOR_5) << 4)+((TAPE_SENSOR_6) << 5));
+            +((TAPE_SENSOR_4) << 3));
 }
 
 //#define ROBOT_TEST
