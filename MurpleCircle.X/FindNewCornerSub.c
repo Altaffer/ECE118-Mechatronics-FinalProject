@@ -141,13 +141,13 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
         case Turn: // Turn 90 deg 
             if (ThisEvent.EventType == ES_ENTRY) {
                 // Spins 90 until timer ends
-                ES_Timer_InitTimer(SpinTimer, TIMER_90);
+                ES_Timer_InitTimer(MotionTimer, TIMER_90);
                 turnBot(LPIVOT_L, LPIVOT_R);
             }
 
             if (ThisEvent.EventType == ES_TIMEOUT) {
                 // timer end transition to find2
-                if (ThisEvent.EventParam == SpinTimer) {
+                if (ThisEvent.EventParam == MotionTimer) {
                     nextState = Find2;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;

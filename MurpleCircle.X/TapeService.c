@@ -96,9 +96,12 @@ ES_Event RunTapeService(ES_Event ThisEvent) {
     uint8_t changed_bits = curr_status ^ past_status;
     switch (ThisEvent.EventType) {
         case ES_TIMEOUT:
+            ES_Timer_InitTimer(TapeTimer, TAPE_TICKS);
+            //printf("ES_TIMEOUT\r\n");
             if (curr_status == past_status) {
                 break;
             }
+            //printf("ES_TIMEOUT2\r\n");
             if (changed_bits & SHOOTER) {
                 ReturnEvent.EventType = SHOOTER_BT_CHANGED;
                 ReturnEvent.EventParam = curr_status;

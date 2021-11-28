@@ -89,5 +89,7 @@ uint8_t TurnTimerHelper(ES_Event ThisEvent);
 
 uint8_t MotionTimerHelper(ES_Event ThisEvent);
 
+uint8_t TurnTimerHelper(ES_Event ThisEvent);
+
 #endif /* Top_Level_H */
 

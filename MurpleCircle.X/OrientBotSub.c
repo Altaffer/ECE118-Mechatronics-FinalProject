@@ -127,7 +127,7 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
         case Spin: // 360 deg pivot turn to the left looking for BT
             if (ThisEvent.EventType == ES_ENTRY) {
                 // Setting a time for a 360 spin (needs to be calibrated) 
-                ES_Timer_InitTimer(SpinTimer, TIMER_360);
+                ES_Timer_InitTimer(MotionTimer, TIMER_360);
                 turnBot(LPIVOT_L, LPIVOT_R);
             }
 
@@ -140,7 +140,7 @@ ES_Event RunOrientBot(ES_Event ThisEvent) {
 
             if (ThisEvent.EventType == ES_TIMEOUT) {
                 // Transition to Spiral if BT is not detected
-                if (ThisEvent.EventParam == SpinTimer) {
+                if (ThisEvent.EventParam == MotionTimer) {
                     nextState = Spiral;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;

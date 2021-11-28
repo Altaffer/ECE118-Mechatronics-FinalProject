@@ -38,7 +38,7 @@
 #define ReverseTimer 3
 #define PingTriggerTimer 4
 #define BumperTimer 5
-#define SpinTimer 6
+//#define SpinTimer 6
 #define MotionTimer 15
 
 #define BOT_MIDDLE_TIME 800
@@ -50,9 +50,10 @@
 #define FINDHOLE_FORWARD_TIME 1000
 #define WALL_HUG_FORWARD_TIME 1000
 #define WALL_HUG_REVERSE_TIME 500
+#define CORNER_ALIGN_TIME 100
 
 
-//#define USE_TAPE_SERVICE //this option disables the working one in the event checkers
+#define USE_TAPE_SERVICE //this option disables the working one in the event checkers
 #define TapeTimer 6
 
 /****************************************************************************/
@@ -186,7 +187,7 @@ static const char *EventNames[] = {
 // a timers, then you can use TIMER_UNUSED
 #define TIMER_UNUSED ((pPostFunc)0)
 #define TIMER0_RESP_FUNC TIMER_UNUSED
-#define TIMER1_RESP_FUNC TIMER_UNUSED
+#define TIMER1_RESP_FUNC TurnTimerHelper
 #define TIMER2_RESP_FUNC TIMER_UNUSED
 #define TIMER3_RESP_FUNC TIMER_UNUSED
 #define TIMER4_RESP_FUNC PostPingService
@@ -226,7 +227,7 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This macro determines that number of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 4//when we decide to use the tape service, change it to 
+#define NUM_SERVICES 5//when we decide to use the tape service, change it to 
 //at least 5
 
 ///****************************************************************************/

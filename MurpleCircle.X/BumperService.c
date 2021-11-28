@@ -92,6 +92,7 @@ ES_Event RunBumperService(ES_Event ThisEvent) {
     uint8_t curr_val = Robot_ReadBumpers();
     switch (ThisEvent.EventType) {
         case ES_TIMEOUT:
+            ES_Timer_InitTimer(BumperTimer, BUMPER_TIME);
             if (curr_val == past_val) {
                 break;
             }

@@ -248,10 +248,11 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                                 makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
+                            case (F_CENTER_TAPE)://test only. delete this line
                             case (F_CENTER_TAPE | F_LEFT_TAPE | B_CENTER_TAPE):
-                                //                            nextState = CornerTurn;
-                                //                            makeTransition = TRUE;
-                                //                            ThisEvent.EventType = ES_NO_EVENT;
+                                nextState = CornerTurn;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             default:
                                 break;
@@ -300,9 +301,30 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                     break;
             }
             break;
+        /* In the CornerTurn:
+         * 1. Go forward a bit until the center of the bot is at the corner
+         * 2. Tank turn ccw 90 degrees
+         * 3. Go back to go forward
+         */
         case CornerTurn:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
+                    // step 1. forward a little
+                    ES_Timer_InitTimer(MotionTimer, BOT_MIDDLE_TIME);
+                    ES_Timer_StopTimer(TurnTimer); //just to be safe
+                    goForward();
+                    break;
+                case MOTION_TIMER_EXP:
+                    // step 2. tank turn 90 degrees
+                    // Using a different timer to avoid conflicts
+                    turnBot(LTANK_L_SLOW, LTANK_R_SLOW);//tank turn
+                    ES_Timer_InitTimer(TurnTimer, TIMER_360);
+                    break;
+                case TURN_TIMER_EXP:
+                    // step 3. go forward
+                    nextState = MoveForward;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
                     break;
                 case ES_EXIT:
                     break;
