@@ -38,9 +38,8 @@
  ******************************************************************************/
 typedef enum {
     InitPSubState,
-    Spin,
     MoveForward,
-    SlightLeft,
+    TankTurn,
     AlignRight,
     AlignLeft,
     CornerTurn,
@@ -48,9 +47,8 @@ typedef enum {
 
 static const char *StateNames[] = {
     "InitPSubState",
-    "Spin",
     "MoveForward",
-    "SlightLeft",
+    "TankTurn",
     "AlignRight",
     "AlignLeft",
     "CornerTurn",
@@ -89,6 +87,7 @@ static uint8_t MyPriority;
 static char LeftMotorSpeed;
 static char RightMotorSpeed;
 static int StartFlag;
+static int TankTurnFlag;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -109,6 +108,7 @@ uint8_t InitAlignSubHSM(void) {
     CurrentState = InitPSubState;
     returnEvent = RunAlignSubHSM(INIT_EVENT);
     StartFlag = 0;
+    TankTurnFlag = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -147,7 +147,7 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                 // now put the machine into the actual initial state
 
                 if (StartFlag == 0) {
-                    nextState = Spin;
+                    nextState = MoveForward;
                 } else if (StartFlag == 1) {
                     //                    nextState = ;
                 }
@@ -155,36 +155,14 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
-        case Spin:
+        case TankTurn:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    turnBot(LPIVOT_L, LPIVOT_R);
+                    turnBot(LTANK_L, LTANK_R);
                     break;
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam == F_RIGHT_TAPE) {
-                        nextState = SlightLeft;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                    } else if (ThisEvent.EventParam == F_CENTER_TAPE
-                            & B_CENTER_TAPE) {
-                        nextState = MoveForward;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-                case ES_EXIT:
-                    break;
-                default:
-                    break;
-            }
-            break;
-        case SlightLeft: // in the first state, replace this with appropriate state
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    turnBot(LGRAD_L, LGRAD_R);
-                    break;
-                case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam == F_CENTER_TAPE | B_CENTER_TAPE) {
+                    if (ThisEvent.EventParam & (F_CENTER_TAPE
+                            | B_CENTER_TAPE)) {
                         nextState = MoveForward;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -195,30 +173,90 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                     break;
             }
             break;
+            //        case Spin:
+            //            switch (ThisEvent.EventType) {
+            //                case ES_ENTRY:
+            //                    turnBot(LPIVOT_L, LPIVOT_R);
+            //                    break;
+            //                case BOT_BT_CHANGED:
+            //                    if (ThisEvent.EventParam & F_LEFT_TAPE) {
+            //                        LF_1st = 1;
+            //                    } else if ((ThisEvent.EventParam & F_RIGHT_TAPE) && LF_1st) {
+            //                        LF_1st = 0;
+            //                    } else if (ThisEvent.EventParam & F_RIGHT_TAPE) {
+            //                        nextState = SlightLeft;
+            //                        makeTransition = TRUE;
+            //                        ThisEvent.EventType = ES_NO_EVENT;
+            //                    } else if (ThisEvent.EventParam == F_CENTER_TAPE
+            //                            & B_CENTER_TAPE) {
+            //                        nextState = MoveForward;
+            //                        makeTransition = TRUE;
+            //                        ThisEvent.EventType = ES_NO_EVENT;
+            //                    }
+            //                    break;
+            //                case ES_EXIT:
+            //                    break;
+            //                default:
+            //                    break;
+            //            }
+            //            break;
+//        case SlightLeft: // in the first state, replace this with appropriate state
+//            switch (ThisEvent.EventType) {
+//                case ES_ENTRY:
+//                    turnBot(LGRAD_L, LGRAD_R);
+//                    break;
+//                case BOT_BT_CHANGED:
+//                    if (ThisEvent.EventParam == F_CENTER_TAPE | B_CENTER_TAPE) {
+//                        nextState = MoveForward;
+//                        makeTransition = TRUE;
+//                        ThisEvent.EventType = ES_NO_EVENT;
+//                    }
+//                    break;
+//                case ES_EXIT:
+//                    stop();
+//                    break;
+//            }
+//            break;
         case MoveForward: // in the first state, replace this with correct names
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     goForward();
                     break;
+                case MOTION_TIMER_EXP:
+                    if (TankTurnFlag == 0) {
+                        nextState = TankTurn;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        TankTurnFlag = 1;
+                    }
+                    break;
                 case BOT_BT_CHANGED:
-                    switch (ThisEvent.EventParam) {
-                        case (F_RIGHT_TAPE):
-                            nextState = AlignRight;
-                            makeTransition = TRUE;
-                            ThisEvent.EventType = ES_NO_EVENT;
-                            break;
-                        case (F_LEFT_TAPE):
-                            nextState = AlignLeft;
-                            makeTransition = TRUE;
-                            ThisEvent.EventType = ES_NO_EVENT;
-                            break;
-                        case (F_CENTER_TAPE | F_LEFT_TAPE | B_CENTER_TAPE):
-                            //                            nextState = CornerTurn;
-                            //                            makeTransition = TRUE;
-                            //                            ThisEvent.EventType = ES_NO_EVENT;
-                            break;
-                        default:
-                            break;
+                    if ((TankTurnFlag == 0) &&
+                            (ThisEvent.EventParam & F_CENTER_TAPE)) {
+                        ES_Timer_InitTimer(MotionTimer, BOT_MIDDLE_TIME);
+                        break;
+                    } else {
+                        switch (ThisEvent.EventParam) {
+                            case (F_RIGHT_TAPE | B_CENTER_TAPE):
+                            case (F_RIGHT_TAPE):
+                                nextState = AlignRight;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            case (F_LEFT_TAPE | B_CENTER_TAPE):
+                            case (F_LEFT_TAPE):
+                                nextState = AlignLeft;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            case (F_CENTER_TAPE | F_LEFT_TAPE | B_CENTER_TAPE):
+                                //                            nextState = CornerTurn;
+                                //                            makeTransition = TRUE;
+                                //                            ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                     break;
                 case ES_EXIT:

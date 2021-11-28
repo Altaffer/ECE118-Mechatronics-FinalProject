@@ -194,6 +194,33 @@ ES_Event RunTopLevel(ES_Event ThisEvent)
         ES_Tail(); // trace call stack end
         return ThisEvent;
 }
+
+
+uint8_t MotionTimerHelper(ES_Event ThisEvent){
+    ES_Event posting;
+    
+    switch (ThisEvent.EventType) {
+    case ES_INIT: //do nothing (initializing)
+        break;
+    
+    /* do nothng */
+    case ES_TIMERACTIVE:
+    case ES_TIMERSTOPPED:
+        break; // We don't use these events
+
+    /* run internal event checkers */
+    case ES_TIMEOUT:
+        posting.EventParam = 1;
+        posting.EventType = MOTION_TIMER_EXP; //When the timer expires, it generates this event
+        PostTopLevel(posting);//then send the event to the toplevel
+        printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
+        ES_Timer_StopTimer(MotionTimer);
+        break;
+    default:
+        break;
+    }
+    return 0;
+}
     /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/

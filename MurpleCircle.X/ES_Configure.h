@@ -41,6 +41,7 @@
 #define SpinTimer 6
 #define MotionTimer 15
 
+#define BOT_MIDDLE_TIME 1000
 #define BUMPER_TIME 100
 #define TIMER_360 1000
 #define TIMER_90 250
@@ -74,7 +75,7 @@ typedef enum {
     //black tape sensors on the bottom
     ON_BT,
     OFF_BT,
-    BOT_BT_CHANGED,
+    BOT_BT_CHANGED,  // event #14
 
 
     //Black tape sensors on the shooter
@@ -88,7 +89,7 @@ typedef enum {
     TURN_TIMER_EXP,
     FORWARD_TIMER_EXP,
     REVERSE_TIMER_EXP,
-    MOTION_TIMER_EXP,
+    MOTION_TIMER_EXP, // event #23
 
     //Tower events
     BALLSHOT,
@@ -203,8 +204,8 @@ static const char *EventNames[] = {
 #define TIMER12_RESP_FUNC TIMER_UNUSED
 #define TIMER13_RESP_FUNC TIMER_UNUSED
 #define TIMER14_RESP_FUNC TIMER_UNUSED
-//#define TIMER15_RESP_FUNC MotionTimerHelper
-#define TIMER15_RESP_FUNC TIMER_UNUSED // for when we are using TestTopLevel.c
+#define TIMER15_RESP_FUNC MotionTimerHelper
+//#define TIMER15_RESP_FUNC TIMER_UNUSED // for when we are using TestTopLevel.c
 
 
 /****************************************************************************/
