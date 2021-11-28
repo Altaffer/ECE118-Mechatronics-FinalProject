@@ -18,9 +18,9 @@
 //#include "TopLevel.h"
 
 //defines for keyboard input
-//#define USE_KEYBOARD_INPUT
+#define USE_KEYBOARD_INPUT
 //What State machine are we testing
-//#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostGenericService
+#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
 
 //define for TattleTale
 #define USE_TATTLETALE
@@ -45,7 +45,7 @@
 #define TIMER_360 1000
 #define TIMER_90 250
 #define FINDHOLE_REV_TIME 20 //the bot was bumped onto the tower, now we need 
-                            //to reverse a bit to create space for turning
+//to reverse a bit to create space for turning
 #define FINDHOLE_FORWARD_TIME 1000
 #define WALL_HUG_FORWARD_TIME 1000
 #define WALL_HUG_REVERSE_TIME 500
@@ -79,7 +79,7 @@ typedef enum {
 
     //Black tape sensors on the shooter
     SHOOTER_BT_CHANGED,
-    BT_FOUND_SHOOTER_1,//we don't need these four
+    BT_FOUND_SHOOTER_1, //we don't need these four
     BT_LOST_SHOOTER_1,
     BT_FOUND_SHOOTER_2,
     BT_LOST_SHOOTER_2,
@@ -89,7 +89,7 @@ typedef enum {
     FORWARD_TIMER_EXP,
     REVERSE_TIMER_EXP,
     MOTION_TIMER_EXP,
-    
+
     //Tower events
     BALLSHOT,
     LOADED,
@@ -97,37 +97,41 @@ typedef enum {
     LOST_BEACON,
     FOUND_TRACK_WIRE,
     LOST_TRACK_WIRE, //just in case
-    TOWER_DONE,        
-    
+    TOWER_DONE,
+
     //Bot Events
     BOT_ORIENTED,
     NO_SIGNAL,
     FOUND_NEW_CORNER,
-            
+
+    NUMBEROFEVENTS,
+
     FOUND_PING,
-            
-            
+
+
+
+
 } ES_EventTyp_t;
 
 static const char *EventNames[] = {
-	"ES_NO_EVENT",
-	"ES_ERROR",
-	"ES_INIT",
-	"ES_ENTRY",
-	"ES_EXIT",
-	"ES_KEYINPUT",
-	"ES_LISTEVENTS",
-	"ES_TIMEOUT",
-	"ES_TIMERACTIVE",
-	"ES_TIMERSTOPPED",
-	//bumper events
+    "ES_NO_EVENT",
+    "ES_ERROR",
+    "ES_INIT",
+    "ES_ENTRY",
+    "ES_EXIT",
+    "ES_KEYINPUT",
+    "ES_LISTEVENTS",
+    "ES_TIMEOUT",
+    "ES_TIMERACTIVE",
+    "ES_TIMERSTOPPED",
+
+    //bumper events
     "BUMP_EVENT",
     "BUMPER_SERVO",
 
     //black tape sensors on the bottom
     "ON_BT",
     "OFF_BT",
-    
     "BOT_BT_CHANGED",
 
     //Black tape sensors on the shooter
@@ -142,7 +146,7 @@ static const char *EventNames[] = {
     "FORWARD_TIMER_EXP",
     "REVERSE_TIMER_EXP",
     "MOTION_TIMER_EXP",
-    
+
     //Tower events
     "BALLSHOT",
     "LOADED",
@@ -150,14 +154,18 @@ static const char *EventNames[] = {
     "LOST_BEACON",
     "FOUND_TRACK_WIRE",
     "LOST_TRACK_WIRE", //just in case
-    "TOWER_DONE",  
-    
+    "TOWER_DONE",
+
     //Bot Events
     "BOT_ORIENTED",
     "NO_SIGNAL",
     "FOUND_NEW_CORNER",
-    
+
+    "NUMBEROFEVENTS",
+
     "FOUND_PING",
+
+
 };
 
 
@@ -195,7 +203,8 @@ static const char *EventNames[] = {
 #define TIMER12_RESP_FUNC TIMER_UNUSED
 #define TIMER13_RESP_FUNC TIMER_UNUSED
 #define TIMER14_RESP_FUNC TIMER_UNUSED
-#define TIMER15_RESP_FUNC MotionTimerHelper
+//#define TIMER15_RESP_FUNC MotionTimerHelper
+#define TIMER15_RESP_FUNC TIMER_UNUSED // for when we are using TestTopLevel.c
 
 
 /****************************************************************************/
@@ -216,8 +225,8 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This macro determines that number of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 4 //when we decide to use the tape service, change it to 
-                        //at least 5
+#define NUM_SERVICES 4//when we decide to use the tape service, change it to 
+//at least 5
 
 ///****************************************************************************/
 //// These are the definitions for Service 0, the lowest priority service
@@ -251,7 +260,7 @@ static const char *EventNames[] = {
 // These are the definitions for Service 1
 #if NUM_SERVICES > 1
 // the header file with the public fuction prototypes
-#define SERV_1_HEADER "TopLevel.h"
+#define SERV_1_HEADER "TestTopLevel.h"
 // the name of the Init function
 #define SERV_1_INIT InitTopLevel
 // the name of the run function
