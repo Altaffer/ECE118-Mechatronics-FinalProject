@@ -159,16 +159,163 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     turnBot(LTANK_L_SLOW, LTANK_R_SLOW);
+                    //ES_Timer_InitTimer(MotionTimer, TIMER_90);//time based, not used
                     break;
                 case BOT_BT_CHANGED:
                     if ((ThisEvent.EventParam & F_CENTER_TAPE)) {
                         nextState = MoveForward;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
+                        goForward();
                     }
                     break;
                 case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
                     stop();
+                    break;
+            }
+            break;
+        case MoveForward:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    goForward();
+                    break;
+                case MOTION_TIMER_EXP:
+                    if (TankTurnFlag == 0) {
+                        nextState = TankTurn;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        TankTurnFlag = 1;
+                    }
+                    break;
+                case BOT_BT_CHANGED:
+                    if ((TankTurnFlag == 0) &&
+                            (ThisEvent.EventParam & F_CENTER_TAPE)) {
+                        ES_Timer_InitTimer(MotionTimer, BOT_MIDDLE_TIME);
+                        break;
+                    } else if ((TankTurnFlag == 1) &&ThisEvent.EventParam & F_CENTER_TAPE) {
+                        goForward();
+                        break;
+                    } else if ((TankTurnFlag == 1)){
+                        switch (ThisEvent.EventParam) {
+                            case (F_RIGHT_TAPE | B_CENTER_TAPE):
+                            case (F_RIGHT_TAPE):
+                                nextState = AlignRight;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            case (F_LEFT_TAPE | B_CENTER_TAPE):
+                            case (F_LEFT_TAPE):
+                                nextState = AlignLeft;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                                //                            case (F_CENTER_TAPE | F_LEFT_TAPE):
+                                //                            case (F_CENTER_TAPE | F_LEFT_TAPE | F_RIGHT_TAPE):
+                                //                            case (F_CENTER_TAPE | F_LEFT_TAPE | B_CENTER_TAPE):
+                                //                            case (F_CENTER_TAPE | F_LEFT_TAPE | F_RIGHT_TAPE | B_CENTER_TAPE):
+                                //                                nextState = CornerTurn;
+                                //                                makeTransition = TRUE;
+                                //                                ThisEvent.EventType = ES_NO_EVENT;
+                                //                                break;
+                            default:
+                                if (ThisEvent.EventType & F_LEFT_TAPE) {
+                                    nextState = AlignLeft;
+                                    makeTransition = TRUE;
+                                    ThisEvent.EventType = ES_NO_EVENT;
+                                } 
+                                if (ThisEvent.EventType & F_RIGHT_TAPE) {
+                                    nextState = AlignRight;
+                                    makeTransition = TRUE;
+                                    ThisEvent.EventType = ES_NO_EVENT;
+                                }
+                                break;
+                        }
+                    }
+
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    stop();
+                    break;
+                case ES_NO_EVENT:
+                default: // all unhandled events pass the event back up to the next level
+                    break;
+            }
+            break;
+        case AlignLeft:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    turnBot(LGRAD_L, LGRAD_R);
+                    ES_Timer_InitTimer(MotionTimer, ABRUPT_TURN_TIME);
+                    break;
+                case MOTION_TIMER_EXP:
+                    turnBot(-10, LPIVOT_R);
+                    break;
+                case BOT_BT_CHANGED:
+                    if (ThisEvent.EventParam & (F_CENTER_TAPE)) {
+                        nextState = MoveForward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        ES_Timer_StopTimer(MotionTimer);
+                        stop();
+                    }
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    stop();
+                    break;
+            }
+            break;
+        case AlignRight:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    turnBot(RGRAD_L, RGRAD_R);
+                    //ES_Timer_InitTimer(MotionTimer, ABRUPT_TURN_TIME);
+                    break;
+                case BOT_BT_CHANGED:
+                    if (ThisEvent.EventParam & (F_CENTER_TAPE)) {
+                        nextState = MoveForward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    stop();
+                    break;
+            }
+            break;
+            /* In the CornerTurn:
+             * 1. Go forward a bit until the center of the bot is at the corner
+             * 2. Tank turn ccw 90 degrees
+             * 3. Go back to go forward
+             */
+        case CornerTurn:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    // step 1. forward a little
+                    ES_Timer_InitTimer(MotionTimer, BOT_MIDDLE_TIME);
+                    ES_Timer_StopTimer(TurnTimer); //just to be safe
+                    goForward();
+                    break;
+                case MOTION_TIMER_EXP:
+                    nextState = TankTurn;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    // step 2. tank turn 90 degrees
+                    // Using a different timer to avoid conflicts
+                    //                    turnBot(LTANK_L_SLOW, LTANK_R_SLOW);//tank turn
+                    //                    ES_Timer_InitTimer(TurnTimer, TIMER_90);
+                    break;
+                    //                case TURN_TIMER_EXP:
+                    //                    // step 3. go forward
+                    //                    nextState = MoveForward;
+                    //                    makeTransition = TRUE;
+                    //                    ThisEvent.EventType = ES_NO_EVENT;
+                    //                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
                     break;
             }
             break;
@@ -216,120 +363,6 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
             //                    break;
             //            }
             //            break;
-        case MoveForward: // in the first state, replace this with correct names
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    goForward();
-                    break;
-                case MOTION_TIMER_EXP:
-                    if (TankTurnFlag == 0) {
-                        nextState = TankTurn;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        TankTurnFlag = 1;
-                    }
-                    break;
-                case BOT_BT_CHANGED:
-                    if ((TankTurnFlag == 0) &&
-                            (ThisEvent.EventParam & F_CENTER_TAPE)) {
-                        ES_Timer_InitTimer(MotionTimer, BOT_MIDDLE_TIME);
-                        break;
-                    } else {
-                        switch (ThisEvent.EventParam) {
-                            case (F_RIGHT_TAPE | B_CENTER_TAPE):
-                            case (F_RIGHT_TAPE):
-                                nextState = AlignRight;
-                                makeTransition = TRUE;
-                                ThisEvent.EventType = ES_NO_EVENT;
-                                break;
-                            case (F_LEFT_TAPE | B_CENTER_TAPE):
-                            case (F_LEFT_TAPE):
-                                nextState = AlignLeft;
-                                makeTransition = TRUE;
-                                ThisEvent.EventType = ES_NO_EVENT;
-                                break;
-                            case (F_CENTER_TAPE)://test only. delete this line
-                            case (F_CENTER_TAPE | F_LEFT_TAPE | B_CENTER_TAPE):
-                                nextState = CornerTurn;
-                                makeTransition = TRUE;
-                                ThisEvent.EventType = ES_NO_EVENT;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                    break;
-                case ES_EXIT:
-                    stop();
-                    break;
-                case ES_NO_EVENT:
-                default: // all unhandled events pass the event back up to the next level
-                    break;
-            }
-            break;
-        case AlignLeft:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    turnBot(LGRAD_L, LGRAD_R);
-                    break;
-                case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam == F_CENTER_TAPE | B_CENTER_TAPE) {
-                        nextState = MoveForward;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-                case ES_EXIT:
-                    stop();
-                    break;
-            }
-            break;
-        case AlignRight:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    turnBot(RGRAD_L, RGRAD_R);
-                    break;
-                case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam == F_CENTER_TAPE | B_CENTER_TAPE) {
-                        nextState = MoveForward;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                    }
-                    break;
-                case ES_EXIT:
-                    stop();
-                    break;
-            }
-            break;
-        /* In the CornerTurn:
-         * 1. Go forward a bit until the center of the bot is at the corner
-         * 2. Tank turn ccw 90 degrees
-         * 3. Go back to go forward
-         */
-        case CornerTurn:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    // step 1. forward a little
-                    ES_Timer_InitTimer(MotionTimer, BOT_MIDDLE_TIME);
-                    ES_Timer_StopTimer(TurnTimer); //just to be safe
-                    goForward();
-                    break;
-                case MOTION_TIMER_EXP:
-                    // step 2. tank turn 90 degrees
-                    // Using a different timer to avoid conflicts
-                    turnBot(LTANK_L_SLOW, LTANK_R_SLOW);//tank turn
-                    ES_Timer_InitTimer(TurnTimer, TIMER_360);
-                    break;
-                case TURN_TIMER_EXP:
-                    // step 3. go forward
-                    nextState = MoveForward;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case ES_EXIT:
-                    break;
-            }
-            break;
 
         default: // all unhandled states fall into here
             break;

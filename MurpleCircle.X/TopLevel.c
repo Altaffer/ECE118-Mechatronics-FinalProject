@@ -370,7 +370,7 @@ uint8_t TurnTimerHelper(ES_Event ThisEvent){
         posting.EventParam = 1;
         posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
         PostTopLevel(posting);//then send the event to the toplevel
-        printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
+        //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
         break;
     default:
         break;
@@ -395,7 +395,7 @@ uint8_t MotionTimerHelper(ES_Event ThisEvent){
         posting.EventParam = 1;
         posting.EventType = MOTION_TIMER_EXP; //When the timer expires, it generates this event
         PostTopLevel(posting);//then send the event to the toplevel
-        printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
+        //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
         ES_Timer_StopTimer(MotionTimer);
         break;
     default:
@@ -421,7 +421,7 @@ uint8_t TurnTimerHelper(ES_Event ThisEvent){
         posting.EventParam = 1;
         posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
         PostTopLevel(posting);//then send the event to the toplevel
-        printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
+        //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
         ES_Timer_StopTimer(MotionTimer);
         break;
     default:

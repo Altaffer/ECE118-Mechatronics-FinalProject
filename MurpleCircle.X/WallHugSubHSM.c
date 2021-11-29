@@ -11,6 +11,7 @@
 #include "BOARD.h"
 #include "TopLevel.h"
 #include "WallHugSubHSM.h"
+#include "TestTopLevel.h"
 #include "robot.h"
 
 
@@ -31,12 +32,12 @@ typedef enum {
     Hiding,
     Reversing,
     Driving2,
-            NoSubService,
+    NoSubService,
 } SubHSMState_t;
 
 static const char *StateNames[] = {
-	"InitPSubState",
-	"Driving",
+    "InitPSubState",
+    "Driving",
     "Hiding",
     "Reversing",
     "Driving2",
@@ -66,6 +67,10 @@ uint8_t robot_forward_2(void);
  * The type of state variable should match that of enum in header file. */
 
 static SubHSMState_t CurrentState = InitPSubState; // initial state
+
+uint8_t StartWallHug;
+
+#define F_CENTER_TAPE 0b000001
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -116,104 +121,122 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
 
 
     switch (CurrentState) {
-    case InitPSubState: // If current state is initial Psedudo State
-        if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
-        {
-            // this is where you would put any actions associated with the
-            // transition from the initial pseudo-state into the actual
-            // initial state
+        case InitPSubState: // If current state is initial Psedudo State
+            if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
+            {
+                // this is where you would put any actions associated with the
+                // transition from the initial pseudo-state into the actual
+                // initial state
 
-            // now put the machine into the actual initial state
-            nextState = NoSubService;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-        }
-        break;
-    case NoSubService: /* After initialzing or executing, it sits here for the next 
+                // now put the machine into the actual initial state
+                nextState = NoSubService;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
+        case NoSubService: /* After initialzing or executing, it sits here for the next 
                               time it gets called. */
             if (StartWallHug) {//when there is actually an event
-                nextState = Driving;
+                nextState = Reversing;
                 makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
                 StartWallHug = 0;
             }
             break;
-    case Driving: // in the first state, replace this with appropriate state
-        if (ThisEvent.EventType == ES_ENTRY) {
+        case Driving: // in the first state, replace this with appropriate state
+            if (ThisEvent.EventType == ES_ENTRY) {
                 robot_forward();
                 ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME);
             }
-        switch (ThisEvent.EventType) {
-            case BUMP_EVENT:
-                nextState = Reversing;
-                robot_reverse();//pivot turn
-                ES_Timer_InitTimer(MotionTimer, WALL_HUG_REVERSE_TIME);
-                ThisEvent.EventType = ES_NO_EVENT;
-                makeTransition = TRUE;
-                break;
-            case MOTION_TIMER_EXP:
-                nextState = Driving2;
-                robot_forward_2();//at a larger angle
-                ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME*4);
-                ThisEvent.EventType = ES_NO_EVENT;
-                makeTransition = TRUE;
-                break;
-            case BOT_BT_CHANGED:
-                nextState = NoSubService;
-                makeTransition = TRUE;
-                break;
-            default:
-                break;
-        }
-        break;
-        
-    case Driving2: // in the first state, replace this with appropriate state
-        switch (ThisEvent.EventType) {
-            case BUMP_EVENT:
-                nextState = Reversing;
-                robot_reverse();
-                ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME);
-                ThisEvent.EventType = ES_NO_EVENT;
-                makeTransition = TRUE;
-                break;
-            case MOTION_TIMER_EXP:
-                nextState = Driving;
-                robot_forward();//straight
-                ThisEvent.EventType = ES_NO_EVENT;
-                makeTransition = TRUE;
-                break;
-            case BOT_BT_CHANGED:
-                nextState = NoSubService;
-                makeTransition = TRUE;
-                break;
-            default:
-                break;
-        }
-        break;
-        
-        
+            switch (ThisEvent.EventType) {
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    break;
+                case BUMP_EVENT:
+                    nextState = Reversing;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    makeTransition = TRUE;
+                    break;
+                case MOTION_TIMER_EXP:
+                    nextState = Driving2;
+                    robot_forward_2(); //at a larger angle
+                    //ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME*4);
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    makeTransition = TRUE;
+                    break;
+                    //only at the second driving state will it rely on the tape
+                case BOT_BT_CHANGED:
+                    if (ThisEvent.EventParam == F_CENTER_TAPE) {
+                        nextState = NoSubService;
+                        makeTransition = TRUE;
+                        break;
+                    }
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                default:
+                    break;
+            }
+            break;
 
-        
-    case Reversing:
-        switch (ThisEvent.EventType) {
-            case MOTION_TIMER_EXP:
-                nextState = Driving;
-                ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME);
-                robot_forward();//straight
-                printf("%d\r\n",WALL_HUG_FORWARD_TIME);
-                ThisEvent.EventType = ES_NO_EVENT;
-                makeTransition = TRUE;
-                break;
-            case BOT_BT_CHANGED:
-                nextState = NoSubService;
-                makeTransition = TRUE;
-                break;
-            default:
-                break;
-        }
-        break;
+        case Driving2: // in the first state, replace this with appropriate state
+            switch (ThisEvent.EventType) {
+                case BUMP_EVENT:
+                    nextState = Reversing;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    makeTransition = TRUE;
+                    break;
+                    //            case MOTION_TIMER_EXP:
+                    //                nextState = Driving;
+                    //                robot_forward();//straight
+                    //                ThisEvent.EventType = ES_NO_EVENT;
+                    //                makeTransition = TRUE;
+                    //                break;
+                case BOT_BT_CHANGED:
+                    if (ThisEvent.EventParam == F_CENTER_TAPE) {
+                        nextState = NoSubService;
+                        makeTransition = TRUE;
+                        break;
+                    }
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                default:
+                    break;
+            }
+            break;
 
-    default: // all unhandled states fall into here
-        break;
+
+
+
+        case Reversing:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    robot_reverse();
+                    ES_Timer_InitTimer(MotionTimer, WALL_HUG_REVERSE_TIME);
+                    break;
+                case MOTION_TIMER_EXP:
+                    nextState = Driving;
+                    ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME);
+                    robot_forward(); //straight
+                    //printf("%d\r\n",WALL_HUG_FORWARD_TIME);
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    makeTransition = TRUE;
+                    break;
+                    //when it's reversing, it should ignore this bot tape
+                case BOT_BT_CHANGED:
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    //                nextState = NoSubService;
+                    //                makeTransition = TRUE;
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    break;
+                default:
+                    break;
+            }
+            break;
+
+        default: // all unhandled states fall into here
+            break;
     } // end switch on Current State
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
@@ -227,37 +250,35 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
 
 }
 
-
-
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
 
 
-uint8_t robot_reverse(void){
-    printf("FL hit, reverse a bit\r\n");
-    Robot_LeftMtrSpeed(-100);
-    Robot_RightMtrSpeed(-5);
+uint8_t robot_reverse(void) {
+    //printf("FL hit, reverse a bit\r\n");
+    Robot_LeftMtrSpeed(-80);
+    Robot_RightMtrSpeed(20);
     return 0;
 }
 
-uint8_t robot_forward(void){
-    printf("Robot going forward\r\n");
+uint8_t robot_forward(void) {
+    //printf("Robot going forward\r\n");
     Robot_LeftMtrSpeed(80);
     Robot_RightMtrSpeed(80);
     return 0;
 }
 
-uint8_t robot_stop(void){
-    printf("Robot stopped\r\n");
+uint8_t robot_stop(void) {
+    //printf("Robot stopped\r\n");
     Robot_LeftMtrSpeed(0);
     Robot_RightMtrSpeed(0);
     return 0;
 }
 
-uint8_t robot_forward_2(void){
-    printf("forward2/r/n");
-    Robot_LeftMtrSpeed(100);
+uint8_t robot_forward_2(void) {
+    //printf("forward2/r/n");
+    Robot_LeftMtrSpeed(80);
     Robot_RightMtrSpeed(30);
 }
 

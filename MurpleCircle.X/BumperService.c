@@ -100,7 +100,7 @@ ES_Event RunBumperService(ES_Event ThisEvent) {
                 ReturnEvent.EventType = BUMPER_SERVO;
                 ReturnEvent.EventParam = curr_val;
                 PostTopLevel(ReturnEvent); //can be any wrapper function
-            } else {
+            } else if (curr_val) {
                 ReturnEvent.EventType = BUMP_EVENT;
                 ReturnEvent.EventParam = curr_val;
                 PostTopLevel(ReturnEvent); //can be any wrapper function 

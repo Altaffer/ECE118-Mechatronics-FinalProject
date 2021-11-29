@@ -15,7 +15,7 @@
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define TAPE_TICKS 100//test
+#define TAPE_TICKS 60//test
 #define TIMER_HIGH_TICKS 1
 //define PING_PIN PORTW03_BIT // defined in the config file
 

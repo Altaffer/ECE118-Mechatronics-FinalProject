@@ -18,15 +18,15 @@
 //#include "TopLevel.h"
 
 //defines for keyboard input
-//#define USE_KEYBOARD_INPUT
+#define USE_KEYBOARD_INPUT
 //What State machine are we testing
-//#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
+#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
 
 //define for TattleTale
-//#define USE_TATTLETALE
+#define USE_TATTLETALE
 
 //uncomment to supress the entry and exit events
-//#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
+#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
 
 /****************************************************************************/
 // Name/define the events of interest
@@ -41,16 +41,24 @@
 //#define SpinTimer 6
 #define MotionTimer 15
 
-#define BOT_MIDDLE_TIME 800
-#define BUMPER_TIME 100
-#define TIMER_360 1000
 #define TIMER_90 250
+#define BOT_MIDDLE_TIME 650
+#define BUMPER_TIME 100
+#define TIMER_360 (TIMER_90*4)
+
 #define FINDHOLE_REV_TIME 20 //the bot was bumped onto the tower, now we need 
 //to reverse a bit to create space for turning
 #define FINDHOLE_FORWARD_TIME 1000
-#define WALL_HUG_FORWARD_TIME 1000
-#define WALL_HUG_REVERSE_TIME 500
+#define WALL_HUG_FORWARD_TIME 300
+#define WALL_HUG_REVERSE_TIME 800
 #define CORNER_ALIGN_TIME 100
+#define ABRUPT_TURN_TIME 500
+
+#define SCAN_TURN_TIME (TIMER_90+TIMER_90) //180 degrees
+
+#define SCAN_THRESHOLD 20
+
+
 
 
 #define USE_TAPE_SERVICE //this option disables the working one in the event checkers
@@ -74,9 +82,7 @@ typedef enum {
     BUMPER_SERVO,
 
     //black tape sensors on the bottom
-    ON_BT,
-    OFF_BT,
-    BOT_BT_CHANGED,  // event #14
+    BOT_BT_CHANGED, // event #14
 
 
     //Black tape sensors on the shooter
@@ -99,6 +105,7 @@ typedef enum {
     LOST_BEACON,
     FOUND_TRACK_WIRE,
     LOST_TRACK_WIRE, //just in case
+    FOUND_TOWER,
     TOWER_DONE,
 
     //Bot Events
@@ -132,8 +139,6 @@ static const char *EventNames[] = {
     "BUMPER_SERVO",
 
     //black tape sensors on the bottom
-    "ON_BT",
-    "OFF_BT",
     "BOT_BT_CHANGED",
 
     //Black tape sensors on the shooter
@@ -156,6 +161,7 @@ static const char *EventNames[] = {
     "LOST_BEACON",
     "FOUND_TRACK_WIRE",
     "LOST_TRACK_WIRE", //just in case
+    "FOUND_TOWER",
     "TOWER_DONE",
 
     //Bot Events

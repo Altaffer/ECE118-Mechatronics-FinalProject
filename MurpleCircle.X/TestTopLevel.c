@@ -14,6 +14,7 @@
 
 #include "AlignSubHSM.h"
 #include "WallHugSubHSM.h"
+#include "ScanForBeaconSub.h"
 //#include all sub state machines called
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
@@ -24,16 +25,17 @@
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 
-typedef enum
-{
+typedef enum {
     InitPState,
     Align,
+    Scan,
     WallHug,
 } TemplateHSMState_t;
 
 static const char *StateNames[] = {
     "InitPState",
     "Align",
+    "Scan",
     "WallHug",
 };
 
@@ -51,6 +53,8 @@ static const char *StateNames[] = {
 
 static TemplateHSMState_t CurrentState = InitPState; // <- change enum name to match ENUM
 static uint8_t MyPriority;
+extern uint8_t StartWallHug;
+extern uint8_t StartScan;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -66,20 +70,17 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitTopLevel(uint8_t Priority)
-{
+uint8_t InitTopLevel(uint8_t Priority) {
     MyPriority = Priority;
     // put us into the Initial PseudoState
     CurrentState = InitPState;
     InitWallHug();
     InitAlignSubHSM();
+    InitScanForBeacon();
     // post the initial transition event
-    if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE)
-    {
+    if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE) {
         return TRUE;
-    }
-    else
-    {
+    } else {
         return FALSE;
     }
 }
@@ -93,8 +94,7 @@ uint8_t InitTopLevel(uint8_t Priority)
  *        be posted to. Remember to rename to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t PostTopLevel(ES_Event ThisEvent)
-{
+uint8_t PostTopLevel(ES_Event ThisEvent) {
     return ES_PostToService(MyPriority, ThisEvent);
 }
 
@@ -113,140 +113,145 @@ uint8_t PostTopLevel(ES_Event ThisEvent)
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunTopLevel(ES_Event ThisEvent)
-{
+ES_Event RunTopLevel(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
-    TemplateHSMState_t nextState;   // <- change type to correct enum
+    TemplateHSMState_t nextState; // <- change type to correct enum
     static uint8_t Tower_Found = 0;
 
     ES_Tattle(); // trace call stack
 
-    switch (CurrentState)
-    {
-    case InitPState:                        // If current state is initial Pseudo State
-        if (ThisEvent.EventType == ES_INIT) // only respond to ES_Init
-        {
-            // this is where you would put any actions associated with the
-            // transition from the initial pseudo-state into the actual
-            // initial state
-            // Initialize all sub-state machines
-//            InitTemplateSubHSM();
-            // now put the machine into the actual initial state
-            nextState = Align;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            ;
-        }
-        break;
-
-    case Align: //
-    {
-        if (ThisEvent.EventType == ES_ENTRY) {
-            //StartAlign = 1;
-            ;
-        }
-        ThisEvent = RunAlignSubHSM(ThisEvent);
-        switch (ThisEvent.EventType)
-        {
-        case BUMP_EVENT:
-                nextState = WallHug;
+    switch (CurrentState) {
+        case InitPState: // If current state is initial Pseudo State
+            if (ThisEvent.EventType == ES_INIT) // only respond to ES_Init
+            {
+                // this is where you would put any actions associated with the
+                // transition from the initial pseudo-state into the actual
+                // initial state
+                // Initialize all sub-state machines
+                //            InitTemplateSubHSM();
+                // now put the machine into the actual initial state
+                //nextState = Align;
+                nextState = Scan;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-            
-            break;            
-        case ES_NO_EVENT:
-        default:
+                ;
+            }
             break;
-        }
-    }
-    break;
-    case WallHug: 
-    {
-        if (ThisEvent.EventType == ES_ENTRY) {
-            StartWallHug = 1;
-        }
-        ThisEvent = RunWallHug(ThisEvent);
-        switch (ThisEvent.EventType)
+        case Scan:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                StartScan = 1;
+            }
+            ThisEvent = RunScanForBeacon(ThisEvent);
+            if (ThisEvent.EventType == FOUND_TOWER) {
+                nextState = Scan;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            break;
+        case Align: //
         {
-        case BOT_BT_CHANGED:
-            nextState = Align;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
+            if (ThisEvent.EventType == ES_ENTRY) {
+                //StartAlign = 1;
+                ;
+            }
+            ThisEvent = RunAlignSubHSM(ThisEvent);
+            switch (ThisEvent.EventType) {
+                case BUMP_EVENT:
+                    nextState = WallHug;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+
+                    break;
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
+        }
             break;
-        case ES_NO_EVENT:
+        case WallHug:
+        {
+            if (ThisEvent.EventType == ES_ENTRY) {
+                StartWallHug = 1;
+            }
+            ThisEvent = RunWallHug(ThisEvent);
+            switch (ThisEvent.EventType) {
+                case BOT_BT_CHANGED:
+                    nextState = Align;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
+        }
+            break;
         default:
             break;
-        }
-    }
-        break;
-    default:
-        break;
-        
-    }
-    if (makeTransition == TRUE)
-        { // making a state transition, send EXIT and ENTRY
-            // recursively call the current state with an exit event
-            RunTopLevel(EXIT_EVENT); // <- rename to your own Run function
-            CurrentState = nextState;
-            RunTopLevel(ENTRY_EVENT); // <- rename to your own Run function
-        }
 
-        ES_Tail(); // trace call stack end
-        return ThisEvent;
+    }
+    if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
+        // recursively call the current state with an exit event
+        RunTopLevel(EXIT_EVENT); // <- rename to your own Run function
+        CurrentState = nextState;
+        RunTopLevel(ENTRY_EVENT); // <- rename to your own Run function
+    }
+
+    ES_Tail(); // trace call stack end
+    return ThisEvent;
 }
 
-
-uint8_t MotionTimerHelper(ES_Event ThisEvent){
+uint8_t MotionTimerHelper(ES_Event ThisEvent) {
     ES_Event posting;
-    
-    switch (ThisEvent.EventType) {
-    case ES_INIT: //do nothing (initializing)
-        break;
-    
-    /* do nothng */
-    case ES_TIMERACTIVE:
-    case ES_TIMERSTOPPED:
-        break; // We don't use these events
 
-    /* run internal event checkers */
-    case ES_TIMEOUT:
-        posting.EventParam = 1;
-        posting.EventType = MOTION_TIMER_EXP; //When the timer expires, it generates this event
-        PostTopLevel(posting);//then send the event to the toplevel
-        printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
-        ES_Timer_StopTimer(MotionTimer);
-        break;
-    default:
-        break;
+    switch (ThisEvent.EventType) {
+        case ES_INIT: //do nothing (initializing)
+            break;
+
+            /* do nothng */
+        case ES_TIMERACTIVE:
+        case ES_TIMERSTOPPED:
+            break; // We don't use these events
+
+            /* run internal event checkers */
+        case ES_TIMEOUT:
+            posting.EventParam = 1;
+            posting.EventType = MOTION_TIMER_EXP; //When the timer expires, it generates this event
+            PostTopLevel(posting); //then send the event to the toplevel
+            //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
+            ES_Timer_StopTimer(MotionTimer);
+            break;
+        default:
+            break;
     }
     return 0;
 }
 
-uint8_t TurnTimerHelper(ES_Event ThisEvent){
+uint8_t TurnTimerHelper(ES_Event ThisEvent) {
     ES_Event posting;
-    
-    switch (ThisEvent.EventType) {
-    case ES_INIT: //do nothing (initializing)
-        break;
-    
-    /* do nothng */
-    case ES_TIMERACTIVE:
-    case ES_TIMERSTOPPED:
-        break; // We don't use these events
 
-    /* run internal event checkers */
-    case ES_TIMEOUT:
-        posting.EventParam = 1;
-        posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
-        PostTopLevel(posting);//then send the event to the toplevel
-        printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
-        ES_Timer_StopTimer(MotionTimer);
-        break;
-    default:
-        break;
+    switch (ThisEvent.EventType) {
+        case ES_INIT: //do nothing (initializing)
+            break;
+
+            /* do nothng */
+        case ES_TIMERACTIVE:
+        case ES_TIMERSTOPPED:
+            break; // We don't use these events
+
+            /* run internal event checkers */
+        case ES_TIMEOUT:
+            posting.EventParam = 1;
+            posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
+            PostTopLevel(posting); //then send the event to the toplevel
+            //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
+            ES_Timer_StopTimer(MotionTimer);
+            break;
+        default:
+            break;
     }
     return 0;
 }
-    /*******************************************************************************
+/*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/

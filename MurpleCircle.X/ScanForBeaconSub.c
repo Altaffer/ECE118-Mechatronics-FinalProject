@@ -12,6 +12,7 @@
 #include "TopLevel.h"
 #include "ScanForBeaconSub.h"
 #include "robot.h"
+#include "TestTopLevel.h"
 
 
 #include <stdio.h>
@@ -21,6 +22,7 @@
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 //States have not been renamed - HZ 11/12
+
 typedef enum {
     InitPSubState,
     Turn,
@@ -39,6 +41,8 @@ static const char *StateNames[] = {
 
 #define TURN_SPEED 50
 #define FRONT_TAPE 0x0008 // 1000 - Change this to the right one
+#define TURNING 1
+#define REVERSING 2
 
 
 /*******************************************************************************
@@ -54,6 +58,7 @@ uint8_t stop_bot(void);
  * The type of state variable should match that of enum in header file. */
 
 static SubHSMState_t CurrentState = InitPSubState; // initial state
+uint8_t StartScan;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -69,8 +74,7 @@ static SubHSMState_t CurrentState = InitPSubState; // initial state
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitScanForBeacon(void)
-{
+uint8_t InitScanForBeacon(void) {
     ES_Event returnEvent;
     CurrentState = InitPSubState;
     returnEvent = RunScanForBeacon(INIT_EVENT);
@@ -96,14 +100,14 @@ uint8_t InitScanForBeacon(void)
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunScanForBeacon(ES_Event ThisEvent)
-{
+ES_Event RunScanForBeacon(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
-    SubHSMState_t nextState; 
-    static uint8_t tower_counter = 0;//counts how many to go when reversing
-    static uint16_t min_elapse_time = 999;//max possible is 704, which does 
-                                            //not generate an event
-    
+    SubHSMState_t nextState;
+    //static uint8_t tower_counter = 0; //counts how many to go when reversing
+    static uint16_t min_elapse_time = 999; //max possible is 704, which does 
+    static uint8_t curr_status = 0;
+    //not generate an event
+
 
     ES_Tattle(); // trace call stack
 
@@ -114,7 +118,6 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent)
                 nextState = NoSubService;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-                CCW_Turn();
             }
             break;
         case NoSubService: /* After initialzing or executing, it sits here for the next 
@@ -128,46 +131,77 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent)
             }
             break;
         case Turn:
-            if (ThisEvent.EventType == FOUND_BEACON) {
-                nextState = FindPing;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            } else if (ThisEvent.EventType == BOT_BT_CHANGED && (ThisEvent.EventParam & FRONT_TAPE)) {
-                nextState = Reverse;
-                makeTransition = TRUE;
-                CW_Turn();
-                ThisEvent.EventType = ES_NO_EVENT;
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    curr_status = TURNING;
+                    CCW_Turn();
+                    ES_Timer_InitTimer(MotionTimer, SCAN_TURN_TIME); //turn 180
+                    break;
+                case FOUND_BEACON:
+                    nextState = FindPing;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case MOTION_TIMER_EXP:
+                    nextState = Reverse;
+                    makeTransition = TRUE;
+                    CW_Turn();
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                default:
+                    break;
             }
             break;
         case FindPing:
             if (ThisEvent.EventType == FOUND_PING) {
-                nextState = Turn;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-                if (min_elapse_time > ThisEvent.EventParam){
-                    min_elapse_time = ThisEvent.EventParam;
-                    tower_counter = 0;
-                } else {
-                    tower_counter++;
+                if (curr_status == TURNING) {
+                    nextState = Turn;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    if (min_elapse_time > ThisEvent.EventParam) {
+                        min_elapse_time = ThisEvent.EventParam;
+                    }
+                } else if (curr_status == REVERSING) {
+
+                    if (ThisEvent.EventParam < min_elapse_time + SCAN_THRESHOLD
+                            || ThisEvent.EventParam > min_elapse_time - SCAN_THRESHOLD) {
+                        //is done scanning, now go forward
+                        nextState = NoSubService;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = FOUND_TOWER;
+                    } else {
+                        nextState = Reverse;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
                 }
+                //counters may not be the best way
+                //                    tower_counter = 0;
+                //                } else {
+                //                    tower_counter++;
+                //                }
             }
             break;
         case Reverse:
-            if (ThisEvent.EventType == FOUND_BEACON) {
-                if (tower_counter-- == 0) {
-                    stop_bot();
-                    nextState = InitPSubState;
-                    makeTransition = FALSE;//This makes sure that it sits at the InitState
-                    //ThisEvent.EventType = ES_NO_EVENT; //passing the event to super state
-                } else {
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    CW_Turn();
+                    curr_status = REVERSING;
+                    break;
+                case FOUND_BEACON:
+                    nextState = FindPing;
+                    makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
-                }
-                nextState = FindPing;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                default:
+                    break;
             }
             break;
-        
+
         default: // all unhandled events fall into here
             break;
     } // end switch on Current State
@@ -183,20 +217,18 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent)
     return ThisEvent;
 }
 
-
-
 /*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
 uint8_t CCW_Turn(void) {
-    Robot_LeftMtrSpeed(-1*TURN_SPEED);
+    Robot_LeftMtrSpeed(-1 * TURN_SPEED);
     Robot_RightMtrSpeed(TURN_SPEED);
     return 0;
 }
 
 uint8_t CW_Turn(void) {
     Robot_LeftMtrSpeed(TURN_SPEED);
-    Robot_RightMtrSpeed(-1*TURN_SPEED);
+    Robot_RightMtrSpeed(-1 * TURN_SPEED);
     return 0;
 }
 
