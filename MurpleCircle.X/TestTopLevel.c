@@ -62,8 +62,10 @@ static uint8_t MyPriority;
 extern uint8_t StartWallHug;
 extern uint8_t StartScan;
 extern uint8_t StartPark;
-extern uint8_t IsParallel;
 extern uint8_t StartFindHole;
+extern uint8_t StartNavTower;
+extern uint8_t StartAlign_boarder;
+extern uint8_t StartAlign_center;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -183,8 +185,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
         case Align: //
         {
             if (ThisEvent.EventType == ES_ENTRY) {
-                //StartAlign = 1;
-                ;
+                StartAlign_boarder = 1;
             }
             ThisEvent = RunAlignSubHSM(ThisEvent);
             switch (ThisEvent.EventType) {

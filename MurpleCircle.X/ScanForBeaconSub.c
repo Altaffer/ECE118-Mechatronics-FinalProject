@@ -135,6 +135,7 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     curr_status = TURNING;
                     CCW_Turn();
+                    // This timing is going to get reset every time we go in here
                     ES_Timer_InitTimer(MotionTimer, SCAN_TURN_TIME); //turn 180
                     break;
                 case FOUND_BEACON:
@@ -166,11 +167,13 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
             }
             break;
         case FindPing:
-            if (ThisEvent.EventType == FOUND_PING) {
+            if (ThisEvent.EventType == FOUND_PING) { // what if we don't find ping??
                 if (curr_status == TURNING) {
-                    nextState = Turn;
+                    nextState = Turn; // 
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
+                    // This won't work how you're thinking because you just set
+                    // ThisEvent.EventType to ES_NO_EVENT
                     if (min_elapse_time > ThisEvent.EventParam) {
                         min_elapse_time = ThisEvent.EventParam;
                     }

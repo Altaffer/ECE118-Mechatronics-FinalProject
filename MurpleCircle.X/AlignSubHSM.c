@@ -43,6 +43,7 @@ typedef enum {
     AlignRight,
     AlignLeft,
     CornerTurn,
+    Sweep,
 } AlignSubHSMState_t;
 
 static const char *StateNames[] = {
@@ -52,6 +53,7 @@ static const char *StateNames[] = {
     "AlignRight",
     "AlignLeft",
     "CornerTurn",
+    "Sweep",
 };
 
 #define TIMER_1_TICKS 250
@@ -88,6 +90,9 @@ static char LeftMotorSpeed;
 static char RightMotorSpeed;
 static int StartFlag;
 static int TankTurnFlag;
+static uint8_t AtCenter;
+uint8_t StartAlign_boarder;
+uint8_t StartAlign_center;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -109,6 +114,9 @@ uint8_t InitAlignSubHSM(void) {
     returnEvent = RunAlignSubHSM(INIT_EVENT);
     StartFlag = 0;
     TankTurnFlag = 0;
+    StartAlign_boarder = 0;
+    StartAlign_center = 0;
+    AtCenter = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -135,6 +143,10 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
     AlignSubHSMState_t nextState; // <- change type to correct enum
 
     ES_Tattle(); // trace call stack
+    if (StartAlign_boarder || StartAlign_center) {
+        CurrentState = InitPSubState;
+        ThisEvent.EventType == ES_INIT;
+    }
 
     switch (CurrentState) {
         case InitPSubState: // If current state is initial Psedudo State
@@ -146,19 +158,27 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
 
                 // now put the machine into the actual initial state
 
-                if (StartFlag == 0) {
+                if (StartAlign_boarder) {
                     nextState = MoveForward;
-                } else if (StartFlag == 1) {
-                    //                    nextState = ;
+                    StartAlign_boarder = 0;
+                    AtCenter = 0;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                } else if (StartAlign_center) {
+                    nextState = MoveForward;
+                    StartAlign_center = 0;
+                    AtCenter = 1;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
                 }
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
+
             }
             break;
         case TankTurn:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    turnBot(LTANK_L_SLOW, LTANK_R_SLOW);
+                    turnBot(LTANK_L, LTANK_R);
+
                     //ES_Timer_InitTimer(MotionTimer, TIMER_90);//time based, not used
                     break;
                 case BOT_BT_CHANGED:
@@ -210,14 +230,6 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                                 makeTransition = TRUE;
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
-                                //                            case (F_CENTER_TAPE | F_LEFT_TAPE):
-                                //                            case (F_CENTER_TAPE | F_LEFT_TAPE | F_RIGHT_TAPE):
-                                //                            case (F_CENTER_TAPE | F_LEFT_TAPE | B_CENTER_TAPE):
-                                //                            case (F_CENTER_TAPE | F_LEFT_TAPE | F_RIGHT_TAPE | B_CENTER_TAPE):
-                                //                                nextState = CornerTurn;
-                                //                                makeTransition = TRUE;
-                                //                                ThisEvent.EventType = ES_NO_EVENT;
-                                //                                break;
                             default:
                                 if (ThisEvent.EventType & F_LEFT_TAPE) {
                                     nextState = AlignLeft;
@@ -283,7 +295,14 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                     }
                     break;
                 case MOTION_TIMER_EXP:
-                    goForward();
+                    if (AtCenter == 0) {
+                        goForward();//go away from the center
+                    } else {
+                        nextState = Sweep;//start finding the tower
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+
                     break;
                 case ES_EXIT:
                     ES_Timer_StopTimer(MotionTimer);
@@ -296,6 +315,32 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
              * 2. Tank turn ccw 90 degrees
              * 3. Go back to go forward
              */
+        case Sweep:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                case TURN_TIMER_EXP:
+                    turnBot(LTANK_L, LTANK_R);
+                    ES_Timer_InitTimer(MotionTimer, READJUST_SHAKE_TIME);
+                    ES_Timer_StopTimer(TurnTimer);
+                    break;
+                case FOUND_BEACON:
+                    // make transition to scan for beacon state
+//                    nextState = ToBeacon;
+//                    makeTransition = TRUE;
+                    ThisEvent.EventType = FOUND_BEACON;
+                    break;
+                case MOTION_TIMER_EXP:
+                    turnBot(RTANK_L, RTANK_R);
+                    ES_Timer_InitTimer(TurnTimer, READJUST_SHAKE_TIME);
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(TurnTimer);
+                    ES_Timer_StopTimer(MotionTimer);
+                    break;
+                default:
+                    break;
+            }
+            break;
         case CornerTurn:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:

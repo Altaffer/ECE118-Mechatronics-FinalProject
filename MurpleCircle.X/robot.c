@@ -19,6 +19,7 @@
 #include <serial.h>
 #include <AD.h>
 #include "IO_Ports.h"
+#include "RC_Servo.h"
 
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
@@ -43,6 +44,7 @@
 
 #define BEACON_PIN PORTX10_BIT
 #define TRACK_WIRE_PIN AD_PORTV6
+#define SHOOTER_SERVO RC_PORTY07
 
 #define TAPE_SENSOR_1_TRIS PORTX03_TRIS
 #define TAPE_SENSOR_2_TRIS PORTX04_TRIS
@@ -317,8 +319,8 @@ unsigned char Robot_ReadRearLeftBumper(void) {
 unsigned char Robot_ReadBumpers(void) {
     //unsigned char bump_state;
     //bump_state = (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
-    //    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
-    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1));
+       // return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
+    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1) + ((!HALL_REAR_LEFT) << 2));
 }
 
 /**
@@ -438,6 +440,11 @@ uint8_t Robot_ReadPingTrigger(void) {
 
 uint8_t Robot_TrigPingSensor(uint8_t trig) {
     IO_PortsWritePort(PORTW, PIN5 * trig); //PIN4
+    return 0;
+}
+
+int Robot_SetServoSpeed(unsigned short int pulseTime){
+    RC_SetPulseTime(SHOOTER_SERVO, pulseTime);
     return 0;
 }
 
