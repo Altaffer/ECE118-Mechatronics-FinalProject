@@ -189,14 +189,14 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 case ES_ENTRY:
                 //state entry
                 //start the servo, but what value?
-                RC_SetPulseTime(SERVO_PIN, 1525);
+                Robot_SetServoSpeed(1525);
                 break;
             
             
             case BUMPER_SERVO:
                 //turn off servo, but what value?
                 if((ThisEvent.EventParam & SERVO_BUMPER_ON) == 0){
-                    RC_SetPulseTime(SERVO_PIN, 1500);
+                    Robot_SetServoSpeed(1500);
                     nextState = Leave;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;

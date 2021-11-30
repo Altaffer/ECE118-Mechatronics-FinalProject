@@ -19,6 +19,7 @@
 #include <serial.h>
 #include <AD.h>
 #include "IO_Ports.h"
+#include "RC_Servo.h"
 
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
@@ -43,6 +44,7 @@
 
 #define BEACON_PIN PORTX10_BIT
 #define TRACK_WIRE_PIN AD_PORTV6
+#define SHOOTER_SERVO RC_PORTY07
 
 #define TAPE_SENSOR_1_TRIS PORTX03_TRIS
 #define TAPE_SENSOR_2_TRIS PORTX04_TRIS
@@ -438,6 +440,11 @@ uint8_t Robot_ReadPingTrigger(void) {
 
 uint8_t Robot_TrigPingSensor(uint8_t trig) {
     IO_PortsWritePort(PORTW, PIN5 * trig); //PIN4
+    return 0;
+}
+
+int Robot_SetServoSpeed(unsigned short int pulseTime){
+    RC_SetPulseTime(SHOOTER_SERVO, pulseTime);
     return 0;
 }
 
