@@ -143,7 +143,7 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
     AlignSubHSMState_t nextState; // <- change type to correct enum
 
     ES_Tattle(); // trace call stack
-    if (StartAlign_boarder || StartAlign_boarder) {
+    if (StartAlign_boarder || StartAlign_center) {
         CurrentState = InitPSubState;
         ThisEvent.EventType == ES_INIT;
     }
