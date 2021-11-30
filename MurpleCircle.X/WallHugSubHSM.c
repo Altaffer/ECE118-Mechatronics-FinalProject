@@ -184,7 +184,6 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
         case Driving2: // in the first state, replace this with appropriate state
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    ES_Timer_InitTimer(MotionTimer, WALL_HUG_CORNER_TIME);
                     CornerFlag = 0;
                 case BUMP_EVENT:
                     nextState = Reversing;
