@@ -155,10 +155,10 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 StartPark;
             }
             ThisEvent = RunPark(ThisEvent);
-            if (IsParallel) {
-                IsParallel = 0;
+            if (ThisEvent.EventType == IS_PARALLEL) {
                 nextState = FindHole;
                 makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit

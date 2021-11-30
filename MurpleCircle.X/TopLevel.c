@@ -60,6 +60,7 @@ typedef enum {
     ToBeacon,
     NavTower,
     NavField,
+            AlignCenter,
 } TemplateHSMState_t;
 
 static const char *StateNames[] = {
@@ -71,6 +72,7 @@ static const char *StateNames[] = {
     "ToBeacon",
     "NavTower",
     "NavField",
+    "AlignCenter",
 };
 
 /*******************************************************************************
@@ -84,12 +86,14 @@ static const char *StateNames[] = {
  ******************************************************************************/
 /* You will need MyPriority and the state variable; you may need others as well.
  * The type of state variable should match that of enum in header file. */
-
+#define F_CENTER_TAPE 0b000001
 static TemplateHSMState_t CurrentState = InitPState; // <- change enum name to match ENUM
 static uint8_t MyPriority;
 extern uint8_t StartScan;
 extern uint8_t StartWallHug;
 extern uint8_t StartNavTower;
+extern uint8_t StartAlign_boarder;
+extern uint8_t StartAlign_center;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -169,7 +173,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
             }
             break;
 
-        // we may not need this state
+            // we may not need this state
         case OrientBot: // Find the bot's initial position on the field by locating first corner
         {
             // Spins to the left to find Black Tape. Once tape is found follow the tap in a CCW orientation to find a corner
@@ -188,8 +192,8 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
             }
         }
             break;
-            
-        //we can just start here, because we know we are at a corner
+
+            //we can just start here, because we know we are at a corner
         case ScanForBeacon: //
         {
             // Completes two 180 deg sweeps to find the closest beacon
@@ -245,7 +249,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
             }
         }
             break;
-            
+
         case ReAdjustBot: // Re-adjust the bot in case the bot veers off course
             //this state to be changed - HZ 11/15
             //do we really need it tho
@@ -301,13 +305,35 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
+                case BOT_BT_CHANGED:
+                    if (ThisEvent.EventType == FRONT_CENTER_TAPE) {
+                        nextState = AlignCenter;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        break;
+                    }
                 case ES_EXIT:
                 default:
                     break;
             }
         }
             break;
-
+        case AlignCenter:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                StartAlign_center = 1;
+            }
+            ThisEvent = RunAlignSubHSM(ThisEvent);
+            switch (ThisEvent.EventType) {
+                case FOUND_BEACON:
+                    // make transition to move toward the beacon
+                    nextState = ToBeacon;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                case ES_EXIT:
+                    stop();
+                default:
+                    break;
+            }
         case NavTower: // navigates around the tower and looks for the track wire
         {
             // Wall follows the tower. Once the track wire is detected, the bot then aligns
