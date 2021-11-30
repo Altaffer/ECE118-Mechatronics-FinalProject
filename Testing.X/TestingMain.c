@@ -37,10 +37,10 @@
 #define DELAY_LOOP_TIME 2000 // ms
 
 // TEST DEFINES
-//#define MOTOR_TEST
+#define MOTOR_TEST
 //#define BUMPER_TEST
 //#define BUMPER_TEST
-#define TAPE_SENSOR_TEST
+//#define TAPE_SENSOR_TEST
 //#define BEACON_TEST
 //#define SERVO_TEST
 //#define SERVO_TEST
@@ -53,15 +53,15 @@
 /*
  * 
  */
-uint8_t goForward(void) {
-    //something here to make the bot go forward at full speed
-    Robot_LeftMtrSpeed(FWD_speed);
-    Robot_RightMtrSpeed(FWD_speed);
-    //    DELAY(DELAY_LOOP_TIME);
-    //    Robot_LeftMtrSpeed(0);
-    //    DELAY(DELAY_LOOP_TIME);
-    //    Robot_RightMtrSpeed(FWD_speed);
-}
+//uint8_t goForward(void) {
+//    //something here to make the bot go forward at full speed
+//    Robot_LeftMtrSpeed(FWD_speed);
+//    Robot_RightMtrSpeed(FWD_speed);
+//    //    DELAY(DELAY_LOOP_TIME);
+//    //    Robot_LeftMtrSpeed(0);
+//    //    DELAY(DELAY_LOOP_TIME);
+//    //    Robot_RightMtrSpeed(FWD_speed);
+//}
 
 int main(void) {
 
@@ -97,7 +97,31 @@ int main(void) {
 
 #endif
 #ifdef MOTOR_TEST
-        goForward();
+        Robot_LeftMtrSpeed(100);
+        Robot_RightMtrSpeed(100);
+        printf("both max speed\r\n");
+        DELAY(DELAY_MULTIPLIER);
+        Robot_RightMtrSpeed(30);
+        DELAY(DELAY_MULTIPLIER);
+        Robot_LeftMtrSpeed(30);
+        printf("both 30 speed\r\n");
+        DELAY(DELAY_MULTIPLIER);
+        Robot_LeftMtrSpeed(0);
+        Robot_RightMtrSpeed(0);
+        printf("stop\r\n");
+        DELAY(DELAY_MULTIPLIER);
+        Robot_LeftMtrSpeed(-100);
+        Robot_RightMtrSpeed(-100);
+        printf("both -max speed\r\n");
+        DELAY(DELAY_MULTIPLIER);
+        Robot_RightMtrSpeed(-30);
+        DELAY(DELAY_MULTIPLIER);
+        Robot_LeftMtrSpeed(-30);
+        printf("both -30 speed\r\n");
+        DELAY(DELAY_MULTIPLIER);
+        Robot_LeftMtrSpeed(0);
+        Robot_RightMtrSpeed(0);
+        return 0;
 #endif
 #ifdef BUMPER_TEST
         currentBumperValue = Robot_ReadBumpers();
