@@ -317,8 +317,8 @@ unsigned char Robot_ReadRearLeftBumper(void) {
 unsigned char Robot_ReadBumpers(void) {
     //unsigned char bump_state;
     //bump_state = (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
-    //    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
-    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1));
+       // return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
+    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1) + ((!HALL_REAR_LEFT) << 2));
 }
 
 /**
