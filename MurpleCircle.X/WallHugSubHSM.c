@@ -69,6 +69,7 @@ uint8_t robot_forward_2(void);
 static SubHSMState_t CurrentState = InitPSubState; // initial state
 
 uint8_t StartWallHug;
+uint8_t CornerFlag;
 
 #define F_CENTER_TAPE 0b000001
 
@@ -91,6 +92,7 @@ uint8_t InitWallHug(void) {
     CurrentState = InitPSubState;
     returnEvent = RunWallHug(INIT_EVENT);
     StartWallHug = 0;
+    CornerFlag = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -132,6 +134,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 nextState = NoSubService;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
+                CornerFlag = 0;
             }
             break;
         case NoSubService: /* After initialzing or executing, it sits here for the next 
@@ -149,9 +152,6 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME);
             }
             switch (ThisEvent.EventType) {
-                case ES_EXIT:
-                    ES_Timer_StopTimer(MotionTimer);
-                    break;
                 case BUMP_EVENT:
                     nextState = Reversing;
                     ThisEvent.EventType = ES_NO_EVENT;
@@ -173,6 +173,9 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                     }
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    break;
                 default:
                     break;
             }
@@ -180,17 +183,17 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
 
         case Driving2: // in the first state, replace this with appropriate state
             switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    ES_Timer_InitTimer(MotionTimer, WALL_HUG_CORNER_TIME);
+                    CornerFlag = 0;
                 case BUMP_EVENT:
                     nextState = Reversing;
                     ThisEvent.EventType = ES_NO_EVENT;
                     makeTransition = TRUE;
                     break;
-                    //            case MOTION_TIMER_EXP:
-                    //                nextState = Driving;
-                    //                robot_forward();//straight
-                    //                ThisEvent.EventType = ES_NO_EVENT;
-                    //                makeTransition = TRUE;
-                    //                break;
+                case MOTION_TIMER_EXP:
+                    CornerFlag = 1;
+                    break;
                 case BOT_BT_CHANGED:
                     if (ThisEvent.EventParam == F_CENTER_TAPE) {
                         nextState = NoSubService;

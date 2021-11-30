@@ -12,6 +12,7 @@
 #include "TopLevel.h"
 #include "robot.h"
 #include "ParkSub.h"
+#include "TestTopLevel.h"
 
 
 #include <stdio.h>
@@ -42,6 +43,9 @@ static const char *StateNames[] = {
 
 #define TURN_SPEED 50
 #define FRONT_TAPE 0x0008 // 1000 - Change this to the right one
+#define LEFT_BUMP 01 // 0b01
+#define RIGHT_BUMP 02 // 0b10
+#define BOTH_BUMP 03 // 0b11
 
 
 /*******************************************************************************
@@ -55,6 +59,8 @@ static const char *StateNames[] = {
  * The type of state variable should match that of enum in header file. */
 
 static SubHSMState_t CurrentState = InitPSubState; // initial state
+uint8_t IsParallel;
+uint8_t StartPark;
 
 
 /*******************************************************************************
@@ -73,7 +79,7 @@ static SubHSMState_t CurrentState = InitPSubState; // initial state
  * @author J. Edward Carryer, 2011.10.23 19:25 */
 uint8_t InitPark(void) {
     ES_Event returnEvent;
-    InitPark();
+    StartPark = 0;
     CurrentState = InitPSubState;
     returnEvent = RunPark(INIT_EVENT);
     if (returnEvent.EventType == ES_NO_EVENT) {
@@ -81,6 +87,7 @@ uint8_t InitPark(void) {
     }
     return FALSE;
 }
+
 
 /**
  * @Function RunTemplateSubHSM(ES_Event ThisEvent)
@@ -129,24 +136,28 @@ ES_Event RunPark(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
                 //turning
-                Robot_LeftMtrSpeed(-50);
-                Robot_LeftMtrSpeed(50);
+                Robot_LeftMtrSpeed(80);
+                Robot_RightMtrSpeed(60);
             }
-            if (ThisEvent.EventType == BUMPED_LEFT)
+            if (ThisEvent.EventType == BUMP_EVENT &&
+                    ThisEvent.EventParam == LEFT_BUMP)
             {
+                
                 nextState = TurnRightWheel;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-            } else if ((ThisEvent.EventType == BUMPED_RIGHT))
+            } else if (ThisEvent.EventType == BUMP_EVENT &&
+                    ThisEvent.EventParam == RIGHT_BUMP)
             {
                 nextState = TurnLeftWheel;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-            } else if (ThisEvent.EventType == BUMPED_BOTH)
+            } else if (ThisEvent.EventType == BUMP_EVENT &&
+                    ThisEvent.EventParam == BOTH_BUMP)
             {
-                nextState = GetParallel;
+                nextState = NoSubService;
                 makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
+                ThisEvent.EventType = IS_PARALLEL;
             }
 
             if (ThisEvent.EventType == ES_EXIT) {
@@ -158,13 +169,14 @@ ES_Event RunPark(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
                 Robot_LeftMtrSpeed(0);
-                Robot_RightMtrSpeed(50);
+                Robot_RightMtrSpeed(100);
             }
-            if (ThisEvent.EventType == BUMPED_BOTH)
+            if (ThisEvent.EventType == BUMP_EVENT &&
+                    ThisEvent.EventParam == BOTH_BUMP)
             {
-                nextState = GetParallel;
+                nextState = NoSubService;
                 makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
+                ThisEvent.EventType = IS_PARALLEL;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
@@ -175,30 +187,18 @@ ES_Event RunPark(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
                 Robot_RightMtrSpeed(0);
-                Robot_LeftMtrSpeed(50);
+                Robot_LeftMtrSpeed(100);
             }
-            if (ThisEvent.EventType == BUMPED_BOTH)
+            if (ThisEvent.EventType == BUMP_EVENT &&
+                    ThisEvent.EventParam == BOTH_BUMP)
             {
-                nextState = GetParallel;
+                nextState = NoSubService;
                 makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
+                ThisEvent.EventType = IS_PARALLEL;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
                 Robot_LeftMtrSpeed(0);
-            }
-            break;
-        case GetParallel:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                IsParallel = 1;
-                ;
-            }
-            nextState = NoSubService;
-            makeTransition = TRUE;
-            //ThisEvent.EventType = ES_NO_EVENT;
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
             }
             break;
         

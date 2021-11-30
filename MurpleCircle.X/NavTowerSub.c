@@ -14,6 +14,7 @@
 #include "robot.h"
 #include "ParkSub.h"
 #include "NavTower_FindHole.h"
+#include "WallHugSubHSM.h"
 
 
 #include <stdio.h>
@@ -59,6 +60,11 @@ static const char *StateNames[] = {
  * The type of state variable should match that of enum in header file. */
 
 static SubHSMState_t CurrentState = InitPSubState; // initial state
+uint8_t StartNavTower;
+extern uint8_t StartWallHug;
+extern uint8_t StartPark;
+extern uint8_t IsParallel;
+extern uint8_t StartFindHole;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -129,9 +135,9 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
         case WallHug:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                ;
+                StartWallHug = 1;
             }
-            // maybe a sub here
+            ThisEvent = RunWallHug(ThisEvent);
             if (ThisEvent.EventType == FOUND_TRACK_WIRE) {
                 nextState = Park;
                 makeTransition = TRUE;
@@ -145,9 +151,9 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
         case Park:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                ;
+                StartPark;
             }
-            RunPark(ThisEvent);
+            ThisEvent = RunPark(ThisEvent);
             if (IsParallel) {
                 IsParallel = 0;
                 nextState = FindHole;

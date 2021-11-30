@@ -35,8 +35,6 @@
 /*******************************************************************************
  * PUBLIC TYPEDEFS                                                             *
  ******************************************************************************/
-static uint8_t IsParallel;
-static uint8_t StartPark;
 
 /*******************************************************************************
  * PUBLIC FUNCTION PROTOTYPES                                                  *
@@ -70,6 +68,10 @@ uint8_t InitPark(void);
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
 ES_Event RunPark(ES_Event ThisEvent);
+// turn into the correct wall to the right
+// When one bumper is pressed turn off that sides wheel
+// Keep turning opposite wheel until its respective bumper is pressed
+// Once both wheels are off, use motion timers 
 
 #endif /* FIND_NEW_CORNER_H */
 

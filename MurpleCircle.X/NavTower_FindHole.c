@@ -14,6 +14,7 @@
 #include "NavTower_FindHole.h"
 #include "robot.h"
 #include "ParkSub.h"
+#include "TestTopLevel.h"
 
 
 #include <stdio.h>
@@ -35,11 +36,10 @@ typedef enum {
 
 static const char *StateNames[] = {
     "InitPSubState",
-    "WallHug",
-    "Park",
-    "FindHole",
-    "ReleaseBall",
-    "Leave",
+    "Reverse",
+    "Turn",
+    "Forward",
+    "Backwards",
     "NoSubService"
 };
 
@@ -61,6 +61,7 @@ static const char *StateNames[] = {
  * The type of state variable should match that of enum in header file. */
 
 static SubHSMState_t CurrentState = InitPSubState; // initial state
+uint8_t StartFindHole;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -80,7 +81,7 @@ uint8_t InitFindHole(void) {
     ES_Event returnEvent;
     InitPark();
     CurrentState = InitPSubState;
-    returnEvent = RunNavTower(INIT_EVENT);
+    returnEvent = RunFindHole(INIT_EVENT);
     StartFindHole = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
@@ -124,6 +125,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
             if (StartFindHole) {//when there is actually an event
                 nextState = Reverse;
                 makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
                 StartFindHole = 0;
             }
             break;
@@ -131,8 +133,8 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
                 //reverse a bit
-                Robot_LeftMtrSpeed(-10);
-                Robot_RightMtrSpeed(-10);
+                Robot_LeftMtrSpeed(FIND_HOLE_REVERSE_L);
+                Robot_RightMtrSpeed(FIND_HOLE_REVERSE_R);
                 ES_Timer_InitTimer(MotionTimer, FINDHOLE_REV_TIME);
             }
             if (ThisEvent.EventType == MOTION_TIMER_EXP) {
@@ -142,6 +144,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
+                ES_Timer_StopTimer(MotionTimer);
                 Robot_LeftMtrSpeed(0);
                 Robot_RightMtrSpeed(0);
             }
@@ -149,9 +152,9 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
         case Turn:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                Robot_LeftMtrSpeed(-50);
-                Robot_RightMtrSpeed(50);
-                ES_Timer_InitTimer(MotionTimer, TIMER_90);
+                Robot_LeftMtrSpeed(FIND_HOLE_FORWARD_L);
+                Robot_RightMtrSpeed(FIND_HOLE_FORWARD_R);
+                ES_Timer_InitTimer(MotionTimer, FINDHOLE_FORWARD_TIME);
             }
             if (ThisEvent.EventType == MOTION_TIMER_EXP) {
                 nextState = Forward;
@@ -160,6 +163,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
+                ES_Timer_StopTimer(MotionTimer);
                 Robot_LeftMtrSpeed(0);
                 Robot_RightMtrSpeed(0);
             }
@@ -169,7 +173,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
                 //state entry
                 Robot_LeftMtrSpeed(60);
                 Robot_RightMtrSpeed(60);
-                ES_Timer_InitTimer(MotionTimer, FINDHOLE_FORWARD_TIME);
+                ES_Timer_InitTimer(MotionTimer, FINDHOLE_EXPIRE_TIME);
             }
             if (ThisEvent.EventType == MOTION_TIMER_EXP) {
                 nextState = Backwards;
@@ -197,6 +201,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
+                ES_Timer_StopTimer(MotionTimer);
                 Robot_LeftMtrSpeed(0);
                 Robot_RightMtrSpeed(0);
             }
@@ -234,6 +239,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
+                ES_Timer_StopTimer(MotionTimer);
                 Robot_LeftMtrSpeed(0);
                 Robot_RightMtrSpeed(0);
             }
@@ -245,9 +251,9 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunNavTower(EXIT_EVENT); // <- rename to your own Run function
+        RunFindHole(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunNavTower(ENTRY_EVENT); // <- rename to your own Run function
+        RunFindHole(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end

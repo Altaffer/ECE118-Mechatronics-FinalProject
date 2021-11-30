@@ -227,7 +227,8 @@ uint8_t BeaconEventChecker(void) {
 #ifdef DEBUG_PRINTS
         printf("Beacon lost.\r\n"); 
 #endif
-        currentEvent = 0; //ES_NO_EVENT
+        currentEvent = LOST_BEACON; //ES_NO_EVENT
+        //or LOST_BEACON
     }
     if (currentEvent != lastEvent) {
         thisEvent.EventType = currentEvent; 

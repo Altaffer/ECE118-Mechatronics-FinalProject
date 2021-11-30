@@ -51,8 +51,7 @@
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
 
-typedef enum
-{
+typedef enum {
     InitPState,
     OrientBot,
     ScanForBeacon,
@@ -88,6 +87,9 @@ static const char *StateNames[] = {
 
 static TemplateHSMState_t CurrentState = InitPState; // <- change enum name to match ENUM
 static uint8_t MyPriority;
+extern uint8_t StartScan;
+extern uint8_t StartWallHug;
+extern uint8_t StartNavTower;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -103,18 +105,14 @@ static uint8_t MyPriority;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitTopLevel(uint8_t Priority)
-{
+uint8_t InitTopLevel(uint8_t Priority) {
     MyPriority = Priority;
     // put us into the Initial PseudoState
     CurrentState = InitPState;
     // post the initial transition event
-    if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE)
-    {
+    if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE) {
         return TRUE;
-    }
-    else
-    {
+    } else {
         return FALSE;
     }
 }
@@ -128,8 +126,7 @@ uint8_t InitTopLevel(uint8_t Priority)
  *        be posted to. Remember to rename to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t PostTopLevel(ES_Event ThisEvent)
-{
+uint8_t PostTopLevel(ES_Event ThisEvent) {
     return ES_PostToService(MyPriority, ThisEvent);
 }
 
@@ -148,284 +145,310 @@ uint8_t PostTopLevel(ES_Event ThisEvent)
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunTopLevel(ES_Event ThisEvent)
-{
+ES_Event RunTopLevel(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
-    TemplateHSMState_t nextState;   // <- change type to correct enum
+    TemplateHSMState_t nextState; // <- change type to correct enum
     static uint8_t Tower_Found = 0;
 
     ES_Tattle(); // trace call stack
 
-    switch (CurrentState)
-    {
-    case InitPState:                        // If current state is initial Pseudo State
-        if (ThisEvent.EventType == ES_INIT) // only respond to ES_Init
-        {
-            // this is where you would put any actions associated with the
-            // transition from the initial pseudo-state into the actual
-            // initial state
-            // Initialize all sub-state machines
-//            InitTemplateSubHSM();
-            // now put the machine into the actual initial state
-            nextState = OrientBot;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            ;
-        }
-        break;
-
-    case OrientBot: // Find the bot's initial position on the field by locating first corner
-    {
-        // Spins to the left to find Black Tape. Once tape is found follow the tap in a CCW orientation to find a corner
-        // Enter Orientation sub state machine
-        ThisEvent = RunOrientBot(ThisEvent);
-        switch (ThisEvent.EventType)
-        {
-        case BOT_ORIENTED:
-            // make transition to scan for beacon state
-            nextState = ScanForBeacon;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            break;
-        case ES_NO_EVENT:
-        default:
-            break;
-        }
-    }
-
-    case ScanForBeacon: //
-    {
-        // Completes two 180 deg sweeps to find the closest beacon
-        // Enter scan for beaco sub state machine
-        ThisEvent = RunScanForBeacon(ThisEvent);
-        switch (ThisEvent.EventType)
-        {
-        case NO_SIGNAL: // or ES_NO_EVENT - HZ 11/15
-            // make transition to find a new corner
-            if (Tower_Found == 0)
+    switch (CurrentState) {
+        case InitPState: // If current state is initial Pseudo State
+            if (ThisEvent.EventType == ES_INIT) // only respond to ES_Init
             {
-                // case before tower is found to initially find a tower from a corner
-                nextState = FindNewCorner;
+                // this is where you would put any actions associated with the
+                // transition from the initial pseudo-state into the actual
+                // initial state
+                // Initialize all sub-state machines
+                //            InitTemplateSubHSM();
+                // now put the machine into the actual initial state
+                nextState = OrientBot;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-            }
-            else if (Tower_Found > 0)
-            {
-                // case before tower is found to initially find a tower from a corner
-                nextState = NavField;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
+                ;
             }
             break;
-        case FOUND_BEACON:
-            // make transition to move toward the beacon
-            nextState = ToBeacon;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-        case ES_NO_EVENT:
-        default:
-            break;
-        }
-    }
 
-    case FindNewCorner: // Locate the next corner going in a counter clock wise (CCW) orientation
-    {
-        // As a case to get a new perspective, this state should change position to the nreturn to Scan for Beacon
-        // Enter Find new corner sub state machine
-        ThisEvent = RunFindNewCorner(ThisEvent);
-        switch (ThisEvent.EventType)
+        // we may not need this state
+        case OrientBot: // Find the bot's initial position on the field by locating first corner
         {
-        case FOUND_NEW_CORNER:
-            // make transition to scan for beacon state
-            nextState = ScanForBeacon;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            break;
-        case ES_NO_EVENT:
-        default:
-            break;
+            // Spins to the left to find Black Tape. Once tape is found follow the tap in a CCW orientation to find a corner
+            // Enter Orientation sub state machine
+            ThisEvent = RunOrientBot(ThisEvent);
+            switch (ThisEvent.EventType) {
+                case BOT_ORIENTED:
+                    // make transition to scan for beacon state
+                    nextState = ScanForBeacon;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
         }
-    }
-
-    case ReAdjustBot: // Re-adjust the bot in case the bot veers off course
-        //this state to be changed - HZ 11/15
-    {
-        // Stops the bot mid way to the beacon to complete anotehr partial sweep to find it again
-        // Enter re-adjust bot sub state machine
-        //ThisEvent = RunReAdjustBotSubHSM(ThisEvent);
-        switch (ThisEvent.EventType)
+            break;
+            
+        //we can just start here, because we know we are at a corner
+        case ScanForBeacon: //
         {
-        case FOUND_BEACON:
-            // make transition to scan for beacon state
-            nextState = ToBeacon;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            break;
-        case ES_NO_EVENT:
-        default:
-            break;
+            // Completes two 180 deg sweeps to find the closest beacon
+            // Enter scan for beacon sub state machine
+            if (ThisEvent.EventType == ES_ENTRY) {
+                StartScan = 1;
+            }
+            ThisEvent = RunScanForBeacon(ThisEvent);
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    //Entry state
+                    break;
+                case NO_SIGNAL:
+                    // make transition to find a new corner
+                    if (Tower_Found == 0) {
+                        // case before tower is found to initially find a tower from a corner
+                        nextState = FindNewCorner;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    } else if (Tower_Found > 0) {
+                        // case before tower is found to initially find a tower from a corner
+                        nextState = NavField;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
+                case FOUND_BEACON:
+                    // make transition to move toward the beacon
+                    nextState = ToBeacon;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
         }
-    }
-
-    case ToBeacon: // Moves the bot to the beacon
-    {
-        // Once the clsoes beacon is located, moves the bot immediately straight
-        // Enter re-adjust bot sub state machine
-        //ThisEvent = RunToBeacon(ThisEvent);
-        switch (ThisEvent.EventType)
+            break;
+        case FindNewCorner: // Locate the next corner going in a counter clock wise (CCW) orientation
         {
-        case LOST_BEACON:
-            // make transition to re-adjust the bot
-            nextState = ReAdjustBot;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            break;
-            case BUMP_EVENT:
-            // make tranisiton to navigate the tower
-            nextState = NavTower;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            break;
-        case ES_NO_EVENT:
-        default:
-            break;
+            // As a case to get a new perspective, this state should change position to the nreturn to Scan for Beacon
+            // Enter Find new corner sub state machine
+            ThisEvent = RunFindNewCorner(ThisEvent);
+            switch (ThisEvent.EventType) {
+                case FOUND_NEW_CORNER:
+                    // make transition to scan for beacon state
+                    nextState = ScanForBeacon;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
         }
-    }
-
-    case NavTower: // navigates aound the tower and looks for the track wire
-    {
-        // Wall follows the tower. Once the track wire is detected, the bot then alligns
-        // itself with the wall and looks for tape
-        // Enter Navigate tower sub state machine
-        //ThisEvent = RunNavTower(ThisEvent);
-        switch (ThisEvent.EventType)
+            break;
+            
+        case ReAdjustBot: // Re-adjust the bot in case the bot veers off course
+            //this state to be changed - HZ 11/15
+            //do we really need it tho
         {
-        case TOWER_DONE:
-            // make transition to scan for beacon state
-            nextState = ScanForBeacon;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            break;
-        case ES_NO_EVENT:
-        default:
-            break;
+            // Stops the bot mid way to the beacon to complete another partial sweep to find it again
+            // Enter re-adjust bot sub state machine
+            //ThisEvent = RunReAdjustBotSubHSM(ThisEvent);
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                case TURN_TIMER_EXP:
+                    turnBot(LTANK_L, LTANK_R);
+                    ES_Timer_InitTimer(MotionTimer, READJUST_SHAKE_TIME);
+                    ES_Timer_StopTimer(TurnTimer);
+                    break;
+                case FOUND_BEACON:
+                    // make transition to scan for beacon state
+                    nextState = ToBeacon;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case MOTION_TIMER_EXP:
+                    turnBot(RTANK_L, RTANK_R);
+                    ES_Timer_InitTimer(TurnTimer, READJUST_SHAKE_TIME);
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(TurnTimer);
+                    ES_Timer_StopTimer(MotionTimer);
+                    break;
+                default:
+                    break;
+            }
         }
-    }
-
-    case NavField: // Find black tape to look for beacon
-    {
-        // If a new beacon isn't found after ball release, this state locates a new corner to scan again
-        // EnterNavigate Field sub state machine
-        //ThisEvent = RunNavField(ThisEvent); 
-        switch (ThisEvent.EventType)
+            break;
+        case ToBeacon: // Moves the bot to the beacon
         {
-        case FOUND_NEW_CORNER:
-            // make transition to Scan for Beacon state
-            nextState = ScanForBeacon;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            break;
-        case BUMP_EVENT:
-            // make tranisiton to Navigate Tower
-            nextState = NavTower;
-            makeTransition = TRUE;
-            ThisEvent.EventType = ES_NO_EVENT;
-            break;
-        case ES_NO_EVENT:
-        default:
-            break;
+            // Once the clsoes beacon is located, moves the bot immediately straight
+            // Enter re-adjust bot sub state machine
+            //ThisEvent = RunToBeacon(ThisEvent);
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    //Entry state
+                    goForward();
+                    break;
+                case LOST_BEACON:
+                    // make transition to re-adjust the bot
+                    nextState = ReAdjustBot;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case BUMP_EVENT:
+                    // make tranisiton to navigate the tower
+                    nextState = NavTower;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case ES_EXIT:
+                default:
+                    break;
+            }
         }
+            break;
+
+        case NavTower: // navigates around the tower and looks for the track wire
+        {
+            // Wall follows the tower. Once the track wire is detected, the bot then aligns
+            // itself with the wall and looks for tape
+            // Enter Navigate tower sub state machine
+            //ThisEvent = RunNavTower(ThisEvent);
+            if (ThisEvent.EventType == ES_ENTRY) {
+                StartNavTower = 1;
+            }
+            ThisEvent = RunNavTower(ThisEvent);
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    //Entry state
+                    break;
+                case TOWER_DONE:
+                    // make transition to scan for beacon state
+                    nextState = ScanForBeacon;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case ES_EXIT:
+                default:
+                    break;
+            }
+        }
+            break;
+        case NavField: // Find black tape to look for beacon
+        {
+            // If a new beacon isn't found after ball release, this state locates a new corner to scan again
+            // EnterNavigate Field sub state machine
+            //ThisEvent = RunNavField(ThisEvent); 
+            switch (ThisEvent.EventType) {
+                case FOUND_NEW_CORNER:
+                    // make transition to Scan for Beacon state
+                    nextState = ScanForBeacon;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case BUMP_EVENT:
+                    // make tranisiton to Navigate Tower
+                    nextState = NavTower;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case ES_NO_EVENT:
+                default:
+                    break;
+            }
+        }
+            break;
+
+
+    }
+    if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
+        // recursively call the current state with an exit event
+        RunTopLevel(EXIT_EVENT); // <- rename to your own Run function
+        CurrentState = nextState;
+        RunTopLevel(ENTRY_EVENT); // <- rename to your own Run function
     }
 
-        if (makeTransition == TRUE)
-        { // making a state transition, send EXIT and ENTRY
-            // recursively call the current state with an exit event
-            RunTopLevel(EXIT_EVENT); // <- rename to your own Run function
-            CurrentState = nextState;
-            RunTopLevel(ENTRY_EVENT); // <- rename to your own Run function
-        }
-
-        ES_Tail(); // trace call stack end
-        return ThisEvent;
-    }
+    ES_Tail(); // trace call stack end
+    return ThisEvent;
 }
-    /*******************************************************************************
+
+/*******************************************************************************
  * PRIVATE FUNCTIONS                                                           *
  ******************************************************************************/
 
-uint8_t TurnTimerHelper(ES_Event ThisEvent){
+uint8_t TurnTimerHelper(ES_Event ThisEvent) {
     ES_Event posting;
-    
-    switch (ThisEvent.EventType) {
-    case ES_INIT: //do nothing (initializing)
-        break;
-    
-    /* do nothng */
-    case ES_TIMERACTIVE:
-    case ES_TIMERSTOPPED:
-        break; // We don't use these events
 
-    /* run internal event checkers */
-    case ES_TIMEOUT:
-        posting.EventParam = 1;
-        posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
-        PostTopLevel(posting);//then send the event to the toplevel
-        //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
-        break;
-    default:
-        break;
+    switch (ThisEvent.EventType) {
+        case ES_INIT: //do nothing (initializing)
+            break;
+
+            /* do nothng */
+        case ES_TIMERACTIVE:
+        case ES_TIMERSTOPPED:
+            break; // We don't use these events
+
+            /* run internal event checkers */
+        case ES_TIMEOUT:
+            posting.EventParam = 1;
+            posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
+            PostTopLevel(posting); //then send the event to the toplevel
+            //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
+            break;
+        default:
+            break;
     }
     return 0;
 }
 
-uint8_t MotionTimerHelper(ES_Event ThisEvent){
+uint8_t MotionTimerHelper(ES_Event ThisEvent) {
     ES_Event posting;
-    
-    switch (ThisEvent.EventType) {
-    case ES_INIT: //do nothing (initializing)
-        break;
-    
-    /* do nothng */
-    case ES_TIMERACTIVE:
-    case ES_TIMERSTOPPED:
-        break; // We don't use these events
 
-    /* run internal event checkers */
-    case ES_TIMEOUT:
-        posting.EventParam = 1;
-        posting.EventType = MOTION_TIMER_EXP; //When the timer expires, it generates this event
-        PostTopLevel(posting);//then send the event to the toplevel
-        //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
-        ES_Timer_StopTimer(MotionTimer);
-        break;
-    default:
-        break;
+    switch (ThisEvent.EventType) {
+        case ES_INIT: //do nothing (initializing)
+            break;
+
+            /* do nothng */
+        case ES_TIMERACTIVE:
+        case ES_TIMERSTOPPED:
+            break; // We don't use these events
+
+            /* run internal event checkers */
+        case ES_TIMEOUT:
+            posting.EventParam = 1;
+            posting.EventType = MOTION_TIMER_EXP; //When the timer expires, it generates this event
+            PostTopLevel(posting); //then send the event to the toplevel
+            //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
+            ES_Timer_StopTimer(MotionTimer);
+            break;
+        default:
+            break;
     }
     return 0;
 }
 
-uint8_t TurnTimerHelper(ES_Event ThisEvent){
+uint8_t TurnTimerHelper(ES_Event ThisEvent) {
     ES_Event posting;
-    
-    switch (ThisEvent.EventType) {
-    case ES_INIT: //do nothing (initializing)
-        break;
-    
-    /* do nothng */
-    case ES_TIMERACTIVE:
-    case ES_TIMERSTOPPED:
-        break; // We don't use these events
 
-    /* run internal event checkers */
-    case ES_TIMEOUT:
-        posting.EventParam = 1;
-        posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
-        PostTopLevel(posting);//then send the event to the toplevel
-        //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
-        ES_Timer_StopTimer(MotionTimer);
-        break;
-    default:
-        break;
+    switch (ThisEvent.EventType) {
+        case ES_INIT: //do nothing (initializing)
+            break;
+
+            /* do nothng */
+        case ES_TIMERACTIVE:
+        case ES_TIMERSTOPPED:
+            break; // We don't use these events
+
+            /* run internal event checkers */
+        case ES_TIMEOUT:
+            posting.EventParam = 1;
+            posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
+            PostTopLevel(posting); //then send the event to the toplevel
+            //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
+            ES_Timer_StopTimer(MotionTimer);
+            break;
+        default:
+            break;
     }
     return 0;
 }

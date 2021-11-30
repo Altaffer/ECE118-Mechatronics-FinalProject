@@ -143,10 +143,21 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
                 case MOTION_TIMER_EXP:
-                    nextState = Reverse;
-                    makeTransition = TRUE;
-                    CW_Turn();
-                    ThisEvent.EventType = ES_NO_EVENT;
+                    if (min_elapse_time == 999) {
+                        //if no tower is found
+                        nextState = NoSubService;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = NO_SIGNAL;
+                        break;
+                    } else {
+                        nextState = Reverse;
+                        makeTransition = TRUE;
+                        CW_Turn();
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+
+                    // do we need to consider the case that this expires in the
+                    // find ping state? (maybe no)
                     break;
                 case ES_EXIT:
                     ES_Timer_StopTimer(MotionTimer);
@@ -170,7 +181,7 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
                         //is done scanning, now go forward
                         nextState = NoSubService;
                         makeTransition = TRUE;
-                        ThisEvent.EventType = FOUND_TOWER;
+                        ThisEvent.EventType = FOUND_BEACON;//pass up to top
                     } else {
                         nextState = Reverse;
                         makeTransition = TRUE;

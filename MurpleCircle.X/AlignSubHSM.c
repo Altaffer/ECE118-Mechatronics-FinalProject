@@ -193,10 +193,10 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                             (ThisEvent.EventParam & F_CENTER_TAPE)) {
                         ES_Timer_InitTimer(MotionTimer, BOT_MIDDLE_TIME);
                         break;
-                    } else if ((TankTurnFlag == 1) &&ThisEvent.EventParam & F_CENTER_TAPE) {
+                    } else if ((TankTurnFlag == 1) && ThisEvent.EventParam & F_CENTER_TAPE) {
                         goForward();
                         break;
-                    } else if ((TankTurnFlag == 1)){
+                    } else if ((TankTurnFlag == 1)) {
                         switch (ThisEvent.EventParam) {
                             case (F_RIGHT_TAPE | B_CENTER_TAPE):
                             case (F_RIGHT_TAPE):
@@ -223,7 +223,7 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                                     nextState = AlignLeft;
                                     makeTransition = TRUE;
                                     ThisEvent.EventType = ES_NO_EVENT;
-                                } 
+                                }
                                 if (ThisEvent.EventType & F_RIGHT_TAPE) {
                                     nextState = AlignRight;
                                     makeTransition = TRUE;
@@ -271,7 +271,9 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     turnBot(RGRAD_L, RGRAD_R);
-                    //ES_Timer_InitTimer(MotionTimer, ABRUPT_TURN_TIME);
+                    ES_Timer_InitTimer(MotionTimer, ALIGN_RIGHT_TIME);
+                    // if you cannot find the tape in a few seconds
+                    // you are in the middle
                     break;
                 case BOT_BT_CHANGED:
                     if (ThisEvent.EventParam & (F_CENTER_TAPE)) {
@@ -279,6 +281,9 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                     }
+                    break;
+                case MOTION_TIMER_EXP:
+                    goForward();
                     break;
                 case ES_EXIT:
                     ES_Timer_StopTimer(MotionTimer);

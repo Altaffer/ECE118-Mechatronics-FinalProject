@@ -15,6 +15,8 @@
 #include "AlignSubHSM.h"
 #include "WallHugSubHSM.h"
 #include "ScanForBeaconSub.h"
+#include "ParkSub.h"
+#include "NavTower_FindHole.h"
 //#include all sub state machines called
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
@@ -28,14 +30,18 @@
 typedef enum {
     InitPState,
     Align,
+    Park,
     Scan,
+    FindHole,
     WallHug,
 } TemplateHSMState_t;
 
 static const char *StateNames[] = {
     "InitPState",
     "Align",
+    "Park",
     "Scan",
+    "FindHole",
     "WallHug",
 };
 
@@ -55,6 +61,9 @@ static TemplateHSMState_t CurrentState = InitPState; // <- change enum name to m
 static uint8_t MyPriority;
 extern uint8_t StartWallHug;
 extern uint8_t StartScan;
+extern uint8_t StartPark;
+extern uint8_t IsParallel;
+extern uint8_t StartFindHole;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -74,9 +83,11 @@ uint8_t InitTopLevel(uint8_t Priority) {
     MyPriority = Priority;
     // put us into the Initial PseudoState
     CurrentState = InitPState;
+    InitPark();
     InitWallHug();
     InitAlignSubHSM();
     InitScanForBeacon();
+    InitFindHole();
     // post the initial transition event
     if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE) {
         return TRUE;
@@ -131,11 +142,32 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                 //            InitTemplateSubHSM();
                 // now put the machine into the actual initial state
                 //nextState = Align;
-                nextState = Scan;
+                nextState = Park;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 ;
             }
+            break;
+        case Park:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                StartPark = 1;
+                //goForward();
+            }
+            ThisEvent = RunPark(ThisEvent);
+            if (ThisEvent.EventType == IS_PARALLEL) {
+                nextState = FindHole;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+
+            break;
+        case FindHole:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                StartFindHole = 1;
+                //goForward();
+            }
+            ThisEvent = RunFindHole(ThisEvent);
+
             break;
         case Scan:
             if (ThisEvent.EventType == ES_ENTRY) {

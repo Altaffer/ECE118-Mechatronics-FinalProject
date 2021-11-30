@@ -18,15 +18,15 @@
 //#include "TopLevel.h"
 
 //defines for keyboard input
-#define USE_KEYBOARD_INPUT
+//#define USE_KEYBOARD_INPUT
 //What State machine are we testing
-#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
+//#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
 
 //define for TattleTale
-#define USE_TATTLETALE
+//#define USE_TATTLETALE
 
 //uncomment to supress the entry and exit events
-#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
+//#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
 
 /****************************************************************************/
 // Name/define the events of interest
@@ -46,18 +46,27 @@
 #define BUMPER_TIME 100
 #define TIMER_360 (TIMER_90*4)
 
-#define FINDHOLE_REV_TIME 20 //the bot was bumped onto the tower, now we need 
-//to reverse a bit to create space for turning
-#define FINDHOLE_FORWARD_TIME 1000
+
+#define FINDHOLE_EXPIRE_TIME 1000//forward too much - go reverse
 #define WALL_HUG_FORWARD_TIME 300
 #define WALL_HUG_REVERSE_TIME 800
+#define WALL_HUG_CORNER_TIME 1000
 #define CORNER_ALIGN_TIME 100
 #define ABRUPT_TURN_TIME 500
+#define ALIGN_RIGHT_TIME 2000
+#define READJUST_SHAKE_TIME 1000
 
-#define SCAN_TURN_TIME (TIMER_90+TIMER_90) //180 degrees
+#define SCAN_TURN_TIME (TIMER_90*4) //360 degrees
 
 #define SCAN_THRESHOLD 20
 
+#define FINDHOLE_REV_TIME 1000 
+#define FIND_HOLE_REVERSE_L -80
+#define FIND_HOLE_REVERSE_R -40
+
+#define FINDHOLE_FORWARD_TIME 1000
+#define FIND_HOLE_FORWARD_L 80
+#define FIND_HOLE_FORWARD_R 20
 
 
 
@@ -107,15 +116,18 @@ typedef enum {
     LOST_TRACK_WIRE, //just in case
     FOUND_TOWER,
     TOWER_DONE,
+    IS_PARALLEL,
 
     //Bot Events
     BOT_ORIENTED,
     NO_SIGNAL,
     FOUND_NEW_CORNER,
 
-    NUMBEROFEVENTS,
+
 
     FOUND_PING,
+
+    NUMBEROFEVENTS,
 
 
 
@@ -163,16 +175,17 @@ static const char *EventNames[] = {
     "LOST_TRACK_WIRE", //just in case
     "FOUND_TOWER",
     "TOWER_DONE",
+    "IS_PARALLEL",
 
     //Bot Events
     "BOT_ORIENTED",
     "NO_SIGNAL",
     "FOUND_NEW_CORNER",
 
-    "NUMBEROFEVENTS",
+
 
     "FOUND_PING",
-
+    "NUMBEROFEVENTS",
 
 };
 
