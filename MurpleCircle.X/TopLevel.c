@@ -34,6 +34,7 @@
 #include "TopLevel.h"
 #include "stdio.h"
 #include "stdlib.h"
+#include "robot.h"
 
 
 #include "OrientBotSub.h"
@@ -42,6 +43,7 @@
 #include "ToBeaconSub.h"
 #include "NavTowerSub.h"
 #include "NavFieldsub.h"//#include all sub state machines called
+#include "AlignSubHSM.h"
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
  ******************************************************************************/
@@ -166,7 +168,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                 // Initialize all sub-state machines
                 //            InitTemplateSubHSM();
                 // now put the machine into the actual initial state
-                nextState = OrientBot;
+                nextState = ScanForBeacon;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 ;
@@ -174,24 +176,24 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
             break;
 
             // we may not need this state
-        case OrientBot: // Find the bot's initial position on the field by locating first corner
-        {
-            // Spins to the left to find Black Tape. Once tape is found follow the tap in a CCW orientation to find a corner
-            // Enter Orientation sub state machine
-            ThisEvent = RunOrientBot(ThisEvent);
-            switch (ThisEvent.EventType) {
-                case BOT_ORIENTED:
-                    // make transition to scan for beacon state
-                    nextState = ScanForBeacon;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case ES_NO_EVENT:
-                default:
-                    break;
-            }
-        }
-            break;
+//        case OrientBot: // Find the bot's initial position on the field by locating first corner
+//        {
+//            // Spins to the left to find Black Tape. Once tape is found follow the tap in a CCW orientation to find a corner
+//            // Enter Orientation sub state machine
+//            ThisEvent = RunOrientBot(ThisEvent);
+//            switch (ThisEvent.EventType) {
+//                case BOT_ORIENTED:
+//                    // make transition to scan for beacon state
+//                    nextState = ScanForBeacon;
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//                    break;
+//                case ES_NO_EVENT:
+//                default:
+//                    break;
+//            }
+//        }
+//            break;
 
             //we can just start here, because we know we are at a corner
         case ScanForBeacon: //
@@ -306,7 +308,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventType == FRONT_CENTER_TAPE) {
+                    if (ThisEvent.EventType == F_CENTER_TAPE) {
                         nextState = AlignCenter;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -355,6 +357,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
                 case ES_EXIT:
+                    Tower_Found++;
                 default:
                     break;
             }
@@ -453,28 +456,3 @@ uint8_t MotionTimerHelper(ES_Event ThisEvent) {
     return 0;
 }
 
-uint8_t TurnTimerHelper(ES_Event ThisEvent) {
-    ES_Event posting;
-
-    switch (ThisEvent.EventType) {
-        case ES_INIT: //do nothing (initializing)
-            break;
-
-            /* do nothng */
-        case ES_TIMERACTIVE:
-        case ES_TIMERSTOPPED:
-            break; // We don't use these events
-
-            /* run internal event checkers */
-        case ES_TIMEOUT:
-            posting.EventParam = 1;
-            posting.EventType = TURN_TIMER_EXP; //When the timer expires, it generates this event
-            PostTopLevel(posting); //then send the event to the toplevel
-            //printf("ExampleTimerEXP, %d\r\n", posting.EventType); // debug use.
-            ES_Timer_StopTimer(MotionTimer);
-            break;
-        default:
-            break;
-    }
-    return 0;
-}

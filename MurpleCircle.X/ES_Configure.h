@@ -118,6 +118,7 @@ typedef enum {
     LOST_TRACK_WIRE, //just in case
     FOUND_TOWER,
     TOWER_DONE,
+            FOUND_HOLE,
     IS_PARALLEL,
 
     //Bot Events
@@ -177,6 +178,7 @@ static const char *EventNames[] = {
     "LOST_TRACK_WIRE", //just in case
     "FOUND_TOWER",
     "TOWER_DONE",
+    "FOUND_HOLE",
     "IS_PARALLEL",
 
     //Bot Events

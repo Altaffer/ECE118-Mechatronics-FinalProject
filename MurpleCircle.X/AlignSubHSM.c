@@ -157,7 +157,7 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                 // initial state
 
                 // now put the machine into the actual initial state
-
+                TankTurnFlag = 0;
                 if (StartAlign_boarder) {
                     nextState = MoveForward;
                     StartAlign_boarder = 0;
@@ -297,6 +297,10 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                 case MOTION_TIMER_EXP:
                     if (AtCenter == 0) {
                         goForward();//go away from the center
+                        nextState = MoveForward;
+                        TankTurnFlag = 0;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
                     } else {
                         nextState = Sweep;//start finding the tower
                         makeTransition = TRUE;
@@ -341,34 +345,34 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                     break;
             }
             break;
-        case CornerTurn:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    // step 1. forward a little
-                    ES_Timer_InitTimer(MotionTimer, BOT_MIDDLE_TIME);
-                    ES_Timer_StopTimer(TurnTimer); //just to be safe
-                    goForward();
-                    break;
-                case MOTION_TIMER_EXP:
-                    nextState = TankTurn;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    // step 2. tank turn 90 degrees
-                    // Using a different timer to avoid conflicts
-                    //                    turnBot(LTANK_L_SLOW, LTANK_R_SLOW);//tank turn
-                    //                    ES_Timer_InitTimer(TurnTimer, TIMER_90);
-                    break;
-                    //                case TURN_TIMER_EXP:
-                    //                    // step 3. go forward
-                    //                    nextState = MoveForward;
-                    //                    makeTransition = TRUE;
-                    //                    ThisEvent.EventType = ES_NO_EVENT;
-                    //                    break;
-                case ES_EXIT:
-                    ES_Timer_StopTimer(MotionTimer);
-                    break;
-            }
-            break;
+//        case CornerTurn:
+//            switch (ThisEvent.EventType) {
+//                case ES_ENTRY:
+//                    // step 1. forward a little
+//                    ES_Timer_InitTimer(MotionTimer, BOT_MIDDLE_TIME);
+//                    ES_Timer_StopTimer(TurnTimer); //just to be safe
+//                    goForward();
+//                    break;
+//                case MOTION_TIMER_EXP:
+//                    nextState = TankTurn;
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//                    // step 2. tank turn 90 degrees
+//                    // Using a different timer to avoid conflicts
+//                    //                    turnBot(LTANK_L_SLOW, LTANK_R_SLOW);//tank turn
+//                    //                    ES_Timer_InitTimer(TurnTimer, TIMER_90);
+//                    break;
+//                    //                case TURN_TIMER_EXP:
+//                    //                    // step 3. go forward
+//                    //                    nextState = MoveForward;
+//                    //                    makeTransition = TRUE;
+//                    //                    ThisEvent.EventType = ES_NO_EVENT;
+//                    //                    break;
+//                case ES_EXIT:
+//                    ES_Timer_StopTimer(MotionTimer);
+//                    break;
+//            }
+//            break;
             //        case Spin:
             //            switch (ThisEvent.EventType) {
             //                case ES_ENTRY:

@@ -192,6 +192,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
                     case BOTH_TAPE:
                         nextState = NoSubService;
                         makeTransition = TRUE;//This makes sure that it sits at the InitState
+                        ThisEvent.EventType = FOUND_HOLE;
                         Robot_LeftMtrSpeed(0);
                         Robot_RightMtrSpeed(0);
                         break;
@@ -230,6 +231,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
                     case BOTH_TAPE:
                         nextState = NoSubService;
                         makeTransition = TRUE;//This makes sure that it sits at the InitState
+                        ThisEvent.EventType = FOUND_HOLE;
                         Robot_LeftMtrSpeed(0);
                         Robot_RightMtrSpeed(0);
                         break;

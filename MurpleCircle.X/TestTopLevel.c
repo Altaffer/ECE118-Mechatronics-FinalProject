@@ -177,7 +177,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
             }
             ThisEvent = RunScanForBeacon(ThisEvent);
             if (ThisEvent.EventType == FOUND_TOWER) {
-                nextState = Scan;
+                //nextState = Scan;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }

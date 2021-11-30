@@ -10,11 +10,8 @@
 #include "ES_Framework.h"
 #include "BOARD.h"
 #include "TopLevel.h"
-#include "NavTowerSub.h"
+#include "NavFieldSub.h"
 #include "robot.h"
-#include "ParkSub.h"
-#include "NavTower_FindHole.h"
-#include "WallHugSubHSM.h"
 
 
 #include <stdio.h>
@@ -27,22 +24,14 @@
 
 typedef enum {
     InitPSubState,
+    NoSubService,
     WallHug,
-    Park,
-    FindHole,
-    ReleaseBall,
-    Leave,
-    NoSubService
 } SubHSMState_t;
 
 static const char *StateNames[] = {
     "InitPSubState",
+    "NoSubService",
     "WallHug",
-    "Park",
-    "FindHole",
-    "ReleaseBall",
-    "Leave",
-    "NoSubService"
 };
 
 #define TURN_SPEED 50
@@ -61,11 +50,8 @@ static const char *StateNames[] = {
  * The type of state variable should match that of enum in header file. */
 
 static SubHSMState_t CurrentState = InitPSubState; // initial state
-uint8_t StartNavTower;
-extern uint8_t StartWallHug;
-extern uint8_t StartPark;
-extern uint8_t IsParallel;
-extern uint8_t StartFindHole;
+uint8_t StartNavField;
+
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -81,13 +67,11 @@ extern uint8_t StartFindHole;
  *        to rename this to something appropriate.
  *        Returns TRUE if successful, FALSE otherwise
  * @author J. Edward Carryer, 2011.10.23 19:25 */
-uint8_t InitNavTower(void) {
+uint8_t InitNavField(void) {
     ES_Event returnEvent;
-    InitPark();
-    InitFindHole();
     CurrentState = InitPSubState;
-    returnEvent = RunNavTower(INIT_EVENT);
-    StartNavTower = 0;
+    returnEvent = RunNavField(INIT_EVENT);
+    StartNavField = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -109,13 +93,13 @@ uint8_t InitNavTower(void) {
  *       not consumed as these need to pass pack to the higher level state machine.
  * @author J. Edward Carryer, 2011.10.23 19:25
  * @author Gabriel H Elkaim, 2011.10.23 19:25 */
-ES_Event RunNavTower(ES_Event ThisEvent) {
+ES_Event RunNavField(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
     SubHSMState_t nextState;
 
 
     ES_Tattle(); // trace call stack
-    if (StartNavTower) {
+    if (StartNavField) {
         CurrentState = NoSubService;
     }//resets the sub
 
@@ -152,78 +136,6 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 ;
             }
             break;
-        case Park:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                StartPark;
-            }
-            ThisEvent = RunPark(ThisEvent);
-            if (ThisEvent.EventType == IS_PARALLEL) {
-                nextState = FindHole;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
-            }
-            break;
-        case FindHole:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                ;
-            }
-            RunFindHole(ThisEvent);
-            if (ThisEvent.EventType == SHOOTER_BT_CHANGED) {
-                //from the ssm, this is for sure both tape on
-                nextState = ReleaseBall;
-                stop();
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                stop();
-            }
-            break;
-        case ReleaseBall:
-            switch (ThisEvent.EventType){
-                case ES_ENTRY:
-                //state entry
-                //start the servo, but what value?
-                Robot_SetServoSpeed(1525);
-                break;
-            
-            
-            case BUMPER_SERVO:
-                //turn off servo, but what value?
-                if((ThisEvent.EventParam & SERVO_BUMPER_ON) == 0){
-                    Robot_SetServoSpeed(1500);
-                    nextState = Leave;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                }
-                break;
-            //
-            case ES_EXIT:
-                //state exit
-            break;
-        }
-        case Leave:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                Robot_LeftMtrSpeed(100);
-                Robot_RightMtrSpeed(100);
-            }
-            nextState = NoSubService;
-            makeTransition = TRUE;
-            ThisEvent.EventType = TOWER_DONE;
-            //do we really need this state?
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
-            }
-            break;
 
         default: // all unhandled events fall into here
             break;
@@ -231,9 +143,9 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
 
     if (makeTransition == TRUE) { // making a state transition, send EXIT and ENTRY
         // recursively call the current state with an exit event
-        RunNavTower(EXIT_EVENT); // <- rename to your own Run function
+        RunNavField(EXIT_EVENT); // <- rename to your own Run function
         CurrentState = nextState;
-        RunNavTower(ENTRY_EVENT); // <- rename to your own Run function
+        RunNavField(ENTRY_EVENT); // <- rename to your own Run function
     }
 
     ES_Tail(); // trace call stack end
