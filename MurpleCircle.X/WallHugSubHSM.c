@@ -177,7 +177,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 case TURN_TIMER_EXP:
                     nextState = NoSubService;
                     makeTransition = TRUE;
-                    ThisEvent.EventType = TOWER_DONE;
+                    ThisEvent.EventType = FOUND_BOX;
                     break;
                 case ES_EXIT:
                     ES_Timer_StopTimer(MotionTimer);
@@ -213,7 +213,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 case TURN_TIMER_EXP:
                     nextState = NoSubService;
                     makeTransition = TRUE;
-                    ThisEvent.EventType = TOWER_DONE;
+                    ThisEvent.EventType = FOUND_BOX;
                     break;
                 case ES_EXIT:
                     stop();
@@ -249,7 +249,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 case TURN_TIMER_EXP:
                     nextState = NoSubService;
                     makeTransition = TRUE;
-                    ThisEvent.EventType = TOWER_DONE;
+                    ThisEvent.EventType = FOUND_BOX;
                     break;
                 case ES_EXIT:
                     ES_Timer_StopTimer(MotionTimer);

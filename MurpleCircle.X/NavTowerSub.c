@@ -149,6 +149,10 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
             } else if (ThisEvent.EventType == BOT_BT_CHANGED) {
                 nextState = NoSubService;
                 makeTransition = TRUE;
+                ThisEvent.EventType = FOUND_TAPE;
+            } else if (ThisEvent.EventType == FOUND_BOX) {
+                nextState = NoSubService;
+                makeTransition = TRUE;
                 ThisEvent.EventType = TOWER_DONE;
             }
             if (ThisEvent.EventType == ES_EXIT) {

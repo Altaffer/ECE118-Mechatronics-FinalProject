@@ -39,7 +39,7 @@ static const char *StateNames[] = {
     "NoSubService"
 };
 
-#define TURN_SPEED 50
+#define TURN_SPEED 80
 #define FRONT_TAPE 0x0008 // 1000 - Change this to the right one
 #define TURNING 1
 #define REVERSING 2

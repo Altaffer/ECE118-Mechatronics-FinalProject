@@ -41,7 +41,7 @@
 //#define SpinTimer 6
 #define MotionTimer 15
 
-#define TIMER_90 750
+#define TIMER_90 500
 #define BOT_MIDDLE_TIME 400
 #define BUMPER_TIME 100
 #define TIMER_360 (TIMER_90 * 4)
@@ -58,7 +58,7 @@
 #define ALIGN_RIGHT_TIME 500
 #define FIND_NEW_CORNER_EXP_TIME 300 //they should use the same time
 #define READJUST_SHAKE_TIME 300
-#define WALL_HUG_END_TIME 10000
+#define WALL_HUG_END_TIME 25000
 
 #define SCAN_TURN_TIME (TIMER_360) //360 degrees
 
@@ -127,6 +127,8 @@ typedef enum {
     BOT_ORIENTED,
     NO_SIGNAL,
     FOUND_NEW_CORNER,
+            FOUND_BOX,
+            FOUND_TAPE,
 
 
 
@@ -187,6 +189,8 @@ static const char *EventNames[] = {
     "BOT_ORIENTED",
     "NO_SIGNAL",
     "FOUND_NEW_CORNER",
+    "FOUND_BOX",
+    "FOUND_TAPE",
 
 
 

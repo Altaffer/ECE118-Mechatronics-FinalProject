@@ -374,6 +374,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
             // Enter Navigate tower sub state machine
             //ThisEvent = RunNavTower(ThisEvent);
             if (ThisEvent.EventType == ES_ENTRY) {
+                ES_Timer_StopTimer(MotionTimer);
                 StartNavTower = 1;
             }
             ThisEvent = RunNavTower(ThisEvent);
@@ -384,6 +385,15 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                 case TOWER_DONE:
                     // make transition to scan for beacon state
                     nextState = ScanForBeacon;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case FOUND_TAPE:
+                    ES_Timer_InitTimer(MotionTimer, FIND_NEW_CORNER_EXP_TIME);
+                    turnBot(-70,-70);
+                    break;
+                case MOTION_TIMER_EXP:
+                    nextState = FindNewCorner;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
