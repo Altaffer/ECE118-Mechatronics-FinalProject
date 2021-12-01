@@ -59,6 +59,7 @@
 // to _RD8 (Z08)
 #define HALL_FRONT_RIGHT _RD8 // <- this is the new front right bump pin (Z08))
 #define HALL_REAR_LEFT _RB10 // W04 used for ball shooter switch
+#define BACK_BUMPER PORTZ03_BIT
 
 #define LEFT_DIR_TRIS _TRISB3
 #define LEFT_DIR_INV_TRIS _TRISB2
@@ -69,6 +70,7 @@
 #define HALL_FRONT_RIGHT_TRIS _TRISD9
 #define HALL_REAR_RIGHT_TRIS _TRISD8
 #define HALL_REAR_LEFT_TRIS _TRISB10
+#define BACK_BUMPER_TRIS PORTZ03_TRIS
 
 #define LEFT_PWM PWM_PORTY10
 #define RIGHT_PWM PWM_PORTY12
@@ -177,6 +179,7 @@ void Robot_Init(void) {
     HALL_FRONT_RIGHT_TRIS = 1;
     HALL_REAR_RIGHT_TRIS = 1;
     HALL_REAR_LEFT_TRIS = 1;
+    BACK_BUMPER_TRIS = 1;
 
 
     //set up the light bank
@@ -323,7 +326,7 @@ unsigned char Robot_ReadBumpers(void) {
     //unsigned char bump_state;
     //bump_state = (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
        // return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
-    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1) + ((!HALL_REAR_LEFT) << 2));
+    return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1) + ((!HALL_REAR_LEFT) << 2) + ((!BACK_BUMPER) << 3));
 }
 
 /**
