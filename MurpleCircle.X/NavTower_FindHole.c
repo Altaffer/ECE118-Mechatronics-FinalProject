@@ -46,7 +46,7 @@ static const char *StateNames[] = {
 #define FIRST_TAPE 1 // 01
 #define SECOND_TAPE 2 // 10
 #define BOTH_TAPE 3 // 11
-
+#define BACK_BUMP 8
 
 
 
@@ -123,47 +123,48 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
         case NoSubService: /* After initialzing or executing, it sits here for the next 
                               time it gets called. */
             if (StartFindHole) {//when there is actually an event
-                nextState = Reverse;
+                nextState = Turn;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 StartFindHole = 0;
             }
             break;
-        case Reverse:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                //reverse a bit
-                Robot_LeftMtrSpeed(FIND_HOLE_REVERSE_L);
-                Robot_RightMtrSpeed(FIND_HOLE_REVERSE_R);
-                ES_Timer_InitTimer(MotionTimer, FINDHOLE_REV_TIME);
-            }
-            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
-                nextState = Turn;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ES_Timer_StopTimer(MotionTimer);
-                Robot_LeftMtrSpeed(0);
-                Robot_RightMtrSpeed(0);
-            }
-            break;
+//        case Reverse:
+//            if (ThisEvent.EventType == ES_ENTRY) {
+//                //state entry
+//                //reverse a bit
+//                Robot_LeftMtrSpeed(FIND_HOLE_REVERSE_L);
+//                Robot_RightMtrSpeed(FIND_HOLE_REVERSE_R);
+//                ES_Timer_InitTimer(MotionTimer, FINDHOLE_REV_TIME);
+//            }
+//            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
+//                nextState = Turn;
+//                makeTransition = TRUE;
+//                ThisEvent.EventType = ES_NO_EVENT;
+//            }
+//            if (ThisEvent.EventType == ES_EXIT) {
+//                //state exit
+//                ES_Timer_StopTimer(MotionTimer);
+//                Robot_LeftMtrSpeed(0);
+//                Robot_RightMtrSpeed(0);
+//            }
+//            break;
         case Turn:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                Robot_LeftMtrSpeed(FIND_HOLE_FORWARD_L);
-                Robot_RightMtrSpeed(FIND_HOLE_FORWARD_R);
-                ES_Timer_InitTimer(MotionTimer, FINDHOLE_FORWARD_TIME);
+                Robot_LeftMtrSpeed(FIND_HOLE_REVERSE_L);
+                Robot_RightMtrSpeed(FIND_HOLE_REVERSE_R);
+//                ES_Timer_InitTimer(MotionTimer, FINDHOLE_FORWARD_TIME);
             }
-            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
+            if (ThisEvent.EventType == BUMP_EVENT &&
+                    ThisEvent.EventParam == BACK_BUMP) {
                 nextState = Forward;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
-                ES_Timer_StopTimer(MotionTimer);
+//                ES_Timer_StopTimer(MotionTimer);
                 Robot_LeftMtrSpeed(0);
                 Robot_RightMtrSpeed(0);
             }

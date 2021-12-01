@@ -45,7 +45,7 @@ static const char *StateNames[] = {
 #define FRONT_TAPE 0x0008 // 1000 - Change this to the right one
 #define LEFT_BUMP 01 // 0b01
 #define RIGHT_BUMP 02 // 0b10
-#define BOTH_BUMP 03 // 0b11
+#define BOTH_BUMP 03 // 0b11`
 
 
 /*******************************************************************************

@@ -143,22 +143,6 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
             }
             ThisEvent = RunWallHug(ThisEvent);
             if (ThisEvent.EventType == FOUND_TRACK_WIRE) {
-                nextState = Park;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                //state exit
-                ;
-            }
-            break;
-        case Park:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                StartPark;
-            }
-            ThisEvent = RunPark(ThisEvent);
-            if (ThisEvent.EventType == IS_PARALLEL) {
                 nextState = FindHole;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
@@ -168,6 +152,22 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 ;
             }
             break;
+//        case Park:
+//            if (ThisEvent.EventType == ES_ENTRY) {
+//                //state entry
+//                StartPark;
+//            }
+//            ThisEvent = RunPark(ThisEvent);
+//            if (ThisEvent.EventType == IS_PARALLEL) {
+//                nextState = FindHole;
+//                makeTransition = TRUE;
+//                ThisEvent.EventType = ES_NO_EVENT;
+//            }
+//            if (ThisEvent.EventType == ES_EXIT) {
+//                //state exit
+//                ;
+//            }
+//            break;
         case FindHole:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
