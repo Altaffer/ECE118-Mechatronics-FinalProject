@@ -34,8 +34,8 @@
 #define LTANK_R 80
 #define RTANK_L 80
 #define RTANK_R -80
-#define LTANK_L_SLOW -70     // tank turns
-#define LTANK_R_SLOW 70
+#define LTANK_L_SLOW -65     // tank turns
+#define LTANK_R_SLOW 65
 
 #define LPIVOT_L 0      // pivot turns
 #define LPIVOT_R 80

@@ -124,6 +124,7 @@ uint8_t InitTopLevel(uint8_t Priority) {
 //    InitWallHug();
     InitAlignSubHSM();
     InitScanForBeacon();
+    InitFindNewCorner();
 //    InitFindHole();
     // post the initial transition event
     if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE) {
@@ -178,7 +179,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                 // Initialize all sub-state machines
                 //            InitTemplateSubHSM();
                 // now put the machine into the actual initial state
-                nextState = ScanForBeacon;
+                nextState = FindNewCorner;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 ;
@@ -247,6 +248,9 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
         {
             // As a case to get a new perspective, this state should change position to the nreturn to Scan for Beacon
             // Enter Find new corner sub state machine
+            if (ThisEvent.EventType == ES_ENTRY) {
+                StartFindNewCorner = 1;
+            }
             ThisEvent = RunFindNewCorner(ThisEvent);
             switch (ThisEvent.EventType) {
                 case FOUND_NEW_CORNER:

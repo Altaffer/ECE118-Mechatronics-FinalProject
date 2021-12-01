@@ -23,7 +23,7 @@
 //#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
 
 //define for TattleTale
-#define USE_TATTLETALE
+//#define USE_TATTLETALE
 
 //uncomment to supress the entry and exit events
 //#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
@@ -42,7 +42,7 @@
 #define MotionTimer 15
 
 #define TIMER_90 750
-#define BOT_MIDDLE_TIME 650
+#define BOT_MIDDLE_TIME 400
 #define BUMPER_TIME 100
 #define TIMER_360 (TIMER_90 * 4)
 
@@ -55,7 +55,8 @@
 #define WALL_HUG_CORNER_TIME 1000
 #define CORNER_ALIGN_TIME 100
 #define ABRUPT_TURN_TIME 500
-#define ALIGN_RIGHT_TIME 2000
+#define ALIGN_RIGHT_TIME 500
+#define FIND_NEW_CORNER_EXP_TIME 300 //they should use the same time
 #define READJUST_SHAKE_TIME 300
 
 #define SCAN_TURN_TIME (TIMER_360) //360 degrees

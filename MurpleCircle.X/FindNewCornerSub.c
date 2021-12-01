@@ -24,16 +24,18 @@
 
 typedef enum {
     InitPSubState,
+    NoSubService,
     MoveForward,
     TankTurn,
     AlignRight,
     AlignLeft,
     CornerTurn,
     Sweep,
-} AlignSubHSMState_t;
+} SubHSMState_t;
 
 static const char *StateNames[] = {
     "InitPSubState",
+    "NoSubService",
     "MoveForward",
     "TankTurn",
     "AlignRight",
@@ -140,7 +142,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
         case TankTurn:
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                    turnBot(LTANK_L, LTANK_R);
+                    turnBot(LTANK_L_SLOW, LTANK_R_SLOW);
 
                     //ES_Timer_InitTimer(MotionTimer, TIMER_90);//time based, not used
                     break;
@@ -194,12 +196,12 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             default:
-                                if (ThisEvent.EventType & F_LEFT_TAPE) {
+                                if (ThisEvent.EventType & F_LEFT_TAPE && ThisEvent.EventType & !F_CENTER_TAPE) {
                                     nextState = AlignLeft;
                                     makeTransition = TRUE;
                                     ThisEvent.EventType = ES_NO_EVENT;
                                 }
-                                if (ThisEvent.EventType & F_RIGHT_TAPE) {
+                                if (ThisEvent.EventType & F_RIGHT_TAPE && ThisEvent.EventType & !F_CENTER_TAPE) {
                                     nextState = AlignRight;
                                     makeTransition = TRUE;
                                     ThisEvent.EventType = ES_NO_EVENT;
@@ -226,6 +228,11 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                     break;
                 case MOTION_TIMER_EXP:
                     turnBot(-10, LPIVOT_R);
+                    ES_Timer_InitTimer(TurnTimer, FIND_NEW_CORNER_EXP_TIME);
+                    break;
+                case TURN_TIMER_EXP:
+                    turnBot(LTANK_L_SLOW, LTANK_R_SLOW);
+                    while(1);
                     break;
                 case BOT_BT_CHANGED:
                     if (ThisEvent.EventParam & (F_CENTER_TAPE)) {
@@ -237,6 +244,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                     }
                     break;
                 case ES_EXIT:
+                    ES_Timer_StopTimer(TurnTimer);
                     ES_Timer_StopTimer(MotionTimer);
                     stop();
                     break;

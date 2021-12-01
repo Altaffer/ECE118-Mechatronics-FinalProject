@@ -231,12 +231,12 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             default:
-                                if (ThisEvent.EventType & F_LEFT_TAPE) {
+                                if (ThisEvent.EventType & F_LEFT_TAPE && ThisEvent.EventType & !F_CENTER_TAPE) {
                                     nextState = AlignLeft;
                                     makeTransition = TRUE;
                                     ThisEvent.EventType = ES_NO_EVENT;
                                 }
-                                if (ThisEvent.EventType & F_RIGHT_TAPE) {
+                                if (ThisEvent.EventType & F_RIGHT_TAPE && ThisEvent.EventType & !F_CENTER_TAPE) {
                                     nextState = AlignRight;
                                     makeTransition = TRUE;
                                     ThisEvent.EventType = ES_NO_EVENT;
