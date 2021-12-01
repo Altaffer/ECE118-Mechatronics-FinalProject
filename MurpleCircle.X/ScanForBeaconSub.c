@@ -140,13 +140,16 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
                     break;
                 case FOUND_BEACON:
                     stop();
-                    nextState = FindPing;
+                    //nextState = FindPing;
+                    nextState = NoSubService;
                     makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
+                    ThisEvent.EventType = FOUND_BEACON;
                     break;
                 case MOTION_TIMER_EXP:
+                    break;//DELETE THIS-TEST ONLY
                     if (min_elapse_time == 999) {
                         //if no tower is found
+                        stop();
                         nextState = NoSubService;
                         makeTransition = TRUE;
                         ThisEvent.EventType = NO_SIGNAL;
@@ -183,6 +186,9 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
                         //is done scanning, now go forward
                         nextState = NoSubService;
                         makeTransition = TRUE;
+                        // Emma 11/30 - we may need to make a new event for this
+                        // that is something like SCAN_COMPLETE or change implementation
+                        // FOUND_PING event is not being absorbed
                         ThisEvent.EventType = FOUND_BEACON; //pass up to top
                     } else {
                         nextState = Reverse;

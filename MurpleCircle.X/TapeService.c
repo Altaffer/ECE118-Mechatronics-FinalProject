@@ -45,7 +45,7 @@ uint8_t InitTapeService(uint8_t Priority)
     ES_Event ThisEvent;
 
     MyPriority = Priority;
-    printf("tape init\r\n");
+//    printf("tape init\r\n");
     // in here you write your initialization code
     // this includes all hardware and software initialization
     // that needs to occur.

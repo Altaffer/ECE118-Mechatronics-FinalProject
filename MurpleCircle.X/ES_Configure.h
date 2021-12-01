@@ -23,7 +23,7 @@
 //#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
 
 //define for TattleTale
-//#define USE_TATTLETALE
+#define USE_TATTLETALE
 
 //uncomment to supress the entry and exit events
 //#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
@@ -41,10 +41,10 @@
 //#define SpinTimer 6
 #define MotionTimer 15
 
-#define TIMER_90 250
+#define TIMER_90 750
 #define BOT_MIDDLE_TIME 650
 #define BUMPER_TIME 100
-#define TIMER_360 (TIMER_90*4)
+#define TIMER_360 (TIMER_90 * 4)
 
 #define TW_UPPER_BOUND 500//TW = Track Wire
 #define TW_LOWER_BOUND 200
@@ -56,9 +56,9 @@
 #define CORNER_ALIGN_TIME 100
 #define ABRUPT_TURN_TIME 500
 #define ALIGN_RIGHT_TIME 2000
-#define READJUST_SHAKE_TIME 1000
+#define READJUST_SHAKE_TIME 300
 
-#define SCAN_TURN_TIME (TIMER_90*4) //360 degrees
+#define SCAN_TURN_TIME (TIMER_360) //360 degrees
 
 #define SCAN_THRESHOLD 20
 
@@ -112,13 +112,13 @@ typedef enum {
     //Tower events
     BALLSHOT,
     LOADED,
-    FOUND_BEACON,
+    FOUND_BEACON, 
     LOST_BEACON,
     FOUND_TRACK_WIRE,
     LOST_TRACK_WIRE, //just in case
     FOUND_TOWER,
     TOWER_DONE,
-            FOUND_HOLE,
+    FOUND_HOLE,
     IS_PARALLEL,
 
     //Bot Events
@@ -202,7 +202,7 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  PingEventChecker, TapeSensorEventChecker
+#define EVENT_CHECK_LIST  PingEventChecker, TapeSensorEventChecker, BeaconEventChecker
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the

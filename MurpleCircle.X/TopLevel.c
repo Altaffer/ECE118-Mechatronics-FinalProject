@@ -44,6 +44,10 @@
 #include "NavTowerSub.h"
 #include "NavFieldsub.h"//#include all sub state machines called
 #include "AlignSubHSM.h"
+#include "WallHugSubHSM.h"
+#include "ScanForBeaconSub.h"
+#include "ParkSub.h"
+#include "NavTower_FindHole.h"
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
  ******************************************************************************/
@@ -96,6 +100,7 @@ extern uint8_t StartWallHug;
 extern uint8_t StartNavTower;
 extern uint8_t StartAlign_boarder;
 extern uint8_t StartAlign_center;
+extern uint8_t StartFindNewCorner;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -115,6 +120,11 @@ uint8_t InitTopLevel(uint8_t Priority) {
     MyPriority = Priority;
     // put us into the Initial PseudoState
     CurrentState = InitPState;
+//    InitPark();
+//    InitWallHug();
+    InitAlignSubHSM();
+    InitScanForBeacon();
+//    InitFindHole();
     // post the initial transition event
     if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE) {
         return TRUE;

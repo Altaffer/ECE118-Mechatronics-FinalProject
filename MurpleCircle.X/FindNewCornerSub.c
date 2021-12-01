@@ -24,18 +24,22 @@
 
 typedef enum {
     InitPSubState,
-    NoSubService,
-    Find1,
-    Turn,
-    Find2
-} SubHSMState_t;
+    MoveForward,
+    TankTurn,
+    AlignRight,
+    AlignLeft,
+    CornerTurn,
+    Sweep,
+} AlignSubHSMState_t;
 
 static const char *StateNames[] = {
     "InitPSubState",
-    "NoSubService",
-    "Find1",
-    "Turn",
-    "Find2"
+    "MoveForward",
+    "TankTurn",
+    "AlignRight",
+    "AlignLeft",
+    "CornerTurn",
+    "Sweep",
 };
 
 
@@ -57,6 +61,14 @@ static const char *StateNames[] = {
  * The type of state variable should match that of enum in header file. */
 
 static SubHSMState_t CurrentState = InitPSubState; // initial state
+#define TIMER_1_TICKS 250
+#define JIG_TIMER_TICKS 5000
+#define F_CENTER_TAPE 0b000001
+#define F_LEFT_TAPE 0b000010
+#define F_RIGHT_TAPE 0b000100
+#define B_CENTER_TAPE 0b001000
+uint8_t StartFindNewCorner;
+uint8_t TankTurnFlag;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -77,6 +89,7 @@ uint8_t InitFindNewCorner(void) {
     CurrentState = InitPSubState;
     returnEvent = RunFindNewCorner(INIT_EVENT);
     StartFindNewCorner = 0;
+    TankTurnFlag = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -103,6 +116,9 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
     SubHSMState_t nextState;
 
     ES_Tattle(); // trace call stack
+    if (StartFindNewCorner) {
+        CurrentState = 1;
+    }
 
     switch (CurrentState) {
         case InitPSubState: // If current state is initial Psedudo State
@@ -116,70 +132,209 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
         case NoSubService: /* After initialzing or executing, it sits here for the next 
                               time it gets called. */
             if (StartFindNewCorner) {//when starting
-                nextState = Find1;
+                nextState = MoveForward;
                 makeTransition = TRUE;
                 StartFindNewCorner = 0;
             }
             break;
-        case Find1: // Finds the first corner in the rotation
-            if (ThisEvent.EventType == ES_ENTRY) {
-                // Go Forward
-                goForward();
-            }
-            // If left and middle BT sensors detected 
-            if (Robot_ReadTapeSensors() == (0b0001 + 0b0010 + 0b1000)) {
-                nextState = Turn;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                // Stop the Robot
-                stop();
+        case TankTurn:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    turnBot(LTANK_L, LTANK_R);
+
+                    //ES_Timer_InitTimer(MotionTimer, TIMER_90);//time based, not used
+                    break;
+                case BOT_BT_CHANGED:
+                    if ((ThisEvent.EventParam & F_CENTER_TAPE)) {
+                        nextState = MoveForward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        goForward();
+                    }
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    stop();
+                    break;
             }
             break;
+        case MoveForward:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    goForward();
+                    break;
+                case MOTION_TIMER_EXP:
+                    if (TankTurnFlag == 0) {
+                        nextState = TankTurn;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        TankTurnFlag = 1;
+                    }
+                    break;
+                case BOT_BT_CHANGED:
+                    if ((TankTurnFlag == 0) &&
+                            (ThisEvent.EventParam & F_CENTER_TAPE)) {
+                        ES_Timer_InitTimer(MotionTimer, BOT_MIDDLE_TIME);
+                        break;
+                    } else if ((TankTurnFlag == 1) && ThisEvent.EventParam & F_CENTER_TAPE) {
+                        goForward();
+                        break;
+                    } else if ((TankTurnFlag == 1)) {
+                        switch (ThisEvent.EventParam) {
+                            case (F_RIGHT_TAPE | B_CENTER_TAPE):
+                            case (F_RIGHT_TAPE):
+                                nextState = AlignRight;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            case (F_LEFT_TAPE | B_CENTER_TAPE):
+                            case (F_LEFT_TAPE):
+                                nextState = AlignLeft;
+                                makeTransition = TRUE;
+                                ThisEvent.EventType = ES_NO_EVENT;
+                                break;
+                            default:
+                                if (ThisEvent.EventType & F_LEFT_TAPE) {
+                                    nextState = AlignLeft;
+                                    makeTransition = TRUE;
+                                    ThisEvent.EventType = ES_NO_EVENT;
+                                }
+                                if (ThisEvent.EventType & F_RIGHT_TAPE) {
+                                    nextState = AlignRight;
+                                    makeTransition = TRUE;
+                                    ThisEvent.EventType = ES_NO_EVENT;
+                                }
+                                break;
+                        }
+                    }
 
-        case Turn: // Turn 90 deg 
-            if (ThisEvent.EventType == ES_ENTRY) {
-                // Spins 90 until timer ends
-                ES_Timer_InitTimer(MotionTimer, TIMER_90);
-                turnBot(LPIVOT_L, LPIVOT_R);
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    stop();
+                    break;
+                case ES_NO_EVENT:
+                default: // all unhandled events pass the event back up to the next level
+                    break;
             }
-
-            if (ThisEvent.EventType == ES_TIMEOUT) {
-                // timer end transition to find2
-                if (ThisEvent.EventParam == MotionTimer) {
-                    nextState = Find2;
+            break;
+        case AlignLeft:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    turnBot(LGRAD_L, LGRAD_R);
+                    ES_Timer_InitTimer(MotionTimer, ABRUPT_TURN_TIME);
+                    break;
+                case MOTION_TIMER_EXP:
+                    turnBot(-10, LPIVOT_R);
+                    break;
+                case BOT_BT_CHANGED:
+                    if (ThisEvent.EventParam & (F_CENTER_TAPE)) {
+                        nextState = MoveForward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                        ES_Timer_StopTimer(MotionTimer);
+                        stop();
+                    }
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    stop();
+                    break;
+            }
+            break;
+        case AlignRight:
+            switch (ThisEvent.EventType) {
+                case ES_ENTRY:
+                    turnBot(RGRAD_L, RGRAD_R);
+                    ES_Timer_InitTimer(MotionTimer, ALIGN_RIGHT_TIME);
+                    // if you cannot find the tape in a few seconds
+                    // you are in the middle
+                    break;
+                case BOT_BT_CHANGED:
+                    if (ThisEvent.EventParam & (F_CENTER_TAPE)) {
+                        nextState = MoveForward;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
+                case MOTION_TIMER_EXP:
+                    goForward(); //go away from the center
+                    nextState = MoveForward;
+                    TankTurnFlag = 0;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
-                }
-            }
 
-            if (ThisEvent.EventType == ES_EXIT) {
-                // stops the robot before exit
-                stop();
-            }
-
-            break;
-
-        case Find2: // Finds the second corner in the rotation
-            if (ThisEvent.EventType == ES_ENTRY) {
-                // Go Forward
-                goForward();
-
-            }
-            if (Robot_ReadTapeSensors() == (0b0001 + 0b0010 + 0b1000)) {
-                nextState = Turn;
-                makeTransition = TRUE;
-                ThisEvent.EventType = ES_NO_EVENT;
-            }
-            if (ThisEvent.EventType == ES_EXIT) {
-                // Stop the Robot
-                stop();
-                ThisEvent.EventType = FOUND_NEW_CORNER;
-                ThisEvent.EventParam = 1;
-                PostTopLevel(ThisEvent);
+                    break;
+                case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    stop();
+                    break;
             }
             break;
+            /* In the CornerTurn:
+             * 1. Go forward a bit until the center of the bot is at the corner
+             * 2. Tank turn ccw 90 degrees
+             * 3. Go back to go forward
+             */
+            //        case Find1: // Finds the first corner in the rotation
+            //            if (ThisEvent.EventType == ES_ENTRY) {
+            //                // Go Forward
+            //                goForward();
+            //            }
+            //            // If left and middle BT sensors detected 
+            //            if (Robot_ReadTapeSensors() == (0b0001 + 0b0010 + 0b1000)) {
+            //                nextState = Turn;
+            //                makeTransition = TRUE;
+            //                ThisEvent.EventType = ES_NO_EVENT;
+            //            }
+            //            if (ThisEvent.EventType == ES_EXIT) {
+            //                // Stop the Robot
+            //                stop();
+            //            }
+            //            break;
+            //
+            //        case Turn: // Turn 90 deg 
+            //            if (ThisEvent.EventType == ES_ENTRY) {
+            //                // Spins 90 until timer ends
+            //                ES_Timer_InitTimer(MotionTimer, TIMER_90);
+            //                turnBot(LPIVOT_L, LPIVOT_R);
+            //            }
+            //
+            //            if (ThisEvent.EventType == ES_TIMEOUT) {
+            //                // timer end transition to find2
+            //                if (ThisEvent.EventParam == MotionTimer) {
+            //                    nextState = Find2;
+            //                    makeTransition = TRUE;
+            //                    ThisEvent.EventType = ES_NO_EVENT;
+            //                }
+            //            }
+            //
+            //            if (ThisEvent.EventType == ES_EXIT) {
+            //                // stops the robot before exit
+            //                stop();
+            //            }
+            //
+            //            break;
+            //
+            //        case Find2: // Finds the second corner in the rotation
+            //            if (ThisEvent.EventType == ES_ENTRY) {
+            //                // Go Forward
+            //                goForward();
+            //
+            //            }
+            //            if (Robot_ReadTapeSensors() == (0b0001 + 0b0010 + 0b1000)) {
+            //                nextState = Turn;
+            //                makeTransition = TRUE;
+            //                ThisEvent.EventType = ES_NO_EVENT;
+            //            }
+            //            if (ThisEvent.EventType == ES_EXIT) {
+            //                // Stop the Robot
+            //                stop();
+            //                ThisEvent.EventType = FOUND_NEW_CORNER;
+            //                ThisEvent.EventParam = 1;
+            //                PostTopLevel(ThisEvent);
+            //            }
+            //            break;
 
         default: // all unhandled events fall into here
             break;

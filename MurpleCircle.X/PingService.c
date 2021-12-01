@@ -43,7 +43,7 @@ uint8_t InitPingService(uint8_t Priority)
     ES_Event ThisEvent;
 
     MyPriority = Priority;
-    printf("ping init\r\n");
+//    printf("ping init\r\n");
     // in here you write your initialization code
     // this includes all hardware and software initialization
     // that needs to occur.

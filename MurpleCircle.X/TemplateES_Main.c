@@ -69,7 +69,7 @@ void main(void) {
 
 
 
-    printf("Test Main Started\r\n");
+//    printf("Test Main Started\r\n");
 
 
     // Your hardware initialization function calls go here
