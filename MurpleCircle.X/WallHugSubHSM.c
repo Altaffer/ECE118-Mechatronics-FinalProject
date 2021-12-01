@@ -144,6 +144,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 StartWallHug = 0;
+                ES_Timer_InitTimer(TurnTimer, WALL_HUG_END_TIME);
             }
             break;
         case Driving: // in the first state, replace this with appropriate state
@@ -159,22 +160,28 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                     break;
                 case MOTION_TIMER_EXP:
                     nextState = Driving2;
-                    robot_forward_2(); //at a larger angle
+
                     //ES_Timer_InitTimer(MotionTimer, WALL_HUG_FORWARD_TIME*4);
                     ThisEvent.EventType = ES_NO_EVENT;
                     makeTransition = TRUE;
                     break;
                     //only at the second driving state will it rely on the tape
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam == F_CENTER_TAPE) {
+                    if (ThisEvent.EventParam & F_CENTER_TAPE) {
                         nextState = NoSubService;
                         makeTransition = TRUE;
                         break;
                     }
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
+                case TURN_TIMER_EXP:
+                    nextState = NoSubService;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = TOWER_DONE;
+                    break;
                 case ES_EXIT:
                     ES_Timer_StopTimer(MotionTimer);
+                    stop();
                     break;
                 default:
                     break;
@@ -185,6 +192,8 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     CornerFlag = 0;
+                    robot_forward_2(); //at a larger angle
+                    break;
                 case BUMP_EVENT:
                     nextState = Reversing;
                     ThisEvent.EventType = ES_NO_EVENT;
@@ -194,12 +203,20 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                     CornerFlag = 1;
                     break;
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam == F_CENTER_TAPE) {
+                    if (ThisEvent.EventParam & F_CENTER_TAPE) {
                         nextState = NoSubService;
                         makeTransition = TRUE;
                         break;
                     }
                     ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case TURN_TIMER_EXP:
+                    nextState = NoSubService;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = TOWER_DONE;
+                    break;
+                case ES_EXIT:
+                    stop();
                     break;
                 default:
                     break;
@@ -228,6 +245,11 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                     ThisEvent.EventType = ES_NO_EVENT;
                     //                nextState = NoSubService;
                     //                makeTransition = TRUE;
+                    break;
+                case TURN_TIMER_EXP:
+                    nextState = NoSubService;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = TOWER_DONE;
                     break;
                 case ES_EXIT:
                     ES_Timer_StopTimer(MotionTimer);
@@ -260,14 +282,14 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
 uint8_t robot_reverse(void) {
     //printf("FL hit, reverse a bit\r\n");
     Robot_LeftMtrSpeed(-80);
-    Robot_RightMtrSpeed(20);
+    Robot_RightMtrSpeed(40);
     return 0;
 }
 
 uint8_t robot_forward(void) {
     //printf("Robot going forward\r\n");
-    Robot_LeftMtrSpeed(80);
-    Robot_RightMtrSpeed(80);
+    Robot_LeftMtrSpeed(70);
+    Robot_RightMtrSpeed(60);
     return 0;
 }
 
@@ -281,6 +303,7 @@ uint8_t robot_stop(void) {
 uint8_t robot_forward_2(void) {
     //printf("forward2/r/n");
     Robot_LeftMtrSpeed(80);
-    Robot_RightMtrSpeed(30);
+    Robot_RightMtrSpeed(-40);
+    return 0;
 }
 

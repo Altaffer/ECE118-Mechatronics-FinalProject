@@ -146,20 +146,23 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
                     ThisEvent.EventType = FOUND_BEACON;
                     break;
                 case MOTION_TIMER_EXP:
-                    break;//DELETE THIS-TEST ONLY
-                    if (min_elapse_time == 999) {
-                        //if no tower is found
-                        stop();
-                        nextState = NoSubService;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = NO_SIGNAL;
-                        break;
-                    } else {
-                        nextState = Reverse;
-                        makeTransition = TRUE;
-                        CW_Turn();
-                        ThisEvent.EventType = ES_NO_EVENT;
-                    }
+                    //break;//DELETE THIS-TEST ONLY
+                    nextState = NoSubService;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = NO_SIGNAL;
+                    //                    if (min_elapse_time == 999) {
+                    //                        //if no tower is found
+                    //                        stop();
+                    //                        nextState = NoSubService;
+                    //                        makeTransition = TRUE;
+                    //                        ThisEvent.EventType = NO_SIGNAL;
+                    //                        break;
+                    //                    } else {
+                    //                        nextState = Reverse;
+                    //                        makeTransition = TRUE;
+                    //                        CW_Turn();
+                    //                        ThisEvent.EventType = ES_NO_EVENT;
+                    //                    }
 
                     // do we need to consider the case that this expires in the
                     // find ping state? (maybe no)
@@ -170,56 +173,56 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
                     break;
             }
             break;
-        case FindPing:
-            if (ThisEvent.EventType == FOUND_PING) { // what if we don't find ping??
-                if (curr_status == TURNING) {
-                    if (min_elapse_time > ThisEvent.EventParam) {
-                        min_elapse_time = ThisEvent.EventParam;
-                    }
-                    nextState = Turn; // 
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                } else if (curr_status == REVERSING) {
-
-                    if (ThisEvent.EventParam < min_elapse_time + SCAN_THRESHOLD
-                            || ThisEvent.EventParam > min_elapse_time - SCAN_THRESHOLD) {
-                        //is done scanning, now go forward
-                        nextState = NoSubService;
-                        makeTransition = TRUE;
-                        // Emma 11/30 - we may need to make a new event for this
-                        // that is something like SCAN_COMPLETE or change implementation
-                        // FOUND_PING event is not being absorbed
-                        ThisEvent.EventType = FOUND_BEACON; //pass up to top
-                    } else {
-                        nextState = Reverse;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                    }
-                }
-                //counters may not be the best way
-                //                    tower_counter = 0;
-                //                } else {
-                //                    tower_counter++;
-                //                }
-            }
-            break;
-        case Reverse:
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    CW_Turn();
-                    curr_status = REVERSING;
-                    break;
-                case FOUND_BEACON:
-                    nextState = FindPing;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case ES_EXIT:
-                    ES_Timer_StopTimer(MotionTimer);
-                default:
-                    break;
-            }
-            break;
+//        case FindPing:
+//            if (ThisEvent.EventType == FOUND_PING) { // what if we don't find ping??
+//                if (curr_status == TURNING) {
+//                    if (min_elapse_time > ThisEvent.EventParam) {
+//                        min_elapse_time = ThisEvent.EventParam;
+//                    }
+//                    nextState = Turn; // 
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//                } else if (curr_status == REVERSING) {
+//
+//                    if (ThisEvent.EventParam < min_elapse_time + SCAN_THRESHOLD
+//                            || ThisEvent.EventParam > min_elapse_time - SCAN_THRESHOLD) {
+//                        //is done scanning, now go forward
+//                        nextState = NoSubService;
+//                        makeTransition = TRUE;
+//                        // Emma 11/30 - we may need to make a new event for this
+//                        // that is something like SCAN_COMPLETE or change implementation
+//                        // FOUND_PING event is not being absorbed
+//                        ThisEvent.EventType = FOUND_BEACON; //pass up to top
+//                    } else {
+//                        nextState = Reverse;
+//                        makeTransition = TRUE;
+//                        ThisEvent.EventType = ES_NO_EVENT;
+//                    }
+//                }
+//                //counters may not be the best way
+//                //                    tower_counter = 0;
+//                //                } else {
+//                //                    tower_counter++;
+//                //                }
+//            }
+//            break;
+//        case Reverse:
+//            switch (ThisEvent.EventType) {
+//                case ES_ENTRY:
+//                    CW_Turn();
+//                    curr_status = REVERSING;
+//                    break;
+//                case FOUND_BEACON:
+//                    nextState = FindPing;
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//                    break;
+//                case ES_EXIT:
+//                    ES_Timer_StopTimer(MotionTimer);
+//                default:
+//                    break;
+//            }
+//            break;
 
         default: // all unhandled events fall into here
             break;

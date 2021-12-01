@@ -71,6 +71,7 @@ static SubHSMState_t CurrentState = InitPSubState; // initial state
 #define B_CENTER_TAPE 0b001000
 uint8_t StartFindNewCorner;
 uint8_t TankTurnFlag;
+uint8_t TwoCornersCounter;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -92,6 +93,7 @@ uint8_t InitFindNewCorner(void) {
     returnEvent = RunFindNewCorner(INIT_EVENT);
     StartFindNewCorner = 0;
     TankTurnFlag = 0;
+    TwoCornersCounter = 0;
     if (returnEvent.EventType == ES_NO_EVENT) {
         return TRUE;
     }
@@ -137,6 +139,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 nextState = MoveForward;
                 makeTransition = TRUE;
                 StartFindNewCorner = 0;
+                TwoCornersCounter = 0;
             }
             break;
         case TankTurn:
@@ -231,8 +234,10 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                     ES_Timer_InitTimer(TurnTimer, FIND_NEW_CORNER_EXP_TIME);
                     break;
                 case TURN_TIMER_EXP:
-                    turnBot(LTANK_L_SLOW, LTANK_R_SLOW);
-                    while(1);
+                    if (TwoCornersCounter++ > 0){
+                        TwoCornersCounter = 0;
+                        ThisEvent.EventType = FOUND_NEW_CORNER;
+                    } 
                     break;
                 case BOT_BT_CHANGED:
                     if (ThisEvent.EventParam & (F_CENTER_TAPE)) {

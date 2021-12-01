@@ -146,6 +146,10 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 nextState = FindHole;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
+            } else if (ThisEvent.EventType == BOT_BT_CHANGED) {
+                nextState = NoSubService;
+                makeTransition = TRUE;
+                ThisEvent.EventType = TOWER_DONE;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit

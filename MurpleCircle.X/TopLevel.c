@@ -67,6 +67,7 @@ typedef enum {
     NavTower,
     NavField,
             AlignCenter,
+            WallHug,//testing
 } TemplateHSMState_t;
 
 static const char *StateNames[] = {
@@ -79,6 +80,7 @@ static const char *StateNames[] = {
     "NavTower",
     "NavField",
     "AlignCenter",
+    "WallHug",
 };
 
 /*******************************************************************************
@@ -121,7 +123,7 @@ uint8_t InitTopLevel(uint8_t Priority) {
     // put us into the Initial PseudoState
     CurrentState = InitPState;
 //    InitPark();
-//    InitWallHug();
+    InitWallHug();
     InitAlignSubHSM();
     InitScanForBeacon();
     InitFindNewCorner();
@@ -179,7 +181,8 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                 // Initialize all sub-state machines
                 //            InitTemplateSubHSM();
                 // now put the machine into the actual initial state
-                nextState = FindNewCorner;
+                //nextState = WallHug;
+                nextState = ScanForBeacon;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 ;
@@ -205,7 +208,13 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
 //            }
 //        }
 //            break;
-
+//        case WallHug:
+//            //testing only. Remove the entire state
+//            if (ThisEvent.EventType == ES_ENTRY) {
+//                StartWallHug = 1;
+//            }
+//            ThisEvent = RunWallHug(ThisEvent);
+//            break;
             //we can just start here, because we know we are at a corner
         case ScanForBeacon: //
         {
@@ -220,18 +229,21 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                     //Entry state
                     break;
                 case NO_SIGNAL:
+                    nextState = FindNewCorner;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
                     // make transition to find a new corner
-                    if (Tower_Found == 0) {
-                        // case before tower is found to initially find a tower from a corner
-                        nextState = FindNewCorner;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                    } else if (Tower_Found > 0) {
-                        // case before tower is found to initially find a tower from a corner
-                        nextState = NavField;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                    }
+//                    if (Tower_Found == 0) {
+//                        // case before tower is found to initially find a tower from a corner
+//                        nextState = FindNewCorner;
+//                        makeTransition = TRUE;
+//                        ThisEvent.EventType = ES_NO_EVENT;
+//                    } else if (Tower_Found > 0) {
+//                        // case before tower is found to initially find a tower from a corner
+//                        nextState = NavField;
+//                        makeTransition = TRUE;
+//                        ThisEvent.EventType = ES_NO_EVENT;
+//                    }
                     break;
                 case FOUND_BEACON:
                     // make transition to move toward the beacon
@@ -256,6 +268,11 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                 case FOUND_NEW_CORNER:
                     // make transition to scan for beacon state
                     nextState = ScanForBeacon;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
+                case BUMP_EVENT:
+                    nextState = NavTower;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
@@ -377,29 +394,32 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
             }
         }
             break;
-        case NavField: // Find black tape to look for beacon
-        {
-            // If a new beacon isn't found after ball release, this state locates a new corner to scan again
-            // EnterNavigate Field sub state machine
-            //ThisEvent = RunNavField(ThisEvent); 
-            switch (ThisEvent.EventType) {
-                case FOUND_NEW_CORNER:
-                    // make transition to Scan for Beacon state
-                    nextState = ScanForBeacon;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case BUMP_EVENT:
-                    // make tranisiton to Navigate Tower
-                    nextState = NavTower;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case ES_NO_EVENT:
-                default:
-                    break;
-            }
-        }
+            //FOR NOW WE DON'T NEED IT
+//        case NavField: // Find black tape to look for beacon
+//        {
+//            // If a new beacon isn't found after ball release, this state locates a new corner to scan again
+//            // EnterNavigate Field sub state machine
+//            //ThisEvent = RunNavField(ThisEvent); 
+//            switch (ThisEvent.EventType) {
+//                case FOUND_NEW_CORNER:
+//                    // make transition to Scan for Beacon state
+//                    nextState = ScanForBeacon;
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//                    break;
+//                case BUMP_EVENT:
+//                    // make tranisiton to Navigate Tower
+//                    nextState = NavTower;
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//                    break;
+//                case ES_NO_EVENT:
+//                default:
+//                    break;
+//            }
+//        }
+//            break;
+        default:
             break;
 
 
