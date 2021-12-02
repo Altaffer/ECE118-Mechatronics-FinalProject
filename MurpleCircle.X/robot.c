@@ -44,7 +44,7 @@
 
 #define BEACON_PIN PORTX10_BIT
 #define BEACON_TRIS PORTX10_TRIS
-#define TRACK_WIRE_PIN AD_PORTV6
+#define TRACK_WIRE_PIN AD_PORTV8
 #define SHOOTER_SERVO RC_PORTY07
 
 #define TAPE_SENSOR_1_TRIS PORTX03_TRIS
@@ -193,7 +193,7 @@ void Robot_Init(void) {
     //while (1);
 
     //Initialize the light sensor
-    AD_AddPins(AD_PORTV6);
+    AD_AddPins(TRACK_WIRE_PIN);
     AD_Init();
     //    printf("Current pins: %d\n",AD_ActivePins());
     //    printf("Add Result: %d\n",AD_AddPins(LIGHT_SENSOR));

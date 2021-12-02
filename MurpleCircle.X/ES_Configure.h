@@ -18,12 +18,12 @@
 //#include "TopLevel.h"
 
 //defines for keyboard input
-#define USE_KEYBOARD_INPUT
+//define USE_KEYBOARD_INPUT
 //What State machine are we testing
-#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
+//#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
 
 //define for TattleTale
-#define USE_TATTLETALE
+//#define USE_TATTLETALE
 
 //uncomment to supress the entry and exit events
 //#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
@@ -61,7 +61,7 @@ typedef enum {
     /* User-defined events start here */
 
     //bumper events
-    BUMP_EVENT,
+    BUMP_EVENT,//10
     BUMPER_SERVO,
     BUMP_BACK,
 

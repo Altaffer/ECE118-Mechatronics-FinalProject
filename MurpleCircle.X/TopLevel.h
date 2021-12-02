@@ -35,11 +35,11 @@
 #define BUMPER_TIME 100
 #define TIMER_360 (TIMER_90 * 4)
 
-#define TW_UPPER_BOUND 600//TW = Track Wire
+#define TW_UPPER_BOUND 650//TW = Track Wire
 #define TW_LOWER_BOUND 400
 
 #define FINDHOLE_EXPIRE_TIME 2000//forward too much - go reverse
-#define WALL_HUG_FORWARD_TIME 300
+#define WALL_HUG_FORWARD_TIME 350
 #define WALL_HUG_REVERSE_TIME 510
 #define WALL_HUG_CORNER_TIME 1000
 #define NAV_TOWER_LEAVE_TIME 500

@@ -285,15 +285,15 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
 
 uint8_t robot_reverse(void) {
     //printf("FL hit, reverse a bit\r\n");
-    Robot_LeftMtrSpeed(-70);
-    Robot_RightMtrSpeed(60);
+    Robot_LeftMtrSpeed(-60);
+    Robot_RightMtrSpeed(0);
     return 0;
 }
 
 uint8_t robot_forward(void) {
     //printf("Robot going forward\r\n");
-    Robot_LeftMtrSpeed(50);
-    Robot_RightMtrSpeed(65);
+    Robot_LeftMtrSpeed(80);
+    Robot_RightMtrSpeed(75);
     return 0;
 }
 
@@ -306,7 +306,7 @@ uint8_t robot_stop(void) {
 
 uint8_t robot_forward_2(void) {
     //printf("forward2/r/n");
-    Robot_LeftMtrSpeed(70);
+    Robot_LeftMtrSpeed(85);
     Robot_RightMtrSpeed(-50);
     return 0;
 }

@@ -44,7 +44,7 @@ uint8_t InitBumperService(uint8_t Priority) {
     ES_Event ThisEvent;
 
     MyPriority = Priority;
-    //printf("bump init\r\n");
+    printf("bump init\r\n");
     // in here you write your initialization code
     // this includes all hardware and software initialization
     // that needs to occur.

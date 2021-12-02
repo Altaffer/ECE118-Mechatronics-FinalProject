@@ -191,7 +191,7 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 //stop();
                 StartFindHole = 1;
             }
-            RunFindHole(ThisEvent);
+            ThisEvent = RunFindHole(ThisEvent);
             if (ThisEvent.EventType == SHOOTER_BT_CHANGED) {
                 //from the ssm, this is for sure both tape on
                 nextState = ReleaseBall;

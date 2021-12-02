@@ -188,6 +188,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                 //nextState = NavTower;
                 nextState = ScanForBeacon;
                 makeTransition = TRUE;
+                //stop();
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
@@ -407,10 +408,10 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
                 case FOUND_TAPE:
-                    ES_Timer_InitTimer(MotionTimer, FIND_NEW_CORNER_EXP_TIME);
+                    ES_Timer_InitTimer(TurnTimer, FIND_NEW_CORNER_EXP_TIME);
                     turnBot(-70,-70);
                     break;
-                case MOTION_TIMER_EXP:
+                case TURN_TIMER_EXP:
                     nextState = FindNewCorner;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;

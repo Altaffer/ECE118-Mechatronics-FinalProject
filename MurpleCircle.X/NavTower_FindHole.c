@@ -29,6 +29,7 @@
 
 typedef enum {
     InitPSubState,
+            Bump,
     Reverse,
     Turn,
     Forward,
@@ -40,6 +41,7 @@ typedef enum {
 
 static const char *StateNames[] = {
     "InitPSubState",
+    "Bump",
     "Reverse",
     "Turn",
     "Forward",
@@ -132,7 +134,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
         case NoSubService: /* After initialzing or executing, it sits here for the next 
                               time it gets called. */
             if (StartFindHole) {//when there is actually an event
-                nextState = Turn;
+                nextState = Bump;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 StartFindHole = 0;
@@ -158,6 +160,31 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
 //                Robot_RightMtrSpeed(0);
 //            }
 //            break;
+        case Bump:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                //state entry
+                Robot_LeftMtrSpeed(90);
+                Robot_RightMtrSpeed(50);
+                ES_Timer_StopTimer(MotionTimer);
+            }
+            if (ThisEvent.EventType == BUMP_EVENT) {
+                ES_Timer_InitTimer(MotionTimer, 300);
+                Robot_LeftMtrSpeed(70);
+                Robot_RightMtrSpeed(68);
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
+                nextState = Turn;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                //state exit
+                ES_Timer_StopTimer(MotionTimer);
+                Robot_LeftMtrSpeed(0);
+                Robot_RightMtrSpeed(0);
+            }
+            break;
         case Turn:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
@@ -291,6 +318,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
+                ThisEvent.EventType = ES_NO_EVENT;
                 ES_Timer_StopTimer(MotionTimer);
                 Robot_LeftMtrSpeed(0);
                 Robot_RightMtrSpeed(0);
