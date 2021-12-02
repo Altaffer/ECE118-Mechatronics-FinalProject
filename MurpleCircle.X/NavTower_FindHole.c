@@ -31,6 +31,8 @@ typedef enum {
     Turn,
     Forward,
     Backwards,
+            BackTurn,
+            BackPivot,
     NoSubService
 } SubHSMState_t;
 
@@ -40,13 +42,15 @@ static const char *StateNames[] = {
     "Turn",
     "Forward",
     "Backwards",
+    "BackTurn",
+    "BackPivot",
     "NoSubService"
 };
 
 #define FIRST_TAPE 1 // 01
 #define SECOND_TAPE 2 // 10
 #define BOTH_TAPE 3 // 11
-#define BACK_BUMP 8
+#define BACK_BUMP 8 // 1000
 
 
 
@@ -110,6 +114,9 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
 
 
     ES_Tattle(); // trace call stack
+    if (StartFindHole) {
+        CurrentState = NoSubService;
+    }
 
     switch (CurrentState) {
         case InitPSubState: // If current state is initial Psedudo State
@@ -152,19 +159,59 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
         case Turn:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                Robot_LeftMtrSpeed(FIND_HOLE_REVERSE_L);
-                Robot_RightMtrSpeed(FIND_HOLE_REVERSE_R);
-//                ES_Timer_InitTimer(MotionTimer, FINDHOLE_FORWARD_TIME);
+                Robot_LeftMtrSpeed(FIND_HOLE_TURN_L);
+                Robot_RightMtrSpeed(FIND_HOLE_TURN_R);
+                ES_Timer_InitTimer(MotionTimer, FINDHOLE_TURN_TIME);
             }
-            if (ThisEvent.EventType == BUMP_EVENT &&
-                    ThisEvent.EventParam == BACK_BUMP) {
+//            if (ThisEvent.EventType == BUMP_BACK) {
+//                nextState = Forward;
+//                makeTransition = TRUE;
+//                ThisEvent.EventType = ES_NO_EVENT;
+//            }
+            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
+                nextState = BackTurn;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                //state exit
+                ES_Timer_StopTimer(MotionTimer);
+                Robot_LeftMtrSpeed(0);
+                Robot_RightMtrSpeed(0);
+            }
+            break;
+        case BackTurn:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                //state entry
+                Robot_LeftMtrSpeed(FIND_HOLE_BACK_TURN_L);
+                Robot_RightMtrSpeed(FIND_HOLE_BACK_TURN_R);
+            }
+            if (ThisEvent.EventType == BUMP_BACK) {
+                nextState = BackPivot;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == ES_EXIT) {
+                //state exit
+                Robot_LeftMtrSpeed(0);
+                Robot_RightMtrSpeed(0);
+            }
+            break;
+        case BackPivot:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                //state entry
+                Robot_LeftMtrSpeed(FIND_HOLE_BACK_PIVOT_L);
+                Robot_RightMtrSpeed(FIND_HOLE_BACK_PIVOT_R);
+                ES_Timer_InitTimer(MotionTimer, FIND_HOLE_BACK_PIVOT_TIME);
+            }
+            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
                 nextState = Forward;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
-//                ES_Timer_StopTimer(MotionTimer);
+                ES_Timer_StopTimer(MotionTimer);
                 Robot_LeftMtrSpeed(0);
                 Robot_RightMtrSpeed(0);
             }
@@ -213,7 +260,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
                 //state entry
                 Robot_LeftMtrSpeed(-60);
                 Robot_RightMtrSpeed(-60);
-                ES_Timer_InitTimer(MotionTimer, FINDHOLE_FORWARD_TIME);
+                ES_Timer_InitTimer(MotionTimer, FINDHOLE_REVERSE_TIME);
             }
             if (ThisEvent.EventType == MOTION_TIMER_EXP) {
                 nextState = Forward;

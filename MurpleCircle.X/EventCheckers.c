@@ -154,6 +154,7 @@ uint8_t TrackWireEventChecker(void) {
         //initial state: es-no-event
 
     // hysteresis bounds 
+    //printf("%d ", TrackWireInput);
     if (TrackWireInput > TW_UPPER_BOUND) {
 #ifdef DEBUG_PRINTS
         printf("TrackWire found.\r\n");

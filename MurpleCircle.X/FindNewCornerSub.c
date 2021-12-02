@@ -228,6 +228,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     turnBot(LGRAD_L, LGRAD_R);
                     ES_Timer_InitTimer(MotionTimer, ABRUPT_TURN_TIME);
+                    TwoCornersCounter = 0;
                     break;
                 case MOTION_TIMER_EXP:
                     turnBot(-10, LPIVOT_R);
@@ -262,6 +263,18 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                     ES_Timer_InitTimer(MotionTimer, ALIGN_RIGHT_TIME);
                     // if you cannot find the tape in a few seconds
                     // you are in the middle
+                    // now it's ok if it's in the middle.
+                    TwoCornersCounter = 0;
+                    break;
+                case MOTION_TIMER_EXP:
+                    turnBot(-10, LPIVOT_R);
+                    ES_Timer_InitTimer(TurnTimer, FIND_NEW_CORNER_EXP_TIME);
+                    break;
+                case TURN_TIMER_EXP:
+                    if (TwoCornersCounter++ > 0){
+                        TwoCornersCounter = 0;
+                        ThisEvent.EventType = FOUND_NEW_CORNER;
+                    } 
                     break;
                 case BOT_BT_CHANGED:
                     if (ThisEvent.EventParam & (F_CENTER_TAPE)) {
@@ -270,14 +283,14 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                         ThisEvent.EventType = ES_NO_EVENT;
                     }
                     break;
-                case MOTION_TIMER_EXP:
-                    goForward(); //go away from the center
-                    nextState = MoveForward;
-                    TankTurnFlag = 0;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-
-                    break;
+//                case MOTION_TIMER_EXP:
+//                    goForward(); //go away from the center
+//                    nextState = MoveForward;
+//                    TankTurnFlag = 0;
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//
+//                    break;
                 case ES_EXIT:
                     ES_Timer_StopTimer(MotionTimer);
                     stop();

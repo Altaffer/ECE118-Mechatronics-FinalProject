@@ -140,6 +140,7 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
                 StartWallHug = 1;
+                ES_Timer_StopTimer(MotionTimer);
             }
             ThisEvent = RunWallHug(ThisEvent);
             if (ThisEvent.EventType == FOUND_TRACK_WIRE) {
@@ -151,9 +152,9 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 makeTransition = TRUE;
                 ThisEvent.EventType = FOUND_TAPE;
             } else if (ThisEvent.EventType == FOUND_BOX) {
-                nextState = NoSubService;
+                nextState = Leave;
                 makeTransition = TRUE;
-                ThisEvent.EventType = TOWER_DONE;
+                ThisEvent.EventType = ES_NO_EVENT;
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
@@ -179,6 +180,8 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
         case FindHole:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
+                //stop();
+                StartFindHole = 1;
                 ;
             }
             RunFindHole(ThisEvent);
@@ -220,12 +223,23 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
         case Leave:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                Robot_LeftMtrSpeed(100);
-                Robot_RightMtrSpeed(100);
+                goForward();
+                ES_Timer_StopTimer(MotionTimer);
+                ES_Timer_InitTimer(MotionTimer, NAV_TOWER_LEAVE_TIME);
             }
-            nextState = NoSubService;
-            makeTransition = TRUE;
-            ThisEvent.EventType = TOWER_DONE;
+            switch (ThisEvent.EventType) {
+                case BUMP_EVENT:
+                    ES_Timer_InitTimer(MotionTimer, NAV_TOWER_LEAVE_TIME);
+                    turnBot(-80,-80);
+                    break;
+                case MOTION_TIMER_EXP:
+                    nextState = NoSubService;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = TOWER_DONE;
+                    break;
+                default:
+                    break;
+            }
             //do we really need this state?
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit

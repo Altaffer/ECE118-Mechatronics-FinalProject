@@ -20,6 +20,7 @@
 #define RIGHT 2 //0b 010
 #define BOTH 3 // 0b 011
 #define SERVO 4 //0b 100
+#define BACK 8 // 0b 1000
 
 
 
@@ -96,11 +97,15 @@ ES_Event RunBumperService(ES_Event ThisEvent) {
             if (curr_val == past_val) {
                 break;
             }
-            if (curr_val & SERVO) { //1zz
+            if (curr_val & SERVO) { //z1zz
                 ReturnEvent.EventType = BUMPER_SERVO;
                 ReturnEvent.EventParam = curr_val;
                 PostTopLevel(ReturnEvent); //can be any wrapper function
-            } else if (curr_val) {
+            } else if (curr_val & BACK) { //1zzz
+                ReturnEvent.EventType = BUMP_BACK;
+                ReturnEvent.EventParam = curr_val;
+                PostTopLevel(ReturnEvent); //can be any wrapper function
+            } else if (curr_val) {//00zz
                 ReturnEvent.EventType = BUMP_EVENT;
                 ReturnEvent.EventParam = curr_val;
                 PostTopLevel(ReturnEvent); //can be any wrapper function 

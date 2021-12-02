@@ -193,6 +193,7 @@ void Robot_Init(void) {
     //while (1);
 
     //Initialize the light sensor
+    AD_AddPins(AD_PORTV6);
     AD_Init();
     //    printf("Current pins: %d\n",AD_ActivePins());
     //    printf("Add Result: %d\n",AD_AddPins(LIGHT_SENSOR));

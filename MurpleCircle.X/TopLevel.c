@@ -68,6 +68,7 @@ typedef enum {
     NavField,
             AlignCenter,
             WallHug,//testing
+            FindHole,
 } TemplateHSMState_t;
 
 static const char *StateNames[] = {
@@ -81,6 +82,7 @@ static const char *StateNames[] = {
     "NavField",
     "AlignCenter",
     "WallHug",
+    "FindHole",
 };
 
 /*******************************************************************************
@@ -103,6 +105,7 @@ extern uint8_t StartNavTower;
 extern uint8_t StartAlign_boarder;
 extern uint8_t StartAlign_center;
 extern uint8_t StartFindNewCorner;
+extern uint8_t StartFindHole;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -123,11 +126,11 @@ uint8_t InitTopLevel(uint8_t Priority) {
     // put us into the Initial PseudoState
     CurrentState = InitPState;
 //    InitPark();
-    InitWallHug();
-    InitAlignSubHSM();
-    InitScanForBeacon();
-    InitFindNewCorner();
-//    InitFindHole();
+//    InitWallHug();
+//    InitAlignSubHSM();
+//    InitScanForBeacon();
+//    InitFindNewCorner();
+    InitFindHole();
     // post the initial transition event
     if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE) {
         return TRUE;
@@ -181,8 +184,8 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                 // Initialize all sub-state machines
                 //            InitTemplateSubHSM();
                 // now put the machine into the actual initial state
-                //nextState = WallHug;
-                nextState = ScanForBeacon;
+                nextState = FindHole;
+                //nextState = ScanForBeacon;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 ;
@@ -190,6 +193,14 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
             break;
 
             // we may not need this state
+        case FindHole:
+            if (ThisEvent.EventType == ES_ENTRY) {
+                //state entry
+                //stop();
+                StartFindHole = 1;
+            }
+            RunFindHole(ThisEvent);
+            break;
 //        case OrientBot: // Find the bot's initial position on the field by locating first corner
 //        {
 //            // Spins to the left to find Black Tape. Once tape is found follow the tap in a CCW orientation to find a corner

@@ -26,6 +26,7 @@
  ******************************************************************************/
 // speed and direction
 #define FWD_speed 75    // Straight
+//#define FWD_speed 100
 #define BCKWD_speed -75 
 #define STOP_speed 0    // stopping
 #define RIGHT_WHEEL_OFFSET 18

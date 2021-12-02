@@ -46,13 +46,14 @@
 #define BUMPER_TIME 100
 #define TIMER_360 (TIMER_90 * 4)
 
-#define TW_UPPER_BOUND 500//TW = Track Wire
-#define TW_LOWER_BOUND 200
+#define TW_UPPER_BOUND 640//TW = Track Wire
+#define TW_LOWER_BOUND 400
 
-#define FINDHOLE_EXPIRE_TIME 1000//forward too much - go reverse
+#define FINDHOLE_EXPIRE_TIME 2000//forward too much - go reverse
 #define WALL_HUG_FORWARD_TIME 300
-#define WALL_HUG_REVERSE_TIME 500
+#define WALL_HUG_REVERSE_TIME 310
 #define WALL_HUG_CORNER_TIME 1000
+#define NAV_TOWER_LEAVE_TIME 500
 #define CORNER_ALIGN_TIME 100
 #define ABRUPT_TURN_TIME 500
 #define ALIGN_RIGHT_TIME 500
@@ -64,14 +65,22 @@
 
 #define SCAN_THRESHOLD 20
 
-#define FINDHOLE_REV_TIME 1500 
-#define FIND_HOLE_REVERSE_L -80
-#define FIND_HOLE_REVERSE_R -50
+#define FINDHOLE_TURN_TIME 800 
+#define FIND_HOLE_TURN_L 70
+#define FIND_HOLE_TURN_R 100
 
-#define FINDHOLE_FORWARD_TIME 1000 
+#define FIND_HOLE_BACK_TURN_L -90
+#define FIND_HOLE_BACK_TURN_R -80
+
+#define FIND_HOLE_BACK_PIVOT_TIME 600
+#define FIND_HOLE_BACK_PIVOT_L 0
+#define FIND_HOLE_BACK_PIVOT_R -70
+
+#define FINDHOLE_FORWARD_TIME 2000 
 #define FIND_HOLE_FORWARD_L -80
 #define FIND_HOLE_FORWARD_R -50
 
+#define FINDHOLE_REVERSE_TIME 4000 
 
 
 #define USE_TAPE_SERVICE //this option disables the working one in the event checkers
@@ -93,9 +102,10 @@ typedef enum {
     //bumper events
     BUMP_EVENT,
     BUMPER_SERVO,
+    BUMP_BACK,
 
     //black tape sensors on the bottom
-    BOT_BT_CHANGED, // event #14
+    BOT_BT_CHANGED, // event #15
 
 
     //Black tape sensors on the shooter
@@ -109,12 +119,12 @@ typedef enum {
     TURN_TIMER_EXP,
     FORWARD_TIMER_EXP,
     REVERSE_TIMER_EXP,
-    MOTION_TIMER_EXP, // event #23
+    MOTION_TIMER_EXP, // event #24
 
     //Tower events
     BALLSHOT,
     LOADED,
-    FOUND_BEACON, 
+    FOUND_BEACON,
     LOST_BEACON,
     FOUND_TRACK_WIRE,
     LOST_TRACK_WIRE, //just in case
@@ -127,8 +137,8 @@ typedef enum {
     BOT_ORIENTED,
     NO_SIGNAL,
     FOUND_NEW_CORNER,
-            FOUND_BOX,
-            FOUND_TAPE,
+    FOUND_BOX,
+    FOUND_TAPE,
 
 
 
@@ -156,6 +166,7 @@ static const char *EventNames[] = {
     //bumper events
     "BUMP_EVENT",
     "BUMPER_SERVO",
+    "BUMP_BACK",
 
     //black tape sensors on the bottom
     "BOT_BT_CHANGED",
@@ -208,7 +219,7 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  PingEventChecker, TapeSensorEventChecker, BeaconEventChecker
+#define EVENT_CHECK_LIST  PingEventChecker, TapeSensorEventChecker, BeaconEventChecker, TrackWireEventChecker
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
