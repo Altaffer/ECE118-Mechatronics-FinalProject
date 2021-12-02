@@ -13,8 +13,10 @@
 #include "NavTowerSub.h"
 #include "NavTower_FindHole.h"
 #include "robot.h"
-#include "ParkSub.h"
-#include "TestTopLevel.h"
+//#include "ParkSub.h"
+//#include "TestTopLevel.h"
+#include "BumperService.h"
+#include "TapeService.h"
 
 
 #include <stdio.h>
@@ -83,7 +85,7 @@ uint8_t StartFindHole;
  * @author J. Edward Carryer, 2011.10.23 19:25 */
 uint8_t InitFindHole(void) {
     ES_Event returnEvent;
-    InitPark();
+    //InitPark();
     CurrentState = InitPSubState;
     returnEvent = RunFindHole(INIT_EVENT);
     StartFindHole = 0;
@@ -219,9 +221,9 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
         case Forward:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                Robot_LeftMtrSpeed(60);
-                Robot_RightMtrSpeed(60);
-                ES_Timer_InitTimer(MotionTimer, FINDHOLE_EXPIRE_TIME);
+                Robot_LeftMtrSpeed(FIND_HOLE_FORWARD_L);
+                Robot_RightMtrSpeed(FIND_HOLE_FORWARD_R);
+                ES_Timer_InitTimer(MotionTimer, FINDHOLE_FORWARD_TIME);
             }
             if (ThisEvent.EventType == MOTION_TIMER_EXP) {
                 nextState = Backwards;
@@ -258,8 +260,8 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
         case Backwards:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                Robot_LeftMtrSpeed(-60);
-                Robot_RightMtrSpeed(-60);
+                Robot_LeftMtrSpeed(FIND_HOLE_REVERSE_L);
+                Robot_RightMtrSpeed(FIND_HOLE_REVERSE_R);
                 ES_Timer_InitTimer(MotionTimer, FINDHOLE_REVERSE_TIME);
             }
             if (ThisEvent.EventType == MOTION_TIMER_EXP) {

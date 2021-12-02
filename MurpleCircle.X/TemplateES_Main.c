@@ -4,6 +4,8 @@
 #include "ES_Configure.h"
 #include "ES_Framework.h"
 #include "ES_Timers.h"
+#include "BumperService.h"
+#include "TapeService.h"
 
 #include <stdlib.h>
 #include "IO_Ports.h"
@@ -79,7 +81,7 @@ void main(void) {
     Robot_Init();
     ES_Timer_Init();
     TIMERS_Init();
-    RC_Init();
+    //RC_Init();
 
     //RC_AddPins(SERVO_PIN);
 #ifdef TEST_HARNESSES

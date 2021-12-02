@@ -44,7 +44,7 @@ uint8_t InitBumperService(uint8_t Priority) {
     ES_Event ThisEvent;
 
     MyPriority = Priority;
-    printf("bumper init\r\n");
+    //printf("bump init\r\n");
     // in here you write your initialization code
     // this includes all hardware and software initialization
     // that needs to occur.
@@ -89,32 +89,37 @@ ES_Event RunBumperService(ES_Event ThisEvent) {
     /********************************************
      in here you write your service code
      *******************************************/
+    static uint8_t curr_val = 0;
     static uint8_t past_val = 0;
-    uint8_t curr_val = Robot_ReadBumpers();
     switch (ThisEvent.EventType) {
         case ES_TIMEOUT:
             ES_Timer_InitTimer(BumperTimer, BUMPER_TIME);
+            curr_val = Robot_ReadBumpers();
             if (curr_val == past_val) {
                 break;
             }
+            
+            if (curr_val & BACK) { //1zzz
+                ReturnEvent.EventType = BUMP_BACK;
+                ReturnEvent.EventParam = curr_val;
+                PostTopLevel(ReturnEvent); //can be any wrapper function
+            } 
+            if ((curr_val & LEFT) || (curr_val & RIGHT) ) {//00zz
+                ReturnEvent.EventType = BUMP_EVENT;
+                ReturnEvent.EventParam = curr_val;
+                PostTopLevel(ReturnEvent); //can be any wrapper function 
+            } 
             if (curr_val & SERVO) { //z1zz
                 ReturnEvent.EventType = BUMPER_SERVO;
                 ReturnEvent.EventParam = curr_val;
                 PostTopLevel(ReturnEvent); //can be any wrapper function
-            } else if (curr_val & BACK) { //1zzz
-                ReturnEvent.EventType = BUMP_BACK;
-                ReturnEvent.EventParam = curr_val;
-                PostTopLevel(ReturnEvent); //can be any wrapper function
-            } else if (curr_val) {//00zz
-                ReturnEvent.EventType = BUMP_EVENT;
-                ReturnEvent.EventParam = curr_val;
-                PostTopLevel(ReturnEvent); //can be any wrapper function 
             }
+            past_val = curr_val;
             break;
         default:
             break;
     }
-    past_val = curr_val;
+    
 
     return ReturnEvent;
 }

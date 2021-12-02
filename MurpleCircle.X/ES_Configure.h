@@ -18,12 +18,12 @@
 //#include "TopLevel.h"
 
 //defines for keyboard input
-//#define USE_KEYBOARD_INPUT
+#define USE_KEYBOARD_INPUT
 //What State machine are we testing
-//#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
+#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
 
 //define for TattleTale
-//#define USE_TATTLETALE
+#define USE_TATTLETALE
 
 //uncomment to supress the entry and exit events
 //#define SUPPRESS_EXIT_ENTRY_IN_TATTLE
@@ -41,46 +41,7 @@
 //#define SpinTimer 6
 #define MotionTimer 15
 
-#define TIMER_90 500
-#define BOT_MIDDLE_TIME 400
-#define BUMPER_TIME 100
-#define TIMER_360 (TIMER_90 * 4)
 
-#define TW_UPPER_BOUND 640//TW = Track Wire
-#define TW_LOWER_BOUND 400
-
-#define FINDHOLE_EXPIRE_TIME 2000//forward too much - go reverse
-#define WALL_HUG_FORWARD_TIME 300
-#define WALL_HUG_REVERSE_TIME 310
-#define WALL_HUG_CORNER_TIME 1000
-#define NAV_TOWER_LEAVE_TIME 500
-#define CORNER_ALIGN_TIME 100
-#define ABRUPT_TURN_TIME 500
-#define ALIGN_RIGHT_TIME 500
-#define FIND_NEW_CORNER_EXP_TIME 300 //they should use the same time
-#define READJUST_SHAKE_TIME 300
-#define WALL_HUG_END_TIME 25000
-
-#define SCAN_TURN_TIME (TIMER_360) //360 degrees
-
-#define SCAN_THRESHOLD 20
-
-#define FINDHOLE_TURN_TIME 800 
-#define FIND_HOLE_TURN_L 70
-#define FIND_HOLE_TURN_R 100
-
-#define FIND_HOLE_BACK_TURN_L -90
-#define FIND_HOLE_BACK_TURN_R -80
-
-#define FIND_HOLE_BACK_PIVOT_TIME 600
-#define FIND_HOLE_BACK_PIVOT_L 0
-#define FIND_HOLE_BACK_PIVOT_R -70
-
-#define FINDHOLE_FORWARD_TIME 2000 
-#define FIND_HOLE_FORWARD_L -80
-#define FIND_HOLE_FORWARD_R -50
-
-#define FINDHOLE_REVERSE_TIME 4000 
 
 
 #define USE_TAPE_SERVICE //this option disables the working one in the event checkers
@@ -219,7 +180,7 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  PingEventChecker, TapeSensorEventChecker, BeaconEventChecker, TrackWireEventChecker
+#define EVENT_CHECK_LIST  TapeSensorEventChecker, BeaconEventChecker, TrackWireEventChecker
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
@@ -230,7 +191,7 @@ static const char *EventNames[] = {
 #define TIMER1_RESP_FUNC TurnTimerHelper
 #define TIMER2_RESP_FUNC TIMER_UNUSED
 #define TIMER3_RESP_FUNC TIMER_UNUSED
-#define TIMER4_RESP_FUNC PostPingService
+#define TIMER4_RESP_FUNC TIMER_UNUSED
 #define TIMER5_RESP_FUNC PostBumperService
 #ifdef USE_TAPE_SERVICE
 #define TIMER6_RESP_FUNC PostTapeService
@@ -267,7 +228,7 @@ static const char *EventNames[] = {
 /****************************************************************************/
 // This macro determines that number of services that are *actually* used in
 // a particular application. It will vary in value from 1 to MAX_NUM_SERVICES
-#define NUM_SERVICES 5//when we decide to use the tape service, change it to 
+#define NUM_SERVICES 4//when we decide to use the tape service, change it to 
 //at least 5
 
 ///****************************************************************************/
@@ -302,26 +263,26 @@ static const char *EventNames[] = {
 // These are the definitions for Service 1
 #if NUM_SERVICES > 1
 // the header file with the public fuction prototypes
-#define SERV_1_HEADER "TestTopLevel.h"
+#define SERV_1_HEADER "TopLevel.h"
 // the name of the Init function
 #define SERV_1_INIT InitTopLevel
 // the name of the run function
 #define SERV_1_RUN RunTopLevel
 // How big should this services Queue be?
-#define SERV_1_QUEUE_SIZE 9
+#define SERV_1_QUEUE_SIZE 30
 #endif
 
 /****************************************************************************/
 // These are the definitions for Service 2
 #if NUM_SERVICES > 2
 // the header file with the public fuction prototypes
-#define SERV_2_HEADER "PingService.h"
+#define SERV_2_HEADER "TapeService.h"
 // the name of the Init function
-#define SERV_2_INIT InitPingService
+#define SERV_2_INIT InitTapeService
 // the name of the run function
-#define SERV_2_RUN RunPingService
+#define SERV_2_RUN RunTapeService
 // How big should this services Queue be?
-#define SERV_2_QUEUE_SIZE 9
+#define SERV_2_QUEUE_SIZE 3
 #endif
 
 
@@ -336,18 +297,18 @@ static const char *EventNames[] = {
 // the name of the run function
 #define SERV_3_RUN RunBumperService
 // How big should this services Queue be?
-#define SERV_3_QUEUE_SIZE 9
+#define SERV_3_QUEUE_SIZE 3
 #endif
 
 /****************************************************************************/
 // These are the definitions for Service 4
 #if NUM_SERVICES > 4
 // the header file with the public fuction prototypes
-#define SERV_4_HEADER "TapeService.h"
+#define SERV_4_HEADER "PingService.h"
 // the name of the Init function
-#define SERV_4_INIT InitTapeService
+#define SERV_4_INIT InitPingService
 // the name of the run function
-#define SERV_4_RUN RunTapeService
+#define SERV_4_RUN RunPingService
 // How big should this services Queue be?
 #define SERV_4_QUEUE_SIZE 9
 #endif

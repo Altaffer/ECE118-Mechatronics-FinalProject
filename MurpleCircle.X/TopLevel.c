@@ -35,6 +35,8 @@
 #include "stdio.h"
 #include "stdlib.h"
 #include "robot.h"
+#include "BumperService.h"
+#include "TapeService.h"
 
 
 #include "OrientBotSub.h"
@@ -46,7 +48,6 @@
 #include "AlignSubHSM.h"
 #include "WallHugSubHSM.h"
 #include "ScanForBeaconSub.h"
-#include "ParkSub.h"
 #include "NavTower_FindHole.h"
 /*******************************************************************************
  * PRIVATE #DEFINES                                                            *
@@ -100,12 +101,11 @@ static const char *StateNames[] = {
 static TemplateHSMState_t CurrentState = InitPState; // <- change enum name to match ENUM
 static uint8_t MyPriority;
 extern uint8_t StartScan;
-extern uint8_t StartWallHug;
+//extern uint8_t StartWallHug;
 extern uint8_t StartNavTower;
-extern uint8_t StartAlign_boarder;
 extern uint8_t StartAlign_center;
 extern uint8_t StartFindNewCorner;
-extern uint8_t StartFindHole;
+//extern uint8_t StartFindHole;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -125,12 +125,13 @@ uint8_t InitTopLevel(uint8_t Priority) {
     MyPriority = Priority;
     // put us into the Initial PseudoState
     CurrentState = InitPState;
-//    InitPark();
-//    InitWallHug();
+    //InitPark();
+    //InitWallHug();
 //    InitAlignSubHSM();
 //    InitScanForBeacon();
 //    InitFindNewCorner();
-    InitFindHole();
+//    InitNavTower();
+    //InitFindHole();
     // post the initial transition event
     if (ES_PostToService(MyPriority, INIT_EVENT) == TRUE) {
         return TRUE;
@@ -184,23 +185,22 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                 // Initialize all sub-state machines
                 //            InitTemplateSubHSM();
                 // now put the machine into the actual initial state
-                nextState = FindHole;
-                //nextState = ScanForBeacon;
+                //nextState = NavTower;
+                nextState = ScanForBeacon;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-                ;
             }
             break;
 
             // we may not need this state
-        case FindHole:
-            if (ThisEvent.EventType == ES_ENTRY) {
-                //state entry
-                //stop();
-                StartFindHole = 1;
-            }
-            RunFindHole(ThisEvent);
-            break;
+//        case FindHole:
+//            if (ThisEvent.EventType == ES_ENTRY) {
+//                //state entry
+//                //stop();
+//                StartFindHole = 1;
+//            }
+//            RunFindHole(ThisEvent);
+//            break;
 //        case OrientBot: // Find the bot's initial position on the field by locating first corner
 //        {
 //            // Spins to the left to find Black Tape. Once tape is found follow the tap in a CCW orientation to find a corner
@@ -234,6 +234,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 StartScan = 1;
             }
+            //printf("?");
             ThisEvent = RunScanForBeacon(ThisEvent);
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
@@ -258,9 +259,11 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                     break;
                 case FOUND_BEACON:
                     // make transition to move toward the beacon
-                    nextState = ToBeacon;
+                    //nextState = ToBeacon;
+                    nextState = FindNewCorner;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
+                    break;
                 case ES_NO_EVENT:
                 default:
                     break;
@@ -271,6 +274,7 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
         {
             // As a case to get a new perspective, this state should change position to the nreturn to Scan for Beacon
             // Enter Find new corner sub state machine
+            //printf("aa");
             if (ThisEvent.EventType == ES_ENTRY) {
                 StartFindNewCorner = 1;
             }
@@ -294,39 +298,39 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
         }
             break;
 
-        case ReAdjustBot: // Re-adjust the bot in case the bot veers off course
-            //this state to be changed - HZ 11/15
-            //do we really need it tho
-        {
-            // Stops the bot mid way to the beacon to complete another partial sweep to find it again
-            // Enter re-adjust bot sub state machine
-            //ThisEvent = RunReAdjustBotSubHSM(ThisEvent);
-            switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                case TURN_TIMER_EXP:
-                    turnBot(LTANK_L, LTANK_R);
-                    ES_Timer_InitTimer(MotionTimer, READJUST_SHAKE_TIME);
-                    ES_Timer_StopTimer(TurnTimer);
-                    break;
-                case FOUND_BEACON:
-                    // make transition to scan for beacon state
-                    nextState = ToBeacon;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
-                case MOTION_TIMER_EXP:
-                    turnBot(RTANK_L, RTANK_R);
-                    ES_Timer_InitTimer(TurnTimer, READJUST_SHAKE_TIME);
-                    break;
-                case ES_EXIT:
-                    ES_Timer_StopTimer(TurnTimer);
-                    ES_Timer_StopTimer(MotionTimer);
-                    break;
-                default:
-                    break;
-            }
-        }
-            break;
+//        case ReAdjustBot: // Re-adjust the bot in case the bot veers off course
+//            //this state to be changed - HZ 11/15
+//            //do we really need it tho
+//        {
+//            // Stops the bot mid way to the beacon to complete another partial sweep to find it again
+//            // Enter re-adjust bot sub state machine
+//            //ThisEvent = RunReAdjustBotSubHSM(ThisEvent);
+//            switch (ThisEvent.EventType) {
+//                case ES_ENTRY:
+//                case TURN_TIMER_EXP:
+//                    turnBot(LTANK_L, LTANK_R);
+//                    ES_Timer_InitTimer(MotionTimer, READJUST_SHAKE_TIME);
+//                    ES_Timer_StopTimer(TurnTimer);
+//                    break;
+//                case FOUND_BEACON:
+//                    // make transition to scan for beacon state
+//                    nextState = ToBeacon;
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//                    break;
+//                case MOTION_TIMER_EXP:
+//                    turnBot(RTANK_L, RTANK_R);
+//                    ES_Timer_InitTimer(TurnTimer, READJUST_SHAKE_TIME);
+//                    break;
+//                case ES_EXIT:
+//                    ES_Timer_StopTimer(TurnTimer);
+//                    ES_Timer_StopTimer(MotionTimer);
+//                    break;
+//                default:
+//                    break;
+//            }
+//        }
+//            break;
         case ToBeacon: // Moves the bot to the beacon
         {
             // Once the clsoes beacon is located, moves the bot immediately straight
@@ -337,26 +341,29 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                     //Entry state
                     goForward();
                     break;
-                case LOST_BEACON:
-                    // make transition to re-adjust the bot
-                    nextState = ReAdjustBot;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                    break;
+//                case LOST_BEACON:
+//                    // make transition to re-adjust the bot
+//                    nextState = ReAdjustBot;
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//                    break;
                 case BUMP_EVENT:
                     // make tranisiton to navigate the tower
                     nextState = NavTower;
                     makeTransition = TRUE;
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
+
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventType == F_CENTER_TAPE) {
+                    if (ThisEvent.EventType & F_CENTER_TAPE) {
                         nextState = AlignCenter;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
                         break;
                     }
+                    break;
                 case ES_EXIT:
+                    stop();
                 default:
                     break;
             }
@@ -378,21 +385,21 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                 default:
                     break;
             }
+            break;
         case NavTower: // navigates around the tower and looks for the track wire
         {
             // Wall follows the tower. Once the track wire is detected, the bot then aligns
             // itself with the wall and looks for tape
             // Enter Navigate tower sub state machine
             //ThisEvent = RunNavTower(ThisEvent);
+            //printf("m");
             if (ThisEvent.EventType == ES_ENTRY) {
                 ES_Timer_StopTimer(MotionTimer);
                 StartNavTower = 1;
+                
             }
             ThisEvent = RunNavTower(ThisEvent);
             switch (ThisEvent.EventType) {
-                case ES_ENTRY:
-                    //Entry state
-                    break;
                 case TOWER_DONE:
                     // make transition to scan for beacon state
                     nextState = ScanForBeacon;

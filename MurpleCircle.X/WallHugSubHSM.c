@@ -11,8 +11,10 @@
 #include "BOARD.h"
 #include "TopLevel.h"
 #include "WallHugSubHSM.h"
-#include "TestTopLevel.h"
+//#include "TestTopLevel.h"
 #include "robot.h"
+#include "BumperService.h"
+#include "TapeService.h"
 
 
 #include <stdio.h>
@@ -120,7 +122,9 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
 
 
     ES_Tattle(); // trace call stack
-
+    if (StartWallHug) {
+        CurrentState = NoSubService;
+    }
 
     switch (CurrentState) {
         case InitPSubState: // If current state is initial Psedudo State
@@ -281,15 +285,15 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
 
 uint8_t robot_reverse(void) {
     //printf("FL hit, reverse a bit\r\n");
-    Robot_LeftMtrSpeed(-80);
-    Robot_RightMtrSpeed(70);
+    Robot_LeftMtrSpeed(-70);
+    Robot_RightMtrSpeed(60);
     return 0;
 }
 
 uint8_t robot_forward(void) {
     //printf("Robot going forward\r\n");
-    Robot_LeftMtrSpeed(60);
-    Robot_RightMtrSpeed(75);
+    Robot_LeftMtrSpeed(50);
+    Robot_RightMtrSpeed(65);
     return 0;
 }
 
@@ -302,8 +306,8 @@ uint8_t robot_stop(void) {
 
 uint8_t robot_forward_2(void) {
     //printf("forward2/r/n");
-    Robot_LeftMtrSpeed(80);
-    Robot_RightMtrSpeed(-60);
+    Robot_LeftMtrSpeed(70);
+    Robot_RightMtrSpeed(-50);
     return 0;
 }
 

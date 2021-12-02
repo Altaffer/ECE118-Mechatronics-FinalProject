@@ -12,7 +12,9 @@
 #include "TopLevel.h"
 #include "ScanForBeaconSub.h"
 #include "robot.h"
-#include "TestTopLevel.h"
+//#include "TestTopLevel.h"
+#include "BumperService.h"
+#include "TapeService.h"
 
 
 #include <stdio.h>
@@ -104,9 +106,12 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
     uint8_t makeTransition = FALSE; // use to flag transition
     SubHSMState_t nextState;
     //static uint8_t tower_counter = 0; //counts how many to go when reversing
-    static uint16_t min_elapse_time = 999; //max possible is 704, which does 
+    //static uint16_t min_elapse_time = 999; //max possible is 704, which does 
     static uint8_t curr_status = 0;
     //not generate an event
+    if (StartScan) {
+        CurrentState = NoSubService;
+    }
 
 
     ES_Tattle(); // trace call stack

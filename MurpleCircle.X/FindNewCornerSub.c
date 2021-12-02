@@ -12,6 +12,8 @@
 #include "TopLevel.h"
 #include "robot.h"
 #include "FindNewCornerSub.h"
+#include "BumperService.h"
+#include "TapeService.h"
 
 
 #include <stdio.h>
@@ -121,7 +123,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
 
     ES_Tattle(); // trace call stack
     if (StartFindNewCorner) {
-        CurrentState = 1;
+        CurrentState = NoSubService;
     }
 
     switch (CurrentState) {
@@ -140,6 +142,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 makeTransition = TRUE;
                 StartFindNewCorner = 0;
                 TwoCornersCounter = 0;
+                TankTurnFlag = 0;
             }
             break;
         case TankTurn:

@@ -12,9 +12,11 @@
 #include "TopLevel.h"
 #include "NavTowerSub.h"
 #include "robot.h"
-#include "ParkSub.h"
+//#include "ParkSub.h"
 #include "NavTower_FindHole.h"
 #include "WallHugSubHSM.h"
+#include "BumperService.h"
+#include "TapeService.h"
 
 
 #include <stdio.h>
@@ -63,8 +65,8 @@ static const char *StateNames[] = {
 static SubHSMState_t CurrentState = InitPSubState; // initial state
 uint8_t StartNavTower;
 extern uint8_t StartWallHug;
-extern uint8_t StartPark;
-extern uint8_t IsParallel;
+//extern uint8_t StartPark;
+//extern uint8_t IsParallel;
 extern uint8_t StartFindHole;
 
 /*******************************************************************************
@@ -83,8 +85,9 @@ extern uint8_t StartFindHole;
  * @author J. Edward Carryer, 2011.10.23 19:25 */
 uint8_t InitNavTower(void) {
     ES_Event returnEvent;
-    InitPark();
+    //InitPark();
     InitFindHole();
+    InitWallHug();
     CurrentState = InitPSubState;
     returnEvent = RunNavTower(INIT_EVENT);
     StartNavTower = 0;
@@ -134,6 +137,7 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 nextState = WallHug;
                 makeTransition = TRUE;
                 StartNavTower = 0;
+                ThisEvent.EventType = ES_NO_EVENT;
             }
             break;
         case WallHug:
@@ -141,6 +145,7 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 //state entry
                 StartWallHug = 1;
                 ES_Timer_StopTimer(MotionTimer);
+                ES_Timer_StopTimer(TurnTimer);
             }
             ThisEvent = RunWallHug(ThisEvent);
             if (ThisEvent.EventType == FOUND_TRACK_WIRE) {
@@ -154,35 +159,37 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
             } else if (ThisEvent.EventType == FOUND_BOX) {
                 nextState = Leave;
                 makeTransition = TRUE;
+                ES_Timer_StopTimer(TurnTimer);
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             if (ThisEvent.EventType == ES_EXIT) {
+                ES_Timer_StopTimer(MotionTimer);
+                ES_Timer_StopTimer(TurnTimer);
                 //state exit
                 ;
             }
             break;
-//        case Park:
-//            if (ThisEvent.EventType == ES_ENTRY) {
-//                //state entry
-//                StartPark;
-//            }
-//            ThisEvent = RunPark(ThisEvent);
-//            if (ThisEvent.EventType == IS_PARALLEL) {
-//                nextState = FindHole;
-//                makeTransition = TRUE;
-//                ThisEvent.EventType = ES_NO_EVENT;
-//            }
-//            if (ThisEvent.EventType == ES_EXIT) {
-//                //state exit
-//                ;
-//            }
-//            break;
+            //        case Park:
+            //            if (ThisEvent.EventType == ES_ENTRY) {
+            //                //state entry
+            //                StartPark;
+            //            }
+            //            ThisEvent = RunPark(ThisEvent);
+            //            if (ThisEvent.EventType == IS_PARALLEL) {
+            //                nextState = FindHole;
+            //                makeTransition = TRUE;
+            //                ThisEvent.EventType = ES_NO_EVENT;
+            //            }
+            //            if (ThisEvent.EventType == ES_EXIT) {
+            //                //state exit
+            //                ;
+            //            }
+            //            break;
         case FindHole:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
                 //stop();
                 StartFindHole = 1;
-                ;
             }
             RunFindHole(ThisEvent);
             if (ThisEvent.EventType == SHOOTER_BT_CHANGED) {
@@ -198,28 +205,29 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
             }
             break;
         case ReleaseBall:
-            switch (ThisEvent.EventType){
+            switch (ThisEvent.EventType) {
                 case ES_ENTRY:
-                //state entry
-                //start the servo, but what value?
-                Robot_SetServoSpeed(1525);
-                break;
-            
-            
-            case BUMPER_SERVO:
-                //turn off servo, but what value?
-                if((ThisEvent.EventParam & SERVO_BUMPER_ON) == 0){
-                    Robot_SetServoSpeed(1500);
-                    nextState = Leave;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
-                }
-                break;
-            //
-            case ES_EXIT:
-                //state exit
+                    //state entry
+                    //start the servo, but what value?
+                    Robot_SetServoSpeed(1525);
+                    break;
+
+
+                case BUMPER_SERVO:
+                    //turn off servo, but what value?
+                    if ((ThisEvent.EventParam & SERVO_BUMPER_ON) == 0) {
+                        Robot_SetServoSpeed(1500);
+                        nextState = Leave;
+                        makeTransition = TRUE;
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    }
+                    break;
+                    //
+                case ES_EXIT:
+                    //state exit
+                    break;
+            }
             break;
-        }
         case Leave:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
@@ -230,7 +238,7 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case BUMP_EVENT:
                     ES_Timer_InitTimer(MotionTimer, NAV_TOWER_LEAVE_TIME);
-                    turnBot(-80,-80);
+                    turnBot(-80, -80);
                     break;
                 case MOTION_TIMER_EXP:
                     nextState = NoSubService;

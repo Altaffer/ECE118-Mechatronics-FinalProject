@@ -148,13 +148,13 @@ uint8_t TrackWireEventChecker(void) {
     ES_Event thisEvent;
     uint8_t returnVal = FALSE;
     uint32_t TrackWireInput = Robot_ReadTrackWire();
-    uint8_t recording = 0; //this is a flag to indicate if the track wire is detected
+    static uint8_t recording = 0; //this is a flag to indicate if the track wire is detected
         //if it does, then it starts to record the ADC output to find the distance
         //between the track wire and the sensor
         //initial state: es-no-event
 
     // hysteresis bounds 
-    //printf("%d ", TrackWireInput);
+    
     if (TrackWireInput > TW_UPPER_BOUND) {
 #ifdef DEBUG_PRINTS
         printf("TrackWire found.\r\n");
@@ -166,7 +166,7 @@ uint8_t TrackWireEventChecker(void) {
 #endif
         recording = 0; //ES_NO_EVENT
     }
-    
+    //printf("%d ", TrackWireInput);
     
     // This one does not consider the prev values 
     // pick the one you want by changing the define value in the beginning
@@ -190,7 +190,8 @@ uint8_t TrackWireEventChecker(void) {
         PostTopLevel(thisEvent);
         lastEvent = currentEvent;
         returnVal = TRUE;
-    
+        
+        
 
 #ifndef EVENTCHECKER_TEST           // keep this as is for test harness
         //        PostTemplateHSM(thisEvent);
@@ -226,7 +227,7 @@ uint8_t BeaconEventChecker(void) {
 #ifdef DEBUG_PRINTS
         printf("Beacon lost.\r\n"); 
 #endif
-        currentEvent = LOST_BEACON; //ES_NO_EVENT
+        currentEvent = ES_NO_EVENT; //ES_NO_EVENT
         //or LOST_BEACON
     }
     if (currentEvent != lastEvent) {

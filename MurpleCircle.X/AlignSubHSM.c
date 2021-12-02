@@ -178,6 +178,7 @@ ES_Event RunAlignSubHSM(ES_Event ThisEvent) {
             switch (ThisEvent.EventType) {
                 case ES_ENTRY:
                     turnBot(LTANK_L, LTANK_R);
+                    
 
                     //ES_Timer_InitTimer(MotionTimer, TIMER_90);//time based, not used
                     break;

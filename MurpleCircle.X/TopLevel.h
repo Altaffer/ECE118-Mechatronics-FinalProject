@@ -30,7 +30,50 @@
 /*******************************************************************************
  * PUBLIC #DEFINES                                                             *
  ******************************************************************************/
+#define TIMER_90 500
+#define BOT_MIDDLE_TIME 400
+#define BUMPER_TIME 100
+#define TIMER_360 (TIMER_90 * 4)
 
+#define TW_UPPER_BOUND 600//TW = Track Wire
+#define TW_LOWER_BOUND 400
+
+#define FINDHOLE_EXPIRE_TIME 2000//forward too much - go reverse
+#define WALL_HUG_FORWARD_TIME 300
+#define WALL_HUG_REVERSE_TIME 510
+#define WALL_HUG_CORNER_TIME 1000
+#define NAV_TOWER_LEAVE_TIME 500
+#define CORNER_ALIGN_TIME 100
+#define ABRUPT_TURN_TIME 500
+#define ALIGN_RIGHT_TIME 500
+#define FIND_NEW_CORNER_EXP_TIME 300 //they should use the same time
+#define READJUST_SHAKE_TIME 300
+#define WALL_HUG_END_TIME 25000
+
+#define SCAN_TURN_TIME (TIMER_360) //360 degrees
+
+#define SCAN_THRESHOLD 20
+
+#define FINDHOLE_TURN_TIME 700 
+#define FIND_HOLE_TURN_L 70
+#define FIND_HOLE_TURN_R 100
+
+#define FIND_HOLE_BACK_TURN_L -90
+#define FIND_HOLE_BACK_TURN_R -90
+
+#define FIND_HOLE_BACK_PIVOT_TIME 600
+#define FIND_HOLE_BACK_PIVOT_L 0
+#define FIND_HOLE_BACK_PIVOT_R -70
+
+#define FINDHOLE_FORWARD_TIME 1000 
+#define FIND_HOLE_FORWARD_L 50
+#define FIND_HOLE_FORWARD_R 50
+
+
+
+#define FINDHOLE_REVERSE_TIME 2000
+#define FIND_HOLE_REVERSE_L -50
+#define FIND_HOLE_REVERSE_R -50
 
 /*******************************************************************************
  * PUBLIC TYPEDEFS                                                             *

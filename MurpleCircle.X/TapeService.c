@@ -92,10 +92,11 @@ ES_Event RunTapeService(ES_Event ThisEvent) {
      in here you write your service code
      *******************************************/
     static uint8_t past_status = 0;
-    uint8_t curr_status = Robot_ReadTapeSensors();
-    uint8_t changed_bits = curr_status ^ past_status;
+    static uint8_t curr_status = 0;
     switch (ThisEvent.EventType) {
         case ES_TIMEOUT:
+            curr_status = Robot_ReadTapeSensors();
+            uint8_t changed_bits = curr_status ^ past_status;
             ES_Timer_InitTimer(TapeTimer, TAPE_TICKS);
             //printf("ES_TIMEOUT\r\n");
             if (curr_status == past_status) {
