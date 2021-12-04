@@ -29,14 +29,14 @@
 //#define FWD_speed 100
 #define BCKWD_speed -75 
 #define STOP_speed 0    // stopping
-#define RIGHT_WHEEL_OFFSET 18
+#define RIGHT_WHEEL_OFFSET 16
 
 #define LTANK_L -80     // tank turns
 #define LTANK_R 80
 #define RTANK_L 80
 #define RTANK_R -80
-#define LTANK_L_SLOW -65     // tank turns
-#define LTANK_R_SLOW 65
+#define LTANK_L_SLOW -60     // tank turns
+#define LTANK_R_SLOW 60
 
 #define LPIVOT_L 0      // pivot turns
 #define LPIVOT_R 80
@@ -186,6 +186,10 @@ uint8_t Robot_ReadPingTrigger(void);
 
 uint8_t Robot_TrigPingSensor(uint8_t trig);
 
-int Robot_SetServoSpeed(unsigned short int pulseTime);
+int Robot_StartServo(unsigned short int pulseTime);
+
+int Robot_StopServo(void);
+
+unsigned char Robot_ReadShooterTape(void);
 
 #endif

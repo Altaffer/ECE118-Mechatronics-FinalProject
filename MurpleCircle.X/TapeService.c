@@ -15,7 +15,7 @@
 /*******************************************************************************
  * MODULE #DEFINES                                                             *
  ******************************************************************************/
-#define TAPE_TICKS 60//test
+#define TAPE_TICKS 20//test
 #define TIMER_HIGH_TICKS 1
 //define PING_PIN PORTW03_BIT // defined in the config file
 
@@ -92,34 +92,51 @@ ES_Event RunTapeService(ES_Event ThisEvent) {
      in here you write your service code
      *******************************************/
     static uint8_t past_status = 0;
+    static uint8_t past_status_shooter = 0;
     static uint8_t curr_status = 0;
+    static uint8_t curr_status_shooter = 0;
     switch (ThisEvent.EventType) {
         case ES_TIMEOUT:
             curr_status = Robot_ReadTapeSensors();
-            uint8_t changed_bits = curr_status ^ past_status;
+            curr_status_shooter = Robot_ReadShooterTape();
+            //uint8_t changed_bits = curr_status ^ past_status;
             ES_Timer_InitTimer(TapeTimer, TAPE_TICKS);
             //printf("ES_TIMEOUT\r\n");
             if (curr_status == past_status) {
-                break;
-            }
-            //printf("ES_TIMEOUT2\r\n");
-            if (changed_bits & SHOOTER) {
-                ReturnEvent.EventType = SHOOTER_BT_CHANGED;
-                ReturnEvent.EventParam = curr_status;
-                PostTopLevel(ReturnEvent);//can be any wrapper function
-            }
-            
-            if (changed_bits & BOTTOM) {
+                ;
+            } else {
                 ReturnEvent.EventType = BOT_BT_CHANGED;
                 ReturnEvent.EventParam = curr_status;
                 PostTopLevel(ReturnEvent);//can be any wrapper function
             }
+            //changed_bits = curr_status_shooter ^ past_status_shooter;
+            if (curr_status_shooter == past_status_shooter) {
+                ;
+            } else {
+                ReturnEvent.EventType = SHOOTER_BT_CHANGED;
+                ReturnEvent.EventParam = curr_status_shooter;
+                PostTopLevel(ReturnEvent);//can be any wrapper function
+            }
             
+            //printf("ES_TIMEOUT2\r\n");
+//            if (changed_bits & SHOOTER) {
+//                ReturnEvent.EventType = SHOOTER_BT_CHANGED;
+//                ReturnEvent.EventParam = curr_status;
+//                PostTopLevel(ReturnEvent);//can be any wrapper function
+//            }
+//            
+//            if (changed_bits & BOTTOM) {
+//                ReturnEvent.EventType = BOT_BT_CHANGED;
+//                ReturnEvent.EventParam = curr_status;
+//                PostTopLevel(ReturnEvent);//can be any wrapper function
+//            }
+            past_status = curr_status;
+            past_status_shooter = curr_status_shooter;
             break;
         default:
             break;
     }
-    past_status = curr_status;
+    
     
     return ReturnEvent;
 }

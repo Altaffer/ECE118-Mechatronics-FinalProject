@@ -163,14 +163,20 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
         case Bump:
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
-                Robot_LeftMtrSpeed(90);
-                Robot_RightMtrSpeed(50);
                 ES_Timer_StopTimer(MotionTimer);
+                Robot_LeftMtrSpeed(-60);
+                Robot_RightMtrSpeed(-60);
+                ES_Timer_InitTimer(TurnTimer, 300);
+            }
+            if (ThisEvent.EventType == TURN_TIMER_EXP) {
+                Robot_LeftMtrSpeed(95);
+                Robot_RightMtrSpeed(-50);
+                ThisEvent.EventType = ES_NO_EVENT;
             }
             if (ThisEvent.EventType == BUMP_EVENT) {
                 ES_Timer_InitTimer(MotionTimer, 300);
                 Robot_LeftMtrSpeed(70);
-                Robot_RightMtrSpeed(68);
+                Robot_RightMtrSpeed(95);
                 ThisEvent.EventType = ES_NO_EVENT;
             }
             if (ThisEvent.EventType == MOTION_TIMER_EXP) {
@@ -181,6 +187,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
                 ES_Timer_StopTimer(MotionTimer);
+                ES_Timer_StopTimer(TurnTimer);
                 Robot_LeftMtrSpeed(0);
                 Robot_RightMtrSpeed(0);
             }
@@ -214,14 +221,21 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
                 //state entry
                 Robot_LeftMtrSpeed(FIND_HOLE_BACK_TURN_L);
                 Robot_RightMtrSpeed(FIND_HOLE_BACK_TURN_R);
+                ES_Timer_InitTimer(MotionTimer, FINDHOLE_TURN_TIME);
             }
             if (ThisEvent.EventType == BUMP_BACK) {
                 nextState = BackPivot;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
+            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
+                nextState = BackPivot;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
+                ES_Timer_StopTimer(MotionTimer);
                 Robot_LeftMtrSpeed(0);
                 Robot_RightMtrSpeed(0);
             }
@@ -234,7 +248,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
                 ES_Timer_InitTimer(MotionTimer, FIND_HOLE_BACK_PIVOT_TIME);
             }
             if (ThisEvent.EventType == MOTION_TIMER_EXP) {
-                nextState = Forward;
+                nextState = Backwards;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
@@ -295,26 +309,26 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
                 nextState = Forward;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
-            } else if (ThisEvent.EventType == SHOOTER_BT_CHANGED) {
-                switch (ThisEvent.EventParam){
-                    case SECOND_TAPE: //only found one - needs forward more
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-                    case FIRST_TAPE: //only found the other one - went too far - need backwards
-                        nextState = Forward;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                        break;
-                    case BOTH_TAPE:
-                        nextState = NoSubService;
-                        makeTransition = TRUE;//This makes sure that it sits at the InitState
-                        ThisEvent.EventType = FOUND_HOLE;
-                        Robot_LeftMtrSpeed(0);
-                        Robot_RightMtrSpeed(0);
-                        break;
-                    default:
-                        break;
-                }
+//            } else if (ThisEvent.EventType == SHOOTER_BT_CHANGED) {
+//                switch (ThisEvent.EventParam){
+//                    case SECOND_TAPE: //only found one - needs forward more
+//                        ThisEvent.EventType = ES_NO_EVENT;
+//                        break;
+//                    case FIRST_TAPE: //only found the other one - went too far - need backwards
+//                        nextState = Forward;
+//                        makeTransition = TRUE;
+//                        ThisEvent.EventType = ES_NO_EVENT;
+//                        break;
+//                    case BOTH_TAPE:
+//                        nextState = NoSubService;
+//                        makeTransition = TRUE;//This makes sure that it sits at the InitState
+//                        ThisEvent.EventType = FOUND_HOLE;
+//                        Robot_LeftMtrSpeed(0);
+//                        Robot_RightMtrSpeed(0);
+//                        break;
+//                    default:
+//                        break;
+//                }
             }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit

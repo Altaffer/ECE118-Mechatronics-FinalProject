@@ -36,7 +36,7 @@
 #define TAPE_SENSOR_2 PORTX04_BIT
 #define TAPE_SENSOR_3 PORTX05_BIT
 #define TAPE_SENSOR_4 PORTX06_BIT
-#define TAPE_SENSOR_5 PORTX07_BIT
+#define TAPE_SENSOR_5 PORTX09_BIT
 #define TAPE_SENSOR_6 PORTX08_BIT
 
 #define PING_PIN PORTW03_BIT 
@@ -45,13 +45,13 @@
 #define BEACON_PIN PORTX10_BIT
 #define BEACON_TRIS PORTX10_TRIS
 #define TRACK_WIRE_PIN AD_PORTV8
-#define SHOOTER_SERVO RC_PORTY07
+#define SHOOTER_SERVO RC_PORTY06
 
 #define TAPE_SENSOR_1_TRIS PORTX03_TRIS
 #define TAPE_SENSOR_2_TRIS PORTX04_TRIS
 #define TAPE_SENSOR_3_TRIS PORTX05_TRIS
 #define TAPE_SENSOR_4_TRIS PORTX06_TRIS
-#define TAPE_SENSOR_5_TRIS PORTX07_TRIS
+#define TAPE_SENSOR_5_TRIS PORTX09_TRIS
 #define TAPE_SENSOR_6_TRIS PORTX08_TRIS
 
 #define HALL_FRONT_LEFT _RB8 // V07
@@ -147,9 +147,9 @@ void Robot_Init(void) {
     TAPE_SENSOR_4_TRIS = INPUT;
     TAPE_SENSOR_5_TRIS = INPUT;
     TAPE_SENSOR_6_TRIS = INPUT;
-    
+
     BEACON_TRIS = INPUT;
-    
+
     TAPE_SENSOR_1 = 0;
     TAPE_SENSOR_2 = 0;
     TAPE_SENSOR_3 = 0;
@@ -195,6 +195,8 @@ void Robot_Init(void) {
     //Initialize the light sensor
     AD_AddPins(TRACK_WIRE_PIN);
     AD_Init();
+    RC_Init();
+    
     //    printf("Current pins: %d\n",AD_ActivePins());
     //    printf("Add Result: %d\n",AD_AddPins(LIGHT_SENSOR));
     //    while(1);
@@ -326,7 +328,7 @@ unsigned char Robot_ReadRearLeftBumper(void) {
 unsigned char Robot_ReadBumpers(void) {
     //unsigned char bump_state;
     //bump_state = (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
-       // return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
+    // return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
     return (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1) + ((!HALL_REAR_LEFT) << 2) + ((!BACK_BUMPER) << 3));
 }
 
@@ -391,16 +393,15 @@ unsigned char Robot_ReadBumpers(void) {
 uint8_t goForward(void) {
     //something here to make the bot go forward at full speed
     Robot_LeftMtrSpeed(FWD_speed);
-    Robot_RightMtrSpeed(FWD_speed-RIGHT_WHEEL_OFFSET);
+    Robot_RightMtrSpeed(FWD_speed - RIGHT_WHEEL_OFFSET);
 
     return 0; //this could be used to indicated true or false. Not necessary tho. 
 }
 
-
 uint8_t turnBot(char leftSpeed, char rightSpeed) {
     //turn bot
     Robot_LeftMtrSpeed(leftSpeed);
-    Robot_RightMtrSpeed(rightSpeed-RIGHT_WHEEL_OFFSET);
+    Robot_RightMtrSpeed(rightSpeed - RIGHT_WHEEL_OFFSET);
     return 0;
 }
 
@@ -416,12 +417,15 @@ uint8_t stop(void) { //one concern - if the gearhead is too powerful we may need
 unsigned char Robot_ReadTapeSensors(void) {
     //unsigned char bump_state;
     //bump_state = (!HALL_FRONT_LEFT + ((!HALL_FRONT_RIGHT) << 1)+((!HALL_REAR_LEFT) << 2)+((!HALL_REAR_RIGHT) << 3));
-//    return (TAPE_SENSOR_1 + ((TAPE_SENSOR_2) << 1)+((TAPE_SENSOR_3) << 2)
-//            +((TAPE_SENSOR_4) << 3)+((TAPE_SENSOR_5) << 4)+((TAPE_SENSOR_6) << 5));
+    //    return (TAPE_SENSOR_1 + ((TAPE_SENSOR_2) << 1)+((TAPE_SENSOR_3) << 2)
+    //            +((TAPE_SENSOR_4) << 3)+((TAPE_SENSOR_5) << 4)+((TAPE_SENSOR_6) << 5));
     return (TAPE_SENSOR_1 + ((TAPE_SENSOR_2) << 1)+((TAPE_SENSOR_3) << 2)
             +((TAPE_SENSOR_4) << 3));
 }
 
+unsigned char Robot_ReadShooterTape(void) {
+    return (TAPE_SENSOR_5 + ((TAPE_SENSOR_6) << 1));
+}
 //#define ROBOT_TEST
 //#ifdef ROBOT_TEST
 
@@ -450,8 +454,14 @@ uint8_t Robot_TrigPingSensor(uint8_t trig) {
     return 0;
 }
 
-int Robot_SetServoSpeed(unsigned short int pulseTime){
+int Robot_StartServo(unsigned short int pulseTime) {
+    RC_AddPins(SHOOTER_SERVO);
     RC_SetPulseTime(SHOOTER_SERVO, pulseTime);
+    return 0;
+}
+
+int Robot_StopServo(void) {
+    RC_RemovePins(SHOOTER_SERVO);
     return 0;
 }
 

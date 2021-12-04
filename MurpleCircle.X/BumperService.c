@@ -91,6 +91,7 @@ ES_Event RunBumperService(ES_Event ThisEvent) {
      *******************************************/
     static uint8_t curr_val = 0;
     static uint8_t past_val = 0;
+    static uint8_t past_servo = 0;
     switch (ThisEvent.EventType) {
         case ES_TIMEOUT:
             ES_Timer_InitTimer(BumperTimer, BUMPER_TIME);
@@ -99,17 +100,22 @@ ES_Event RunBumperService(ES_Event ThisEvent) {
                 break;
             }
             
-            if (curr_val & BACK) { //1zzz
-                ReturnEvent.EventType = BUMP_BACK;
-                ReturnEvent.EventParam = curr_val;
-                PostTopLevel(ReturnEvent); //can be any wrapper function
-            } 
+//            if (curr_val & BACK) { //1zzz
+//                ReturnEvent.EventType = BUMP_BACK;
+//                ReturnEvent.EventParam = curr_val;
+//                PostTopLevel(ReturnEvent); //can be any wrapper function
+//            } 
             if ((curr_val & LEFT) || (curr_val & RIGHT) ) {//00zz
                 ReturnEvent.EventType = BUMP_EVENT;
                 ReturnEvent.EventParam = curr_val;
                 PostTopLevel(ReturnEvent); //can be any wrapper function 
             } 
-            if (curr_val & SERVO) { //z1zz
+//            if (curr_val & SERVO || (past_val & SERVO && !(curr_val & SERVO))) { //z1zz
+//                ReturnEvent.EventType = BUMPER_SERVO;
+//                ReturnEvent.EventParam = curr_val;
+//                PostTopLevel(ReturnEvent); //can be any wrapper function
+//            }
+            if ((past_val & SERVO) && !(curr_val & SERVO)) { //z0zz
                 ReturnEvent.EventType = BUMPER_SERVO;
                 ReturnEvent.EventParam = curr_val;
                 PostTopLevel(ReturnEvent); //can be any wrapper function

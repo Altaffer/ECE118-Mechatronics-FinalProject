@@ -77,11 +77,11 @@ void main(void) {
     // Your hardware initialization function calls go here
     AD_Init();
     PWM_Init();
-    SERIAL_Init();
+    //SERIAL_Init();
     Robot_Init();
     ES_Timer_Init();
     TIMERS_Init();
-    //RC_Init();
+//    RC_Init();
 
     //RC_AddPins(SERVO_PIN);
 #ifdef TEST_HARNESSES

@@ -30,23 +30,23 @@
 /*******************************************************************************
  * PUBLIC #DEFINES                                                             *
  ******************************************************************************/
-#define TIMER_90 500
+#define TIMER_90 550
 #define BOT_MIDDLE_TIME 400
 #define BUMPER_TIME 100
 #define TIMER_360 (TIMER_90 * 4)
 
-#define TW_UPPER_BOUND 650//TW = Track Wire
+#define TW_UPPER_BOUND 630//TW = Track Wire
 #define TW_LOWER_BOUND 400
 
 #define FINDHOLE_EXPIRE_TIME 2000//forward too much - go reverse
 #define WALL_HUG_FORWARD_TIME 350
-#define WALL_HUG_REVERSE_TIME 510
+#define WALL_HUG_REVERSE_TIME 650
 #define WALL_HUG_CORNER_TIME 1000
-#define NAV_TOWER_LEAVE_TIME 500
+#define NAV_TOWER_LEAVE_TIME 200
 #define CORNER_ALIGN_TIME 100
-#define ABRUPT_TURN_TIME 500
+#define ABRUPT_TURN_TIME 400
 #define ALIGN_RIGHT_TIME 500
-#define FIND_NEW_CORNER_EXP_TIME 300 //they should use the same time
+#define FIND_NEW_CORNER_EXP_TIME 300
 #define READJUST_SHAKE_TIME 300
 #define WALL_HUG_END_TIME 25000
 
@@ -54,26 +54,26 @@
 
 #define SCAN_THRESHOLD 20
 
-#define FINDHOLE_TURN_TIME 700 
+#define FINDHOLE_TURN_TIME 550 
 #define FIND_HOLE_TURN_L 70
 #define FIND_HOLE_TURN_R 100
 
 #define FIND_HOLE_BACK_TURN_L -90
-#define FIND_HOLE_BACK_TURN_R -90
+#define FIND_HOLE_BACK_TURN_R -95
 
-#define FIND_HOLE_BACK_PIVOT_TIME 600
-#define FIND_HOLE_BACK_PIVOT_L 0
+#define FIND_HOLE_BACK_PIVOT_TIME 720
+#define FIND_HOLE_BACK_PIVOT_L 50
 #define FIND_HOLE_BACK_PIVOT_R -70
 
-#define FINDHOLE_FORWARD_TIME 1000 
-#define FIND_HOLE_FORWARD_L 50
+#define FINDHOLE_FORWARD_TIME 2000 
+#define FIND_HOLE_FORWARD_L 60
 #define FIND_HOLE_FORWARD_R 50
 
 
 
-#define FINDHOLE_REVERSE_TIME 2000
-#define FIND_HOLE_REVERSE_L -50
-#define FIND_HOLE_REVERSE_R -50
+#define FINDHOLE_REVERSE_TIME 1000
+#define FIND_HOLE_REVERSE_L -60
+#define FIND_HOLE_REVERSE_R -65
 
 /*******************************************************************************
  * PUBLIC TYPEDEFS                                                             *
@@ -133,6 +133,7 @@ uint8_t TurnTimerHelper(ES_Event ThisEvent);
 uint8_t MotionTimerHelper(ES_Event ThisEvent);
 
 uint8_t TurnTimerHelper(ES_Event ThisEvent);
+uint8_t AnotherTimerHelper(ES_Event ThisEvent);
 
 #endif /* Top_Level_H */
 

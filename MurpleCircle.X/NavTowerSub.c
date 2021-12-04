@@ -17,6 +17,7 @@
 #include "WallHugSubHSM.h"
 #include "BumperService.h"
 #include "TapeService.h"
+#include "RC_Servo.h"
 
 
 #include <stdio.h>
@@ -68,6 +69,7 @@ extern uint8_t StartWallHug;
 //extern uint8_t StartPark;
 //extern uint8_t IsParallel;
 extern uint8_t StartFindHole;
+uint8_t enough_bump;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -138,6 +140,7 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 makeTransition = TRUE;
                 StartNavTower = 0;
                 ThisEvent.EventType = ES_NO_EVENT;
+                enough_bump = 0;
             }
             break;
         case WallHug:
@@ -190,18 +193,34 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 //state entry
                 //stop();
                 StartFindHole = 1;
+                ES_Timer_StopTimer(MotionTimer);
+                ES_Timer_InitTimer(AnotherTimer,7000);
             }
             ThisEvent = RunFindHole(ThisEvent);
-            if (ThisEvent.EventType == SHOOTER_BT_CHANGED) {
+            if (ThisEvent.EventType == FOUND_HOLE) {
+                //from the ssm, this is for sure both tape on
+                ES_Timer_InitTimer(MotionTimer, 250);
+                turnBot(-40, -40);
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
+            if (ThisEvent.EventType == MOTION_TIMER_EXP) {
                 //from the ssm, this is for sure both tape on
                 nextState = ReleaseBall;
                 stop();
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             }
+            if (ThisEvent.EventType == ANOTHER_TIMER_EXP) {
+                //from the ssm, this is for sure both tape on
+                nextState = Leave;
+                makeTransition = TRUE;
+                ThisEvent.EventType = ES_NO_EVENT;
+            }
             if (ThisEvent.EventType == ES_EXIT) {
                 //state exit
                 stop();
+                ES_Timer_StopTimer(MotionTimer);
+                ES_Timer_StopTimer(TurnTimer);
             }
             break;
         case ReleaseBall:
@@ -209,18 +228,18 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     //state entry
                     //start the servo, but what value?
-                    Robot_SetServoSpeed(1525);
+                    Robot_StartServo(1525);
                     break;
 
 
                 case BUMPER_SERVO:
                     //turn off servo, but what value?
-                    if ((ThisEvent.EventParam & SERVO_BUMPER_ON) == 0) {
-                        Robot_SetServoSpeed(1500);
-                        nextState = Leave;
-                        makeTransition = TRUE;
-                        ThisEvent.EventType = ES_NO_EVENT;
-                    }
+
+                    Robot_StopServo();
+                    nextState = Leave;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+
                     break;
                     //
                 case ES_EXIT:
@@ -237,8 +256,9 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
             }
             switch (ThisEvent.EventType) {
                 case BUMP_EVENT:
-                    ES_Timer_InitTimer(MotionTimer, NAV_TOWER_LEAVE_TIME);
-                    turnBot(-80, -80);
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    //ES_Timer_InitTimer(MotionTimer, NAV_TOWER_LEAVE_TIME);
+                    //turnBot(-80, -80);
                     break;
                 case MOTION_TIMER_EXP:
                     nextState = NoSubService;

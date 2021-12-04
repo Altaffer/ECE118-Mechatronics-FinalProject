@@ -18,7 +18,7 @@
 //#include "TopLevel.h"
 
 //defines for keyboard input
-//define USE_KEYBOARD_INPUT
+//#define USE_KEYBOARD_INPUT
 //What State machine are we testing
 //#define POSTFUNCTION_FOR_KEYBOARD_INPUT PostTopLevel
 
@@ -38,6 +38,7 @@
 #define ReverseTimer 3
 #define PingTriggerTimer 4
 #define BumperTimer 5
+#define AnotherTimer 7
 //#define SpinTimer 6
 #define MotionTimer 15
 
@@ -66,7 +67,7 @@ typedef enum {
     BUMP_BACK,
 
     //black tape sensors on the bottom
-    BOT_BT_CHANGED, // event #15
+    BOT_BT_CHANGED, // event #13
 
 
     //Black tape sensors on the shooter
@@ -77,10 +78,10 @@ typedef enum {
     BT_LOST_SHOOTER_2,
 
     //Timer events
-    TURN_TIMER_EXP,
+    TURN_TIMER_EXP,//19
     FORWARD_TIMER_EXP,
     REVERSE_TIMER_EXP,
-    MOTION_TIMER_EXP, // event #24
+    MOTION_TIMER_EXP, // event #22
 
     //Tower events
     BALLSHOT,
@@ -100,6 +101,8 @@ typedef enum {
     FOUND_NEW_CORNER,
     FOUND_BOX,
     FOUND_TAPE,
+            SCAN_AT_CORNER,
+            ANOTHER_TIMER_EXP,
 
 
 
@@ -163,10 +166,13 @@ static const char *EventNames[] = {
     "FOUND_NEW_CORNER",
     "FOUND_BOX",
     "FOUND_TAPE",
+    "SCAN_AT_CORNER",
+    "ANOTHER_TIMER_EXP",
 
 
 
     "FOUND_PING",
+    
     "NUMBEROFEVENTS",
 
 };
@@ -198,7 +204,7 @@ static const char *EventNames[] = {
 #else
 #define TIMER6_RESP_FUNC TIMER_UNUSED
 #endif
-#define TIMER7_RESP_FUNC TIMER_UNUSED
+#define TIMER7_RESP_FUNC AnotherTimerHelper
 #define TIMER8_RESP_FUNC TIMER_UNUSED
 #define TIMER9_RESP_FUNC TIMER_UNUSED
 #define TIMER10_RESP_FUNC TIMER_UNUSED

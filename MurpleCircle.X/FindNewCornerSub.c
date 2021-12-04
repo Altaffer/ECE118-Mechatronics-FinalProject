@@ -73,7 +73,9 @@ static SubHSMState_t CurrentState = InitPSubState; // initial state
 #define B_CENTER_TAPE 0b001000
 uint8_t StartFindNewCorner;
 uint8_t TankTurnFlag;
-uint8_t TwoCornersCounter;
+uint8_t CenterScanFlag;
+int8_t TwoCornersCounter;
+int8_t TwoCornersCounter_Right;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -141,8 +143,10 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 nextState = MoveForward;
                 makeTransition = TRUE;
                 StartFindNewCorner = 0;
-                TwoCornersCounter = 0;
+                TwoCornersCounter = -1;
+                TwoCornersCounter_Right = 0;
                 TankTurnFlag = 0;
+                CenterScanFlag = 0;
             }
             break;
         case TankTurn:
@@ -202,12 +206,12 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                                 ThisEvent.EventType = ES_NO_EVENT;
                                 break;
                             default:
-                                if (ThisEvent.EventType & F_LEFT_TAPE && ThisEvent.EventType & !F_CENTER_TAPE) {
+                                if ((ThisEvent.EventType & F_LEFT_TAPE) && (ThisEvent.EventType & !F_CENTER_TAPE)) {
                                     nextState = AlignLeft;
                                     makeTransition = TRUE;
                                     ThisEvent.EventType = ES_NO_EVENT;
                                 }
-                                if (ThisEvent.EventType & F_RIGHT_TAPE && ThisEvent.EventType & !F_CENTER_TAPE) {
+                                if ((ThisEvent.EventType & F_RIGHT_TAPE) && (ThisEvent.EventType & !F_CENTER_TAPE)) {
                                     nextState = AlignRight;
                                     makeTransition = TRUE;
                                     ThisEvent.EventType = ES_NO_EVENT;
@@ -228,23 +232,53 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
             break;
         case AlignLeft:
             switch (ThisEvent.EventType) {
+                case FOUND_BEACON:
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    break;
                 case ES_ENTRY:
                     turnBot(LGRAD_L, LGRAD_R);
                     ES_Timer_InitTimer(MotionTimer, ABRUPT_TURN_TIME);
-                    TwoCornersCounter = 0;
+                    
+                    ES_Timer_InitTimer(AnotherTimer, 2000);
                     break;
                 case MOTION_TIMER_EXP:
-                    turnBot(-10, LPIVOT_R);
+                    turnBot(-30, LPIVOT_R);
                     ES_Timer_InitTimer(TurnTimer, FIND_NEW_CORNER_EXP_TIME);
+                    ThisEvent.EventType = ES_NO_EVENT;
                     break;
                 case TURN_TIMER_EXP:
-                    if (TwoCornersCounter++ > 0){
-                        TwoCornersCounter = 0;
+                    if (TwoCornersCounter == -1) {
+                        TwoCornersCounter++;
+                    } else if (TwoCornersCounter == 0){
+                        ES_Timer_StopTimer(AnotherTimer);
+                        TwoCornersCounter++;
+                        turnBot(-90,90);
+                        ES_Timer_InitTimer(TurnTimer, 800);
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    } else if (TwoCornersCounter == 1) {
+                        TwoCornersCounter++;
+                        goForward();
+                        ES_Timer_InitTimer(TurnTimer, 800);
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    } else if (TwoCornersCounter == 2) {
+                        TwoCornersCounter++;
+                        turnBot(90,-60);
+                        ES_Timer_InitTimer(TurnTimer, 1000);
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    } else if (TwoCornersCounter == 3) {
+                        TwoCornersCounter++;
+                        stop();
                         ThisEvent.EventType = FOUND_NEW_CORNER;
-                    } 
+                        TwoCornersCounter = -1;
+                    }
                     break;
+                case ANOTHER_TIMER_EXP:
+                    TwoCornersCounter = -1;
+                    nextState = AlignRight;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam & (F_CENTER_TAPE)) {
+                    if ((ThisEvent.EventParam & (F_CENTER_TAPE)) && (TwoCornersCounter <1)) {
                         nextState = MoveForward;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;
@@ -255,29 +289,42 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 case ES_EXIT:
                     ES_Timer_StopTimer(TurnTimer);
                     ES_Timer_StopTimer(MotionTimer);
+                    ES_Timer_StopTimer(AnotherTimer);
                     stop();
                     break;
             }
             break;
         case AlignRight:
             switch (ThisEvent.EventType) {
+                case FOUND_BEACON:
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    
+                    break;
                 case ES_ENTRY:
                     turnBot(RGRAD_L, RGRAD_R);
                     ES_Timer_InitTimer(MotionTimer, ALIGN_RIGHT_TIME);
                     // if you cannot find the tape in a few seconds
                     // you are in the middle
                     // now it's ok if it's in the middle.
-                    TwoCornersCounter = 0;
                     break;
                 case MOTION_TIMER_EXP:
-                    turnBot(-10, LPIVOT_R);
+                    turnBot(80, -10);
                     ES_Timer_InitTimer(TurnTimer, FIND_NEW_CORNER_EXP_TIME);
+                    ThisEvent.EventType = ES_NO_EVENT;
                     break;
                 case TURN_TIMER_EXP:
-                    if (TwoCornersCounter++ > 0){
-                        TwoCornersCounter = 0;
-                        ThisEvent.EventType = FOUND_NEW_CORNER;
-                    } 
+                    if (TwoCornersCounter_Right == 0){
+                        TwoCornersCounter_Right++;
+                        
+                        ThisEvent.EventType = ES_NO_EVENT;
+                    } else {
+                        //ThisEvent.EventType = FOUND_NEW_CORNER;
+                        ThisEvent.EventType = SCAN_AT_CORNER;
+                        CenterScanFlag = 1;
+                        TwoCornersCounter_Right = 0;
+                    }
+                    
+                    //ThisEvent.EventType = ES_NO_EVENT;
                     break;
                 case BOT_BT_CHANGED:
                     if (ThisEvent.EventParam & (F_CENTER_TAPE)) {
@@ -296,6 +343,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
 //                    break;
                 case ES_EXIT:
                     ES_Timer_StopTimer(MotionTimer);
+                    ES_Timer_StopTimer(TurnTimer);
                     stop();
                     break;
             }

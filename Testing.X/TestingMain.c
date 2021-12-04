@@ -29,7 +29,7 @@
 //#define TAPE_SENSOR_2 PORTX05_BIT
 #define BEACON_PIN PORTX10_BIT
 #define PING_PIN PORTX9_BIT
-#define SERVO_PIN RC_PORTW08
+#define SERVO_PIN RC_PORTY06
 
 
 #define DELAY_MULTIPLIER 1000
@@ -37,12 +37,12 @@
 #define DELAY_LOOP_TIME 2000 // ms
 
 // TEST DEFINES
-#define MOTOR_TEST
+//#define MOTOR_TEST
 //#define BUMPER_TEST
 //#define BUMPER_TEST
 //#define TAPE_SENSOR_TEST
 //#define BEACON_TEST
-//#define SERVO_TEST
+#define SERVO_TEST
 //#define SERVO_TEST
 //#define PING_SENSOR_TEST
 
@@ -151,9 +151,12 @@ int main(void) {
         printf("\nBeacon %d \n\r", currentBeaconValue); //BEACON working -HZ 11/19
 #endif
 #ifdef SERVO_TEST
-        RC_SetPulseTime(SERVO_PIN, 1550);
-        currentBumperValue = Robot_ReadRearLeftBumper();
-        printf("\nSwitch Value = %d \n\r", currentBumperValue);
+//        RC_SetPulseTime(SERVO_PIN, 1525);
+//        currentBumperValue = Robot_ReadRearLeftBumper();
+//        printf("\nSwitch Value = %d \n\r", currentBumperValue);
+//        DELAY(DELAY_LOOP_TIME);
+        RC_SetPulseTime(SERVO_PIN, 1500);
+//        DELAY(DELAY_LOOP_TIME);
 #endif
     }
 

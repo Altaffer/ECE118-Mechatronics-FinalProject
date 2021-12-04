@@ -41,7 +41,7 @@ static const char *StateNames[] = {
     "NoSubService"
 };
 
-#define TURN_SPEED 80
+#define TURN_SPEED 65
 #define FRONT_TAPE 0x0008 // 1000 - Change this to the right one
 #define TURNING 1
 #define REVERSING 2
@@ -113,7 +113,9 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
         CurrentState = NoSubService;
     }
 
-
+    if (ThisEvent.EventType == BOT_BT_CHANGED) {
+        ThisEvent.EventType = ES_NO_EVENT;
+    }
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
@@ -130,7 +132,7 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
             if (StartScan)// only respond to an actual event
             {
                 nextState = Turn;
-                ES_Timer_InitTimer(MotionTimer, SCAN_TURN_TIME); //turn 360
+                ES_Timer_InitTimer(MotionTimer, SCAN_TURN_TIME/StartScan); //turn 360
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 StartScan = 0;

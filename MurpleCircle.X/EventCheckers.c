@@ -166,7 +166,7 @@ uint8_t TrackWireEventChecker(void) {
 #endif
         recording = 0; //ES_NO_EVENT
     }
-    printf("%d ", TrackWireInput);
+    //printf("%d ", TrackWireInput);
     
     // This one does not consider the prev values 
     // pick the one you want by changing the define value in the beginning
