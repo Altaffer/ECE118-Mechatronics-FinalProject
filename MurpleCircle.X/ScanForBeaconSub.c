@@ -113,9 +113,7 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
         CurrentState = NoSubService;
     }
 
-    if (ThisEvent.EventType == BOT_BT_CHANGED) {
-        ThisEvent.EventType = ES_NO_EVENT;
-    }
+    
     ES_Tattle(); // trace call stack
 
     switch (CurrentState) {
@@ -140,6 +138,17 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
             break;
         case Turn:
             switch (ThisEvent.EventType) {
+//                if (ThisEvent.EventType == BOT_BT_CHANGED && (ThisEvent.EventParam &1)) {
+//        ThisEvent.EventType = ;
+//    } else if (ThisEvent.EventType == BOT_BT_CHANGED){
+//        ThisEvent.EventType = ES_NO_EVENT;
+//    }
+                case BOT_BT_CHANGED:
+                    if (ThisEvent.EventParam & 1){
+                        ES_Timer_InitTimer(MotionTimer, 1000);
+                        turnBot(-80,-80);
+                    }
+                    ThisEvent.EventType = ES_NO_EVENT;
                 case ES_ENTRY:
                     curr_status = TURNING;
                     CCW_Turn();
