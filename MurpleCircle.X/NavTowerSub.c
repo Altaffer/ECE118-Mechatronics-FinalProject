@@ -152,14 +152,15 @@ ES_Event RunNavTower(ES_Event ThisEvent) {
             }
             ThisEvent = RunWallHug(ThisEvent);
             if (ThisEvent.EventType == FOUND_TRACK_WIRE) {
+                ES_Timer_StopTimer(MotionTimer);
+                ES_Timer_StopTimer(TurnTimer);
                 nextState = FindHole;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
             } else if (ThisEvent.EventType == BOT_BT_CHANGED) {
-                //nextState = NoSubService;
-                //makeTransition = TRUE;
-                //ThisEvent.EventType = FOUND_TAPE;
-                ;
+                nextState = NoSubService;
+                makeTransition = TRUE;
+                ThisEvent.EventType = FOUND_TAPE;
             } else if (ThisEvent.EventType == FOUND_BOX) {
                 nextState = Leave;
                 makeTransition = TRUE;

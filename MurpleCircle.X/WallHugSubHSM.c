@@ -62,6 +62,7 @@ uint8_t robot_stop(void);
 
 uint8_t robot_forward_2(void);
 
+
 /*******************************************************************************
  * PRIVATE MODULE VARIABLES                                                            *
  ******************************************************************************/
@@ -74,6 +75,7 @@ uint8_t StartWallHug;
 uint8_t CornerFlag;
 
 #define F_CENTER_TAPE 0b000001
+#define F_RIGHT_TAPE 0b000100
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -125,7 +127,9 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
     if (StartWallHug) {
         CurrentState = NoSubService;
     }
-
+    //    if (ThisEvent.EventType == BOT_BT_CHANGED) {
+    //        ThisEvent.EventType = ES_NO_EVENT;
+    //    }
     switch (CurrentState) {
         case InitPSubState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
@@ -149,6 +153,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 ThisEvent.EventType = ES_NO_EVENT;
                 StartWallHug = 0;
                 ES_Timer_InitTimer(TurnTimer, WALL_HUG_END_TIME);
+                CornerFlag = 0;
             }
             break;
         case Driving: // in the first state, replace this with appropriate state
@@ -171,7 +176,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                     break;
                     //only at the second driving state will it rely on the tape
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam & F_CENTER_TAPE) {
+                    if (ThisEvent.EventParam & F_RIGHT_TAPE) {
                         nextState = NoSubService;
                         makeTransition = TRUE;
                         break;
@@ -197,29 +202,36 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                 case ES_ENTRY:
                     CornerFlag = 0;
                     robot_forward_2(); //at a larger angle
+                    ES_Timer_InitTimer(AnotherTimer, WALL_HUG_FORWARD_TIME);
                     break;
                 case BUMP_EVENT:
                     nextState = Reversing;
                     ThisEvent.EventType = ES_NO_EVENT;
                     makeTransition = TRUE;
                     break;
-                case MOTION_TIMER_EXP:
-                    CornerFlag = 1;
+                case ANOTHER_TIMER_EXP:
+                    //CornerFlag = 1;
+                    turnBot(100,-50); // even larger angle
+                    break;
                     break;
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam & F_CENTER_TAPE) {
+                    if (ThisEvent.EventParam & F_RIGHT_TAPE) {
                         nextState = NoSubService;
                         makeTransition = TRUE;
                         break;
                     }
+
                     ThisEvent.EventType = ES_NO_EVENT;
                     break;
                 case TURN_TIMER_EXP:
+
                     nextState = NoSubService;
                     makeTransition = TRUE;
                     ThisEvent.EventType = FOUND_BOX;
                     break;
                 case ES_EXIT:
+                    ES_Timer_StopTimer(MotionTimer);
+                    ES_Timer_StopTimer(AnotherTimer);
                     stop();
                     break;
                 default:
@@ -310,4 +322,6 @@ uint8_t robot_forward_2(void) {
     Robot_RightMtrSpeed(-50);
     return 0;
 }
+
+
 

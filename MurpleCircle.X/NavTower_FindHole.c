@@ -70,6 +70,7 @@ static const char *StateNames[] = {
 
 static SubHSMState_t CurrentState = InitPSubState; // initial state
 uint8_t StartFindHole;
+uint8_t RevFlag;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -138,6 +139,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 StartFindHole = 0;
+                RevFlag = 0;
             }
             break;
 //        case Reverse:
@@ -164,9 +166,9 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
             if (ThisEvent.EventType == ES_ENTRY) {
                 //state entry
                 ES_Timer_StopTimer(MotionTimer);
-                Robot_LeftMtrSpeed(-60);
-                Robot_RightMtrSpeed(-60);
-                ES_Timer_InitTimer(TurnTimer, 300);
+                Robot_LeftMtrSpeed(-50);
+                Robot_RightMtrSpeed(-50);
+                ES_Timer_InitTimer(TurnTimer, 250);
             }
             if (ThisEvent.EventType == TURN_TIMER_EXP) {
                 Robot_LeftMtrSpeed(95);
@@ -248,6 +250,7 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
                 ES_Timer_InitTimer(MotionTimer, FIND_HOLE_BACK_PIVOT_TIME);
             }
             if (ThisEvent.EventType == MOTION_TIMER_EXP) {
+                RevFlag = 0;
                 nextState = Backwards;
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
@@ -303,7 +306,13 @@ ES_Event RunFindHole(ES_Event ThisEvent) {
                 //state entry
                 Robot_LeftMtrSpeed(FIND_HOLE_REVERSE_L);
                 Robot_RightMtrSpeed(FIND_HOLE_REVERSE_R);
-                ES_Timer_InitTimer(MotionTimer, FINDHOLE_REVERSE_TIME);
+                if (RevFlag == 0) {
+                    ES_Timer_InitTimer(MotionTimer, FINDHOLE_REVERSE_TIME);
+                    RevFlag = 1;
+                } else {
+                    ES_Timer_InitTimer(MotionTimer, FINDHOLE_FORWARD_TIME);
+                }
+                
             }
             if (ThisEvent.EventType == MOTION_TIMER_EXP) {
                 nextState = Forward;
