@@ -75,6 +75,10 @@
 #define FIND_HOLE_REVERSE_L -60
 #define FIND_HOLE_REVERSE_R -65
 
+#define SHOOTER_TAPE_WHITE 200
+#define SHOOTER_TAPE_BLACK 400
+#define SHOOTER_TAPE_ENVIRON 600
+
 /*******************************************************************************
  * PUBLIC TYPEDEFS                                                             *
  ******************************************************************************/

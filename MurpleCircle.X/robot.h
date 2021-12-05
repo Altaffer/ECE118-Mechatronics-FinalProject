@@ -190,6 +190,6 @@ int Robot_StartServo(unsigned short int pulseTime);
 
 int Robot_StopServo(void);
 
-unsigned char Robot_ReadShooterTape(void);
+uint32_t Robot_ReadShooterTape(void);
 
 #endif
