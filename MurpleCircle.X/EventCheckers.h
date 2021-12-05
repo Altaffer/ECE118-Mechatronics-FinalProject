@@ -68,6 +68,8 @@ uint8_t BeaconEventChecker(void);
 
 uint8_t PingEventChecker(void);
 
+uint8_t ShooterEventChecker(void);
+
 
 
 #endif	/* TEMPLATEEVENTCHECKER_H */

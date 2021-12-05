@@ -32,6 +32,7 @@
 #define PING_MAX 700
 #define SHOOTER 48 //0b 11 0000
 #define BOTTOM 15 //0b 00 1111
+#define MOVING_WINDOW_SIZE 5
 
 //comment this out if you don't want to consider prev values for the track wire's
 //   hysteresis bounds
@@ -305,6 +306,38 @@ uint8_t PingEventChecker(void) {
         SaveEvent(thisEvent);
 #endif   
     }
+    return (returnVal);
+}
+    
+uint8_t ShooterEventChecker(void) {
+    ES_Event thisEvent;
+    ES_EventTyp_t currentEvent = ES_NO_EVENT;
+    static uint32_t past_time = 0;
+    static int8_t tape_counter = 0;
+    uint32_t curr_time = ES_Timer_GetTime();
+    uint32_t curr_tape = Robot_ReadShooterTape();
+    uint8_t returnVal = (FALSE);
+    if (curr_time > past_time + 1000) {
+        if (curr_tape > SHOOTER_TAPE_WHITE &&
+                curr_tape < SHOOTER_TAPE_BLACK) {
+            tape_counter = tape_counter < MOVING_WINDOW_SIZE? tape_counter +1 : tape_counter;
+        } else if (curr_tape < SHOOTER_TAPE_WHITE) {
+            tape_counter = tape_counter > 0? tape_counter -1 : tape_counter;
+        }
+        past_time = curr_time;
+        
+    }
+    if (tape_counter >= MOVING_WINDOW_SIZE) {
+        currentEvent = FOUND_BOX;
+        tape_counter = 0;
+        thisEvent.EventType = currentEvent; 
+        thisEvent.EventParam = 0;
+        PostTopLevel(thisEvent);
+        returnVal = (TRUE);
+    }
+    //printf("%d ", tape_counter);
+    
+    
     return (returnVal);
 }
 /* 

@@ -71,11 +71,13 @@ uint8_t robot_forward_2(void);
 
 static SubHSMState_t CurrentState = InitPSubState; // initial state
 
+
 uint8_t StartWallHug;
 uint8_t CornerFlag;
 
 #define F_CENTER_TAPE 0b000001
 #define F_RIGHT_TAPE 0b000100
+
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -127,6 +129,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
     if (StartWallHug) {
         CurrentState = NoSubService;
     }
+
     //    if (ThisEvent.EventType == BOT_BT_CHANGED) {
     //        ThisEvent.EventType = ES_NO_EVENT;
     //    }

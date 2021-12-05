@@ -186,7 +186,7 @@ static const char *EventNames[] = {
 
 /****************************************************************************/
 // This is the list of event checking functions
-#define EVENT_CHECK_LIST  TapeSensorEventChecker, BeaconEventChecker, TrackWireEventChecker
+#define EVENT_CHECK_LIST  TapeSensorEventChecker, BeaconEventChecker, TrackWireEventChecker, ShooterEventChecker
 
 /****************************************************************************/
 // These are the definitions for the post functions to be executed when the
