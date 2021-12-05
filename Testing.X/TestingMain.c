@@ -40,9 +40,9 @@
 //#define MOTOR_TEST
 //#define BUMPER_TEST
 //#define BUMPER_TEST
-//#define TAPE_SENSOR_TEST
+#define TAPE_SENSOR_TEST
 //#define BEACON_TEST
-#define SERVO_TEST
+//#define SERVO_TEST
 //#define SERVO_TEST
 //#define PING_SENSOR_TEST
 
@@ -75,7 +75,7 @@ int main(void) {
     RC_AddPins(SERVO_PIN);
     int currentTapeValue1 = 0;
     int currentTapeValue2 = 0;
-    uint8_t tapeSensorParam = 0;
+    uint16_t tapeSensorParam = 0;
     uint8_t currentBumperValue = 0;
     int currentBeaconValue = 0;
 
@@ -92,7 +92,8 @@ int main(void) {
         //        currentTapeValue2 = TAPE_SENSOR_2;
         //        printf("\nTape Sensor Value 1 = %d \n\r", currentTapeValue1);
         //        printf("\nTape Sensor Value 2 = %d \n\r", currentTapeValue2);
-        tapeSensorParam = Robot_ReadTapeSensors();
+        tapeSensorParam = Robot_ReadShooterTape();
+//        tapeSensorParam = Robot_ReadTapeSensors();
         printf("\nTape Sensor Param = %d \n\r", tapeSensorParam);
 
 #endif
