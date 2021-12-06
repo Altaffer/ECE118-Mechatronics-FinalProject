@@ -29,7 +29,7 @@
 //#define FWD_speed 100
 #define BCKWD_speed -75 
 #define STOP_speed 0    // stopping
-#define RIGHT_WHEEL_OFFSET 16
+#define RIGHT_WHEEL_OFFSET 20
 
 #define LTANK_L -80     // tank turns
 #define LTANK_R 80

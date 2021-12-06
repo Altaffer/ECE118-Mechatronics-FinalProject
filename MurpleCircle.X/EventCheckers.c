@@ -33,6 +33,7 @@
 #define SHOOTER 48 //0b 11 0000
 #define BOTTOM 15 //0b 00 1111
 #define MOVING_WINDOW_SIZE 5
+#define SHOOTER_CHECK_INTERVAL 1000
 
 //comment this out if you don't want to consider prev values for the track wire's
 //   hysteresis bounds
@@ -317,9 +318,11 @@ uint8_t ShooterEventChecker(void) {
     uint32_t curr_time = ES_Timer_GetTime();
     uint32_t curr_tape = Robot_ReadShooterTape();
     uint8_t returnVal = (FALSE);
-    if (curr_time > past_time + 1000) {
-        if (curr_tape > SHOOTER_TAPE_WHITE &&
-                curr_tape < SHOOTER_TAPE_BLACK) {
+    //printf("%d ", curr_tape);
+    if (curr_time > past_time + SHOOTER_CHECK_INTERVAL) {
+//        if (curr_tape > SHOOTER_TAPE_WHITE &&
+//                curr_tape < SHOOTER_TAPE_BLACK) {
+        if (curr_tape > SHOOTER_TAPE_BLACK && curr_tape < SHOOTER_TAPE_ENVIRON) {
             tape_counter = tape_counter < MOVING_WINDOW_SIZE? tape_counter +1 : tape_counter;
         } else if (curr_tape < SHOOTER_TAPE_WHITE) {
             tape_counter = tape_counter > 0? tape_counter -1 : tape_counter;

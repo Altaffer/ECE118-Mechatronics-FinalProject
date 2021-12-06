@@ -37,7 +37,7 @@
 #define TAPE_SENSOR_3 PORTX05_BIT
 #define TAPE_SENSOR_4 PORTX06_BIT
 #define TAPE_SENSOR_5 PORTX09_BIT
-#define TAPE_SENSOR_6 PORTX08_BIT
+#define TAPE_SENSOR_6 PORTW08_BIT
 
 #define PING_PIN PORTW03_BIT 
 #define PING_TRIG PORTW07_BIT
@@ -45,7 +45,7 @@
 #define BEACON_PIN PORTX10_BIT
 #define BEACON_TRIS PORTX10_TRIS
 #define TRACK_WIRE_PIN AD_PORTV8
-#define TAPE_SENSOR_PIN AD_PORTW8
+//#define TAPE_SENSOR_PIN AD_PORTW8 // not using analog anymore 
 #define SHOOTER_SERVO RC_PORTY06
 
 #define TAPE_SENSOR_1_TRIS PORTX03_TRIS
@@ -53,7 +53,7 @@
 #define TAPE_SENSOR_3_TRIS PORTX05_TRIS
 #define TAPE_SENSOR_4_TRIS PORTX06_TRIS
 #define TAPE_SENSOR_5_TRIS PORTX09_TRIS
-#define TAPE_SENSOR_6_TRIS PORTX08_TRIS
+#define TAPE_SENSOR_6_TRIS PORTW08_TRIS
 
 #define HALL_FRONT_LEFT _RB8 // V07
 //#define HALL_FRONT_RIGHT _RD9 // V08 I don't think this pin works so I moved
@@ -193,7 +193,7 @@ void Robot_Init(void) {
     //while (1);
 
     //Initialize the light sensor
-    AD_AddPins(TAPE_SENSOR_PIN);
+//    AD_AddPins(TAPE_SENSOR_PIN);
     AD_AddPins(TRACK_WIRE_PIN);
     AD_Init();
     RC_Init();
@@ -425,8 +425,8 @@ unsigned char Robot_ReadTapeSensors(void) {
 }
 
 uint32_t Robot_ReadShooterTape(void) {
-    //return (TAPE_SENSOR_5 + ((TAPE_SENSOR_6) << 1));
-    return AD_ReadADPin(TAPE_SENSOR_PIN);
+    return (TAPE_SENSOR_5 + ((TAPE_SENSOR_6) << 1));
+//    return AD_ReadADPin(TAPE_SENSOR_PIN);
 }
 //#define ROBOT_TEST
 //#ifdef ROBOT_TEST

@@ -130,9 +130,9 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
         CurrentState = NoSubService;
     }
 
-    //    if (ThisEvent.EventType == BOT_BT_CHANGED) {
-    //        ThisEvent.EventType = ES_NO_EVENT;
-    //    }
+        if (ThisEvent.EventType == BOT_BT_CHANGED) {
+            ThisEvent.EventType = ES_NO_EVENT;
+        }
     switch (CurrentState) {
         case InitPSubState: // If current state is initial Psedudo State
             if (ThisEvent.EventType == ES_INIT)// only respond to ES_Init
@@ -214,7 +214,7 @@ ES_Event RunWallHug(ES_Event ThisEvent) {
                     break;
                 case ANOTHER_TIMER_EXP:
                     //CornerFlag = 1;
-                    turnBot(100,-50); // even larger angle
+                    turnBot(90,-50); // even larger angle
                     break;
                     break;
                 case BOT_BT_CHANGED:

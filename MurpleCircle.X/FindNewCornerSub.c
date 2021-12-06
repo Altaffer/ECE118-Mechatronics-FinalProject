@@ -76,6 +76,7 @@ uint8_t TankTurnFlag;
 uint8_t CenterScanFlag;
 int8_t TwoCornersCounter;
 int8_t TwoCornersCounter_Right;
+int8_t LongTurn;
 
 /*******************************************************************************
  * PUBLIC FUNCTIONS                                                            *
@@ -127,6 +128,10 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
     if (StartFindNewCorner) {
         CurrentState = NoSubService;
     }
+    if (ThisEvent.EventType == ANOTHER_TIMER_EXP) {
+        LongTurn = 1;
+        ThisEvent.EventType = ES_NO_EVENT;
+    }
 
     switch (CurrentState) {
         case InitPSubState: // If current state is initial Psedudo State
@@ -147,6 +152,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 TwoCornersCounter_Right = 0;
                 TankTurnFlag = 0;
                 CenterScanFlag = 0;
+                LongTurn = 0;
             }
             break;
         case TankTurn:
@@ -239,7 +245,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                     turnBot(LGRAD_L, LGRAD_R);
                     ES_Timer_InitTimer(MotionTimer, ABRUPT_TURN_TIME);
                     
-                    ES_Timer_InitTimer(AnotherTimer, 2000);
+                    //ES_Timer_InitTimer(AnotherTimer, 2000);
                     break;
                 case MOTION_TIMER_EXP:
                     turnBot(-30, LPIVOT_R);
@@ -249,20 +255,28 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 case TURN_TIMER_EXP:
                     if (TwoCornersCounter == -1) {
                         TwoCornersCounter++;
+                        ES_Timer_InitTimer(AnotherTimer, 9000);
                     } else if (TwoCornersCounter == 0){
                         ES_Timer_StopTimer(AnotherTimer);
-                        TwoCornersCounter++;
-                        turnBot(-90,90);
-                        ES_Timer_InitTimer(TurnTimer, 800);
+                        if (LongTurn == 0) {
+                            ThisEvent.EventType = SCAN_AT_CORNER;
+                            break;
+                        } else {
+                            TwoCornersCounter++;
+                        }
+                        
+                        
+                        turnBot(-80,80);
+                        ES_Timer_InitTimer(TurnTimer, 700);
                         ThisEvent.EventType = ES_NO_EVENT;
                     } else if (TwoCornersCounter == 1) {
                         TwoCornersCounter++;
                         goForward();
-                        ES_Timer_InitTimer(TurnTimer, 800);
+                        ES_Timer_InitTimer(TurnTimer, 1500);
                         ThisEvent.EventType = ES_NO_EVENT;
                     } else if (TwoCornersCounter == 2) {
                         TwoCornersCounter++;
-                        turnBot(90,-60);
+                        turnBot(70,-60);
                         ES_Timer_InitTimer(TurnTimer, 1000);
                         ThisEvent.EventType = ES_NO_EVENT;
                     } else if (TwoCornersCounter == 3) {
@@ -272,11 +286,15 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                         TwoCornersCounter = -1;
                     }
                     break;
-                case ANOTHER_TIMER_EXP:
-                    TwoCornersCounter = -1;
-                    nextState = AlignRight;
-                    makeTransition = TRUE;
-                    ThisEvent.EventType = ES_NO_EVENT;
+//                case ANOTHER_TIMER_EXP:
+////                    ThisEvent.EventType = SCAN_AT_CORNER;
+//                    ThisEvent.EventType = ES_NO_EVENT;
+//                    CenterScanFlag = 1;
+//                    break;
+//                    TwoCornersCounter = -1;
+//                    nextState = AlignRight;
+//                    makeTransition = TRUE;
+//                    ThisEvent.EventType = ES_NO_EVENT;
                 case BOT_BT_CHANGED:
                     if ((ThisEvent.EventParam & (F_CENTER_TAPE)) && (TwoCornersCounter <1)) {
                         nextState = MoveForward;
@@ -289,7 +307,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 case ES_EXIT:
                     ES_Timer_StopTimer(TurnTimer);
                     ES_Timer_StopTimer(MotionTimer);
-                    ES_Timer_StopTimer(AnotherTimer);
+                    //ES_Timer_StopTimer(AnotherTimer);
                     stop();
                     break;
             }
@@ -315,11 +333,15 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                 case TURN_TIMER_EXP:
                     if (TwoCornersCounter_Right == 0){
                         TwoCornersCounter_Right++;
-                        
+                        CenterScanFlag = 0;
+                        //LongTurn = 0;
                         ThisEvent.EventType = ES_NO_EVENT;
                     } else {
                         //ThisEvent.EventType = FOUND_NEW_CORNER;
-                        ThisEvent.EventType = SCAN_AT_CORNER;
+                        stop();
+                        ThisEvent.EventType = FOUND_NEW_CORNER;
+                        nextState = NoSubService;
+                        makeTransition = TRUE;
                         CenterScanFlag = 1;
                         TwoCornersCounter_Right = 0;
                     }
@@ -327,7 +349,7 @@ ES_Event RunFindNewCorner(ES_Event ThisEvent) {
                     //ThisEvent.EventType = ES_NO_EVENT;
                     break;
                 case BOT_BT_CHANGED:
-                    if (ThisEvent.EventParam & (F_CENTER_TAPE)) {
+                    if ((ThisEvent.EventParam & (F_CENTER_TAPE))) {
                         nextState = MoveForward;
                         makeTransition = TRUE;
                         ThisEvent.EventType = ES_NO_EVENT;

@@ -111,21 +111,30 @@ ES_Event RunTapeService(ES_Event ThisEvent) {
                 PostTopLevel(ReturnEvent);//can be any wrapper function
             }
             //changed_bits = curr_status_shooter ^ past_status_shooter;
-            if (curr_status_shooter > SHOOTER_TAPE_WHITE 
-                    && curr_status_shooter < SHOOTER_TAPE_BLACK
-                    && past_status_shooter < SHOOTER_TAPE_WHITE) {
+//            if (curr_status_shooter > SHOOTER_TAPE_WHITE 
+//                    && curr_status_shooter < SHOOTER_TAPE_BLACK
+//                    && past_status_shooter < SHOOTER_TAPE_WHITE) {
+//            
+////            if (curr_status_shooter < SHOOTER_TAPE_BLACK && past_status_shooter > SHOOTER_TAPE_BLACK) {
+////                ;
+////                
+////            } else if (curr_shooter > SHOOTER_TAPE_BLACK) {
+//                ReturnEvent.EventType = SHOOTER_BT_CHANGED;
+//                ReturnEvent.EventParam = curr_shooter;
+//                past_status_shooter = curr_status_shooter;
+//                PostTopLevel(ReturnEvent);//can be any wrapper function
+////            } else if (past_status_shooter > SHOOTER_TAPE_WHITE 
+////                    && curr_status_shooter < SHOOTER_TAPE_WHITE) {
+//            } else {
+//                past_status_shooter = curr_status_shooter;
+//            }
+            if (curr_status_shooter == past_status_shooter) {
+                ;
+            } else {
                 ReturnEvent.EventType = SHOOTER_BT_CHANGED;
                 ReturnEvent.EventParam = curr_status_shooter;
-                past_status_shooter = curr_status_shooter;
                 PostTopLevel(ReturnEvent);//can be any wrapper function
             }
-//            if (curr_status_shooter == past_status_shooter) {
-//                ;
-//            } else {
-//                ReturnEvent.EventType = SHOOTER_BT_CHANGED;
-//                ReturnEvent.EventParam = curr_status_shooter;
-//                PostTopLevel(ReturnEvent);//can be any wrapper function
-//            }
             
             //printf("ES_TIMEOUT2\r\n");
 //            if (changed_bits & SHOOTER) {
@@ -140,7 +149,7 @@ ES_Event RunTapeService(ES_Event ThisEvent) {
 //                PostTopLevel(ReturnEvent);//can be any wrapper function
 //            }
             past_status = curr_status;
-            
+            past_status_shooter = curr_status_shooter;            
             break;
         default:
             break;

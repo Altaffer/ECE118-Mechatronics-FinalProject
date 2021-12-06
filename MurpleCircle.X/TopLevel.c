@@ -324,6 +324,9 @@ ES_Event RunTopLevel(ES_Event ThisEvent) {
                     break;
                 case ES_EXIT:
                     stop();
+                    ES_Timer_StopTimer(AnotherTimer);
+                    ES_Timer_StopTimer(MotionTimer);
+                    ES_Timer_StopTimer(TurnTimer);
                 case ES_NO_EVENT:
                 default:
                     break;

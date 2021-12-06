@@ -30,12 +30,12 @@
 /*******************************************************************************
  * PUBLIC #DEFINES                                                             *
  ******************************************************************************/
-#define TIMER_90 550
+#define TIMER_90 650
 #define BOT_MIDDLE_TIME 400
 #define BUMPER_TIME 100
 #define TIMER_360 (TIMER_90 * 4)
 
-#define TW_UPPER_BOUND 630//TW = Track Wire
+#define TW_UPPER_BOUND 640//TW = Track Wire
 #define TW_LOWER_BOUND 400
 
 #define FINDHOLE_EXPIRE_TIME 2000//forward too much - go reverse
@@ -65,19 +65,20 @@
 #define FIND_HOLE_BACK_PIVOT_L 50
 #define FIND_HOLE_BACK_PIVOT_R -70
 
-#define FINDHOLE_FORWARD_TIME 2000 
+#define FINDHOLE_FORWARD_TIME 1400 
 #define FIND_HOLE_FORWARD_L 60
 #define FIND_HOLE_FORWARD_R 56
 
 
 
-#define FINDHOLE_REVERSE_TIME 550
+#define FINDHOLE_REVERSE_TIME 450
 #define FIND_HOLE_REVERSE_L -60
 #define FIND_HOLE_REVERSE_R -65
 
-#define SHOOTER_TAPE_WHITE 500
-#define SHOOTER_TAPE_BLACK 950
-//#define SHOOTER_TAPE_ENVIRON 950
+#define SHOOTER_TAPE_WHITE 700
+//#define SHOOTER_TAPE_BLACK 950
+#define SHOOTER_TAPE_BLACK 800
+#define SHOOTER_TAPE_ENVIRON 1000
 #define BLACK_BOX_TIME 5000
 
 /*******************************************************************************

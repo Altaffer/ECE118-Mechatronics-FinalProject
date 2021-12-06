@@ -127,10 +127,21 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
             break;
         case NoSubService: /* After initialzing or executing, it sits here for the next 
                               time it gets called. */
+//            if (ThisEvent.EventType == ES_ENTRY)// only respond to ES_Init
+//            {
+//                ;
+//            }
             if (StartScan)// only respond to an actual event
             {
                 nextState = Turn;
-                ES_Timer_InitTimer(MotionTimer, SCAN_TURN_TIME/StartScan); //turn 360
+                if (StartScan == 1) {
+                    CCW_Turn();
+                    ES_Timer_InitTimer(MotionTimer, SCAN_TURN_TIME); //turn 360
+                } else {
+                    CW_Turn();
+                    ES_Timer_InitTimer(MotionTimer, SCAN_TURN_TIME - (StartScan-1) * 1000); //turn 360
+                }
+                
                 makeTransition = TRUE;
                 ThisEvent.EventType = ES_NO_EVENT;
                 StartScan = 0;
@@ -145,14 +156,14 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
 //    }
                 case BOT_BT_CHANGED:
                     if (ThisEvent.EventParam & 1){
-                        ES_Timer_InitTimer(MotionTimer, 1000);
+                        ES_Timer_InitTimer(AnotherTimer, 1200);
                         turnBot(-80,-80);
                     }
                     ThisEvent.EventType = ES_NO_EVENT;
                 case ES_ENTRY:
                     curr_status = TURNING;
-                    CCW_Turn();
-                    ES_Timer_StartTimer(MotionTimer);
+                    
+                    //ES_Timer_StartTimer(MotionTimer);
                     break;
                 case FOUND_BEACON:
                     stop();
@@ -183,8 +194,16 @@ ES_Event RunScanForBeacon(ES_Event ThisEvent) {
                     // do we need to consider the case that this expires in the
                     // find ping state? (maybe no)
                     break;
-                case ES_EXIT:
+                case ANOTHER_TIMER_EXP:
+                    nextState = Turn;
+                    makeTransition = TRUE;
+                    ThisEvent.EventType = ES_NO_EVENT;
+                    CCW_Turn();
                     ES_Timer_StopTimer(MotionTimer);
+                    ES_Timer_InitTimer(MotionTimer, SCAN_TURN_TIME);
+                    break;
+                case ES_EXIT:
+                    //ES_Timer_StopTimer(MotionTimer);
                 default:
                     break;
             }
